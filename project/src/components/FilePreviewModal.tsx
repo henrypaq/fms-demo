@@ -1,0 +1,594 @@
+import React, { useState, memo } from 'react';
+
+import { 
+  X, 
+  Download, 
+  Star, 
+  Edit3, 
+  Calendar, 
+  HardDrive, 
+  Tag, 
+  User,
+  FileText,
+  Image,
+  Video,
+  Music,
+  Archive,
+  File,
+  Save,
+  Link,
+  Copy,
+  Play,
+  Pause,
+  MessageSquare,
+  Info
+} from 'lucide-react';
+import { FileItem } from './FileCard';
+import { supabase } from '../lib/supabase';
+import AutoTaggingButton from './AutoTaggingButton';
+import TagInput from './TagInput';
+import VideoPlayer from './VideoPlayer';
+
+interface FilePreviewModalProps {
+  file: FileItem | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onUpdate?: (fileId: string, updates: Partial<FileItem>) => void;
+  onToggleFavorite?: (fileId: string) => void;
+  userRole?: 'admin' | 'employee';
+  isPreviewMode?: boolean;
+}
+
+const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
+  file,
+  isOpen,
+  onClose,
+  onUpdate,
+  onToggleFavorite,
+  userRole = 'admin',
+  isPreviewMode = false
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState('');
+  const [editedTags, setEditedTags] = useState<string[]>([]);
+  const [editedFileUrl, setEditedFileUrl] = useState('');
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [activeTab, setActiveTab] = useState<'comments' | 'fields'>('comments');
+  const [commentText, setCommentText] = useState('');
+  const [videoCurrentTime, setVideoCurrentTime] = useState(0);
+  const [showTimestamp, setShowTimestamp] = useState(true);
+
+  // Check permissions
+  const canEdit = userRole === 'admin';
+  const canEditTags = userRole === 'admin';
+
+  React.useEffect(() => {
+    if (file) {
+      setEditedName(file.name);
+      setEditedTags(file.tags || []);
+      setEditedFileUrl(file.fileUrl || '');
+    }
+  }, [file]);
+
+
+  // Prevent drag operations on the modal content
+  const handleDragStart = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  if (!isOpen || !file) return null;
+
+  const getFileIcon = (type: FileItem['type']) => {
+    const iconClass = "w-12 h-12";
+    switch (type) {
+      case 'document':
+        return <FileText className={`${iconClass} text-blue-400`} />;
+      case 'image':
+        return <Image className={`${iconClass} text-green-400`} />;
+      case 'video':
+        return <Video className={`${iconClass} text-purple-400`} />;
+      case 'audio':
+        return <Music className={`${iconClass} text-orange-400`} />;
+      case 'archive':
+        return <Archive className={`${iconClass} text-yellow-400`} />;
+      default:
+        return <File className={`${iconClass} text-slate-400`} />;
+    }
+  };
+
+  const getFileUrl = () => {
+    if (file.fileUrl) return file.fileUrl;
+    
+    // Generate Supabase public URL
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    return `${supabaseUrl}/storage/v1/object/public/files/${file.filePath}`;
+  };
+
+  const handleDownload = async () => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('files')
+        .download(file.filePath);
+
+      if (error) throw error;
+
+      const url = URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.originalName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download error:', error);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!onUpdate) return;
+
+    try {
+      await onUpdate(file.id, {
+        name: editedName,
+        tags: editedTags,
+        fileUrl: editedFileUrl || undefined
+      });
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Update error:', error);
+    }
+  };
+
+  const handleCopyFileUrl = async () => {
+    if (!file.fileUrl) return;
+
+    try {
+      await navigator.clipboard.writeText(file.fileUrl);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy URL:', error);
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      const fileUrl = getFileUrl();
+      if (navigator.share) {
+        await navigator.share({
+          title: file.name,
+          text: `Check out this file: ${file.name}`,
+          url: fileUrl
+        });
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(fileUrl);
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      }
+    } catch (error) {
+      console.error('Share failed:', error);
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(getFileUrl());
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      } catch (clipboardError) {
+        console.error('Clipboard copy failed:', clipboardError);
+      }
+    }
+  };
+
+  const handleTagsUpdated = (newTags: string[]) => {
+    if (onUpdate) {
+      onUpdate(file.id, { tags: newTags });
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const formatTime = (seconds: number) => {
+    if (!seconds || isNaN(seconds)) return '00:00:00:00';
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    const ms = Math.floor((seconds % 1) * 100);
+    
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}:${ms.toString().padStart(2, '0')}`;
+  };
+
+  const handleVideoTimeUpdate = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.currentTarget;
+    setCurrentTime(video.currentTime);
+    setDuration(video.duration || 0);
+  };
+
+  const handleVideoPlay = () => setIsPlaying(true);
+  const handleVideoPause = () => setIsPlaying(false);
+
+  return (
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-dark-surface rounded-2xl border border-dark-surface/50 w-full max-w-[calc(100vw-4rem)] max-h-[calc(100vh-4rem)] overflow-hidden shadow-2xl relative"
+        draggable={false}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Top Header with Path, Filename, and Share */}
+        <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+          {/* Left: Path and Filename */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center space-x-2 text-sm text-slate-400 mb-1">
+              <span>Projects</span>
+              <span>/</span>
+              <span>Current Project</span>
+              <span>/</span>
+              <span>Media</span>
+            </div>
+          <div className="flex items-center space-x-3">
+              <h1 className="text-2xl font-bold text-white truncate">{file.name}</h1>
+            {file.isFavorite && (
+                <Star className="w-6 h-6 text-yellow-400 fill-current flex-shrink-0" />
+            )}
+          </div>
+          </div>
+          
+          {/* Right: Share Button and Close */}
+          <div className="flex items-center space-x-3">
+              <button
+              onClick={handleShare}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                copySuccess 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+              }`}
+            >
+              <Link className="w-4 h-4" />
+              <span>{copySuccess ? 'Copied!' : 'Share'}</span>
+              </button>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors duration-200"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex h-[calc(100vh-200px)]">
+          {/* Main Preview Area - Much Larger */}
+          <div className="flex-1 flex items-center justify-center bg-slate-900/30 p-6 pb-8">
+            <div className="w-full h-full flex items-center justify-center">
+              {file.type === 'image' ? (
+                <img
+                  src={file.thumbnail || getFileUrl()}
+                  alt={file.name}
+                  className="w-full h-full object-contain rounded-xl shadow-2xl"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    if (target.src !== getFileUrl()) {
+                      target.src = getFileUrl();
+                    }
+                  }}
+                />
+              ) : file.type === 'video' ? (
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <VideoPlayer
+                    src={getFileUrl()}
+                    poster={file.thumbnail}
+                    className="w-full h-full rounded-xl shadow-2xl"
+                    showTimer={true}
+                    onTimeUpdate={setVideoCurrentTime}
+                  />
+                </div>
+              ) : file.thumbnail ? (
+                <img
+                  src={file.thumbnail}
+                  alt={file.name}
+                  className="w-full h-full object-contain rounded-xl shadow-2xl"
+                />
+              ) : (
+                <div className="text-center">
+                  {getFileIcon(file.type)}
+                  <p className="text-slate-400 mt-4 text-lg font-medium">{file.originalName}</p>
+                  <p className="text-slate-500 text-sm mt-2">No preview available</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Sidebar - Two Sections with Tab Buttons */}
+          <div className="w-80 border-l border-slate-700/50 flex flex-col">
+            {/* Tab Buttons - Like in the image */}
+            <div className="flex border-b border-slate-700/50 p-2">
+              <button
+                onClick={() => setActiveTab('comments')}
+                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-2 ${
+                  activeTab === 'comments'
+                    ? 'bg-[#262626] text-light-text' // Active style from image
+                    : 'text-light-text/70 hover:bg-[#171717]' // Inactive style from image
+                }`}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Comments</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('fields')}
+                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-2 ${
+                  activeTab === 'fields'
+                    ? 'bg-[#262626] text-light-text' // Active style from image
+                    : 'text-light-text/70 hover:bg-[#171717]' // Inactive style from image
+                }`}
+              >
+                <Info className="w-4 h-4" />
+                <span>Fields</span>
+              </button>
+            </div>
+
+            {/* Content based on active tab */}
+            {activeTab === 'comments' ? (
+              <div className="flex-1 p-6 overflow-y-auto flex flex-col">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-white">Comments</h3>
+                </div>
+                <div className="space-y-4 flex-1">
+                  {/* Placeholder for comments - not functional yet */}
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <User className="w-6 h-6 text-slate-400" />
+                    </div>
+                    <p className="text-slate-400 text-sm">No comments yet</p>
+                    <p className="text-slate-500 text-xs mt-1">Be the first to add a comment</p>
+                  </div>
+                </div>
+                
+                {/* Comment Input within sidebar */}
+                <div className="mt-4 pt-4 border-t border-slate-700/50">
+                  <div className="space-y-2">
+                    {/* Comment Input Field with Timer */}
+                    <div className="flex items-center w-full">
+                      {/* Video Timer (only for videos and when enabled) - positioned at start */}
+                      {file.type === 'video' && showTimestamp && (
+                        <div className="bg-amber-900/80 text-amber-200 px-2 py-1 rounded text-xs font-mono tracking-wider flex-shrink-0 mr-2" style={{fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace'}}>
+                          {formatTime(videoCurrentTime)}
+                        </div>
+                      )}
+                      
+                      <input
+                        type="text"
+                        placeholder="Leave your comment..."
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        className="flex-1 min-w-0 bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && commentText.trim()) {
+                            // TODO: Handle comment submission
+                            console.log('Comment:', commentText, file.type === 'video' ? `at ${formatTime(videoCurrentTime)}` : '');
+                            setCommentText('');
+                          }
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Action Icons and Controls */}
+                    <div className="flex items-center justify-between">
+                      {/* Timestamp Toggle Button */}
+                      <button 
+                        onClick={() => setShowTimestamp(!showTimestamp)}
+                        className={`transition-colors duration-200 ${showTimestamp ? 'text-amber-400 hover:text-amber-300' : 'text-gray-400 hover:text-gray-300'}`} 
+                        title={showTimestamp ? "Hide timestamp" : "Show timestamp"}
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                      
+                      {/* Send Button */}
+                      <button
+                        onClick={() => {
+                          if (commentText.trim()) {
+                            // TODO: Handle comment submission
+                            console.log('Comment:', commentText, file.type === 'video' ? `at ${formatTime(videoCurrentTime)}` : '');
+                            setCommentText('');
+                          }
+                        }}
+                        className="bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-lg transition-colors duration-200"
+                        title="Send comment"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 p-6 overflow-y-auto">
+                <h3 className="text-lg font-semibold text-white mb-4">File Details</h3>
+                <div className="space-y-4">
+              {/* File Name */}
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">
+                  File Name
+                </label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={editedName}
+                    onChange={(e) => setEditedName(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                ) : (
+                  <p className="text-white font-medium">{file.name}</p>
+                )}
+              </div>
+
+              {/* Original Name */}
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">
+                  Original Name
+                </label>
+                    <p className="text-slate-300 text-sm">{file.originalName}</p>
+              </div>
+
+                  {/* File Type & Size */}
+                  <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">
+                    Type
+                  </label>
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-600 text-white">
+                    {file.type.charAt(0).toUpperCase() + file.type.slice(1)}
+                  </span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">
+                        Size
+                  </label>
+                      <p className="text-slate-300 text-sm">{file.size}</p>
+                </div>
+              </div>
+
+              {/* Upload Date */}
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">
+                  <Calendar className="w-4 h-4 inline mr-1" />
+                  Last Modified
+                </label>
+                    <p className="text-slate-300 text-sm">{file.modifiedDate}</p>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-slate-400">
+                    <Tag className="w-4 h-4 inline mr-1" />
+                    Tags
+                  </label>
+                  {!isEditing && canEditTags && (
+                    <AutoTaggingButton
+                      fileId={file.id}
+                      currentTags={file.tags || []}
+                      onTagsUpdated={handleTagsUpdated}
+                      className="text-xs"
+                    />
+                  )}
+                </div>
+                {isEditing && canEditTags ? (
+                  <TagInput
+                    tags={editedTags}
+                    onTagsChange={setEditedTags}
+                    placeholder="Add tag..."
+                  />
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {file.tags && file.tags.length > 0 ? (
+                      file.tags.map((tag) => (
+                        <span
+                          key={tag}
+                              className="inline-flex items-center px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))
+                    ) : (
+                      <p className="text-slate-500 text-sm">No tags</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+                  <div className="pt-4 border-t border-slate-700/50 space-y-3">
+                {isEditing ? (
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={handleSave}
+                          className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200 text-sm"
+                    >
+                      <Save className="w-4 h-4" />
+                          <span>Save</span>
+                    </button>
+                    <button
+                      onClick={() => setIsEditing(false)}
+                          className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors duration-200 text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                      <div className="space-y-2">
+                  <button
+                    onClick={handleDownload}
+                          className="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200 text-sm"
+                  >
+                    <Download className="w-4 h-4" />
+                          <span>Download</span>
+                        </button>
+                        {canEdit && !isPreviewMode && (
+                          <button
+                            onClick={() => setIsEditing(!isEditing)}
+                            className="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors duration-200 text-sm"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                            <span>Edit Details</span>
+                  </button>
+                        )}
+                      </div>
+                )}
+              </div>
+
+              {/* Permission Notice for Employees */}
+              {userRole === 'employee' && !isPreviewMode && (
+                    <div className="pt-4 border-t border-slate-700/50">
+                  <div className="bg-slate-700/50 rounded-lg p-3">
+                    <p className="text-xs text-slate-400">
+                      <User className="w-3 h-3 inline mr-1" />
+                      Employee account: Limited permissions. Contact an admin for additional file management options.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+            )}
+        </div>
+        </div>
+
+      </div>
+    </div>
+  );
+});
+
+FilePreviewModal.displayName = 'FilePreviewModal';
+
+export default FilePreviewModal;
