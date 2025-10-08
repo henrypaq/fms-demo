@@ -266,16 +266,11 @@ function AppContentWithWorkspace({
   const [sidebarData, setSidebarData] = useState<any>(null);
   
   // Debug: Log when sidebarData changes
+  // Monitor sidebar data updates (debug only when needed)
   React.useEffect(() => {
-    console.log('📥 App.tsx received sidebarData update:', sidebarData ? {
-      folderTreeLength: sidebarData.folderTree?.length,
-      folderTree: sidebarData.folderTree,
-      hasFunctions: !!(sidebarData.onSelectFolder && sidebarData.onToggleFolder),
-      currentFolder: sidebarData.currentFolder?.name || 'Root'
-    } : 'NULL - sidebar will not render!');
-    
+    // Only log errors, not every update
     if (showProjectV3View && selectedProject && !sidebarData) {
-      console.error('❌ ERROR: Inside project but sidebarData is null! The sidebar will not render.');
+      console.warn('⚠️ Sidebar data not yet loaded for project:', selectedProject.name);
     }
   }, [sidebarData, showProjectV3View, selectedProject]);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
@@ -484,7 +479,8 @@ function AppContentWithWorkspace({
 
   // Dynamic CTA configuration based on current view
   const getCtaConfig = () => {
-    if (showProjectV3View && !selectedProject) {
+    // Only show "New Project" when explicitly in Projects view AND no project selected
+    if (activeView === 'project-v3' && showProjectV3View && !selectedProject) {
       return {
         label: 'New Project',
         icon: (
@@ -635,23 +631,7 @@ function AppContentWithWorkspace({
         <div className="flex-1 overflow-hidden content-gutter">
           <div className="h-full flex gap-1">
             {/* Project Sidebar - Only show when inside a project */}
-            {showProjectV3View && selectedProject && (() => {
-              console.log('🔍 Checking ProjectFolderSidebar render conditions:', {
-                showProjectV3View,
-                hasSelectedProject: !!selectedProject,
-                projectName: selectedProject?.name,
-                hasSidebarData: !!sidebarData,
-                folderCount: sidebarData?.folderTree?.length ?? 'no data yet'
-              });
-              
-              // Render sidebar even if sidebarData isn't ready yet (it will show "No folders yet")
-              if (!sidebarData) {
-                console.warn('⚠️ sidebarData is null - sidebar will show loading state');
-                return false; // Don't render until we have data
-              }
-              
-              return true;
-            })() && sidebarData && (
+            {showProjectV3View && selectedProject && sidebarData && (
               <ProjectFolderSidebar
                 key={selectedProject?.id} // Force remount when project changes
                 folderTree={sidebarData.folderTree || []}
