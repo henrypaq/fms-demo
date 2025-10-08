@@ -56,7 +56,7 @@
     --card-light: 240 30% 10%; /* #12142A - Lighter navy for cards and interactive elements */
     
     /* Sidebar Navy Colors */
-    --sidebar-background: 240 30% 4%; /* #080A15 - Darker navy-black sidebar */
+    --sidebar-background: 237 38% 16%; /* #1A1C3A - Matches upload sheet */
     --sidebar-foreground: 240 10% 90%; /* #E4E5F1 - Soft off-white text */
     --sidebar-primary: 220 85% 45%; /* #1E40AF - Royal blue primary */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - White text on primary */
@@ -70,7 +70,7 @@
     --sidebar-width-icon: 5rem; /* 80px - Collapsed width */
   }
   .dark {
-    --sidebar-background: 240 30% 4%; /* #080A15 - Darker navy-black sidebar */
+    --sidebar-background: 237 38% 16%; /* #1A1C3A - Matches upload sheet */
     --sidebar-foreground: 240 10% 90%; /* #E4E5F1 - Soft off-white text */
     --sidebar-primary: 220 85% 45%; /* #1E40AF - Royal blue primary */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - White text on primary */
@@ -325,34 +325,36 @@
 
 /* Button sizing controlled by Tailwind classes in sidebar-shadcn.tsx - no overrides needed */
 
-/* Upload Sheet positioning - ensure no gap, override built-in left-0 */
+/* Upload Sheet positioning - add small gap matching content area spacing */
 [data-sidebar-upload-sheet] {
-  left: var(--sidebar-width) !important;
+  left: calc(var(--sidebar-width) + 4px) !important;
   transition: left 0.3s ease-in-out !important;
 }
 
 [data-state="collapsed"] [data-sidebar-upload-sheet] {
-  left: var(--sidebar-width-icon) !important;
+  left: calc(var(--sidebar-width-icon) + 4px) !important;
 }
 
 /* Override built-in sheet variants positioning */
 [data-sidebar-upload-sheet].left-0 {
-  left: var(--sidebar-width) !important;
+  left: calc(var(--sidebar-width) + 4px) !important;
 }
 
 [data-state="collapsed"] [data-sidebar-upload-sheet].left-0 {
-  left: var(--sidebar-width-icon) !important;
+  left: calc(var(--sidebar-width-icon) + 4px) !important;
 }
 
 /* Upload Sheet overlay positioning - responsive to sidebar state */
 [data-sidebar-overlay-exclude] {
+  left: calc(var(--sidebar-width) + 4px) !important;
+  width: calc(100% - var(--sidebar-width) - 4px) !important;
   transition: left 0.3s ease-in-out, width 0.3s ease-in-out;
 }
 
 /* When sidebar is collapsed, adjust overlay positioning */
 [data-state="collapsed"] [data-sidebar-overlay-exclude] {
-  left: var(--sidebar-width-icon) !important;
-  width: calc(100% - var(--sidebar-width-icon)) !important;
+  left: calc(var(--sidebar-width-icon) + 4px) !important;
+  width: calc(100% - var(--sidebar-width-icon) - 4px) !important;
 }
 
 /* Sidebar color change when upload sheet is open */

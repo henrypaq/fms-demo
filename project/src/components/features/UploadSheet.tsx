@@ -31,7 +31,7 @@ const CustomSheetContent = React.forwardRef<
         className
       )}
       style={{
-        left: 'var(--sidebar-width, 5rem)'
+        left: 'calc(var(--sidebar-width, 5rem) + 4px)'
       }}
       {...props}
     >
