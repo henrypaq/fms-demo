@@ -190,13 +190,13 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
         {filteredTagStats.length === 0 && (
           <div className="text-center py-8">
             <RiPriceTag3Line className="w-12 h-12 text-[#8A8C8E] mx-auto mb-2" />
-            <p className="text-[#8A8C8E] text-sm">
+            <p className="text-[#8A8C8E] text-sm mb-3">
               {tagSearch ? 'No tags found' : 'No tags yet'}
             </p>
             {canEditTags && !tagSearch && (
               <button
                 onClick={onAddTag}
-                className="text-[#6049E3] hover:text-[#6049E3]/80 text-sm mt-1 font-medium"
+                className="border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               >
                 Create your first tag
               </button>

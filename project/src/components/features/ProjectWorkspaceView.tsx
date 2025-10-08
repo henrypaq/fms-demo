@@ -1527,10 +1527,10 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
           {folderTree.length === 0 && (
             <div className="text-center py-8">
               <Icon Icon={RiFolder3Line} size={IconSizes.card} color="#8A8C8E" className="mx-auto mb-2" />
-              <p className="text-[#8A8C8E] text-sm">No folders yet</p>
+              <p className="text-[#8A8C8E] text-sm mb-3">No folders yet</p>
               <button
                 onClick={() => setShowCreateFolder(true)}
-                className="text-[#6049E3] hover:text-[#6049E3]/80 text-sm mt-1 font-medium"
+                className="border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               >
                 Create your first folder
               </button>
@@ -1578,9 +1578,9 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
             </div>
           ) : (filteredAndSortedFiles.length === 0 && childFolders.length === 0) ? (
             <div className="text-center py-12">
-              <FileText className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-white mb-2">No Files or Folders</h3>
-              <p className="text-slate-400">
+              <FileText className="w-16 h-16 text-[#8A8C8E] mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-[#CFCFF6] mb-2">No Files or Folders</h3>
+              <p className="text-[#CFCFF6]/60 mb-6">
                 {currentFolder 
                   ? `No files or folders in "${currentFolder.name}" folder.`
                   : `No files or folders in "${project.name}" project.`
@@ -1588,7 +1588,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
               </p>
               <button
                 onClick={() => setShowUploadSheet(true)}
-                className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200"
+                className="px-6 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-lg font-medium transition-all duration-200"
               >
                 Upload Files
               </button>

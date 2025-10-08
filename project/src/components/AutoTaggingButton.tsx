@@ -102,14 +102,14 @@ const AutoTaggingButton: React.FC<AutoTaggingButtonProps> = ({
 
   const getButtonStyles = () => {
     if (status === 'success') {
-      return 'bg-green-600 hover:bg-green-700 text-white';
+      return 'border-2 border-green-500 bg-green-500/20 text-[#CFCFF6] hover:bg-green-500/30 hover:text-white';
     }
     
     if (status === 'error') {
-      return 'bg-red-600 hover:bg-red-700 text-white';
+      return 'border-2 border-red-500 bg-red-500/20 text-[#CFCFF6] hover:bg-red-500/30 hover:text-white';
     }
     
-    return 'bg-blue-600 hover:bg-blue-700 text-white';
+    return 'border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white';
   };
 
   return (
@@ -117,7 +117,7 @@ const AutoTaggingButton: React.FC<AutoTaggingButtonProps> = ({
       <button
         onClick={handleAutoTag}
         disabled={isProcessing}
-        className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${getButtonStyles()}`}
+        className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${getButtonStyles()}`}
       >
         {getButtonContent()}
       </button>
