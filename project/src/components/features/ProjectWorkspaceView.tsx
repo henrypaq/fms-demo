@@ -1428,8 +1428,11 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
         onDragLeave: handleDragLeave,
         onDrop: handleDrop,
         onDragStart: (e: React.DragEvent, folder: any) => {
+          console.log('🎬 Sidebar folder drag started:', folder.name);
           e.dataTransfer.effectAllowed = 'move';
-          setDraggedItem({ id: folder.id, type: 'folder' });
+          const dragData = { id: folder.id, type: 'folder' as const };
+          draggedItemRef.current = dragData;
+          setDraggedItem(dragData);
         },
         onFolderContextMenu: (e: React.MouseEvent, folder: any) => {
           console.log('🎯 ProjectFolderSidebar context menu triggered for:', folder.name);
