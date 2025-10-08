@@ -232,24 +232,24 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
     <>
       {/* Floating Action Bar */}
       <div className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 ${className}`}>
-        <div className="bg-dark-surface border border-dark-surface rounded-xl shadow-2xl p-4 min-w-96">
+        <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl p-4 min-w-96">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-light-text rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 bg-[#6049E3]/20 border border-[#6049E3]/40 rounded-lg flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-[#6049E3]" />
               </div>
               <div>
-                <h3 className="text-white font-medium">
+                <h3 className="text-[#CFCFF6] font-medium">
                   {selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''} selected
                 </h3>
-                <p className="text-slate-400 text-sm">Total size: {getTotalSize()}</p>
+                <p className="text-[#CFCFF6]/60 text-sm">Total size: {getTotalSize()}</p>
               </div>
             </div>
             <button
               onClick={onClearSelection}
               disabled={isProcessing}
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors duration-200 disabled:opacity-50"
+              className="p-2 rounded-lg text-[#CFCFF6]/60 hover:text-white hover:bg-[#22243E] transition-colors duration-200 disabled:opacity-50"
             >
               <X className="w-5 h-5" />
             </button>
@@ -257,17 +257,17 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
 
           {/* Processing Status */}
           {isProcessing && (
-            <div className="mb-4 p-3 bg-light-text/20 border border-light-text/30 rounded-lg">
+            <div className="mb-4 p-3 bg-[#6049E3]/10 border border-[#6049E3]/30 rounded-lg">
               <div className="flex items-center space-x-3">
-                <Loader className="w-5 h-5 text-blue-400 animate-spin" />
-                <span className="text-blue-400 font-medium">{processingAction}</span>
+                <Loader className="w-5 h-5 text-[#6049E3] animate-spin" />
+                <span className="text-[#6049E3] font-medium">{processingAction}</span>
               </div>
             </div>
           )}
 
           {/* Success Messages */}
           {showMoveSuccess && (
-            <div className="mb-4 p-3 bg-green-600/20 border border-green-500/30 rounded-lg">
+            <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
               <div className="flex items-center space-x-3">
                 <CheckCircle className="w-5 h-5 text-green-400" />
                 <span className="text-green-400 font-medium">Files moved successfully!</span>
@@ -276,7 +276,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
           )}
 
           {showDownloadSuccess && (
-            <div className="mb-4 p-3 bg-green-600/20 border border-green-500/30 rounded-lg">
+            <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
               <div className="flex items-center space-x-3">
                 <CheckCircle className="w-5 h-5 text-green-400" />
                 <span className="text-green-400 font-medium">Files downloaded successfully!</span>
@@ -285,7 +285,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
           )}
 
           {showDeleteSuccess && (
-            <div className="mb-4 p-3 bg-green-600/20 border border-green-500/30 rounded-lg">
+            <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
               <div className="flex items-center space-x-3">
                 <CheckCircle className="w-5 h-5 text-green-400" />
                 <span className="text-green-400 font-medium">Files deleted successfully!</span>
@@ -299,7 +299,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
             <button
               onClick={() => setShowMoveModal(true)}
               disabled={isProcessing}
-              className="flex items-center space-x-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white rounded-lg font-medium transition-colors duration-200"
+              className="flex items-center space-x-2 px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] disabled:opacity-50 text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
             >
               <Move className="w-4 h-4" />
               <span>Move</span>
@@ -309,7 +309,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
             <button
               onClick={handleBatchDownload}
               disabled={isProcessing}
-              className="flex items-center space-x-2 px-4 py-2 bg-light-text hover:bg-light-text/90 disabled:opacity-50 text-dark-bg rounded-lg font-medium transition-colors duration-200"
+              className="flex items-center space-x-2 px-4 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 disabled:opacity-50 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-lg font-medium transition-all duration-200"
             >
               <Download className="w-4 h-4" />
               <span>Download</span>
@@ -320,7 +320,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
               <button
                 onClick={() => setShowDeleteConfirm(true)}
                 disabled={isProcessing}
-                className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-lg font-medium transition-colors duration-200"
+                className="flex items-center space-x-2 px-4 py-2 border-2 border-red-500 bg-red-500/20 disabled:opacity-50 text-[#CFCFF6] hover:bg-red-500/30 hover:text-white rounded-lg font-medium transition-all duration-200"
               >
                 <Trash2 className="w-4 h-4" />
                 <span>Delete</span>
@@ -332,26 +332,26 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
 
       {/* Move Modal */}
       {showMoveModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-surface border border-dark-surface rounded-lg shadow-xl w-full max-w-md max-h-96 overflow-hidden">
-            <div className="p-4 border-b border-slate-700">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md max-h-96 overflow-hidden">
+            <div className="p-4 border-b border-[#2A2C45]/40">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-white">Move Files</h3>
+                <h3 className="text-lg font-medium text-[#CFCFF6]">Move Files</h3>
                 <button
                   onClick={() => setShowMoveModal(false)}
-                  className="text-slate-400 hover:text-white transition-colors duration-200"
+                  className="text-[#CFCFF6]/60 hover:text-white transition-colors duration-200"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <p className="text-slate-400 text-sm mt-1">Choose destination for {selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''}</p>
+              <p className="text-[#CFCFF6]/60 text-sm mt-1">Choose destination for {selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''}</p>
             </div>
 
             <div className="p-4 max-h-80 overflow-y-auto">
               {loadingProjects ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="w-6 h-6 border-2 border-light-text border-t-transparent rounded-full animate-spin"></div>
-                  <span className="ml-2 text-slate-400">Loading projects...</span>
+                  <div className="w-6 h-6 border-2 border-[#6049E3] border-t-transparent rounded-full animate-spin"></div>
+                  <span className="ml-2 text-[#CFCFF6]/60">Loading projects...</span>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -359,7 +359,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
                   <button
                     onClick={() => handleBatchMove(null, null)}
                     disabled={isProcessing}
-                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 text-slate-300 hover:bg-slate-700 hover:text-white disabled:opacity-50"
+                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 text-[#CFCFF6] hover:bg-[#22243E] hover:text-white disabled:opacity-50"
                   >
                     <Home className="w-4 h-4" />
                     <span>Workspace Root</span>
@@ -375,7 +375,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
                         <button
                           onClick={() => handleBatchMove(project.id, null)}
                           disabled={isProcessing}
-                          className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 text-slate-300 hover:bg-slate-700 hover:text-white disabled:opacity-50"
+                          className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 text-[#CFCFF6] hover:bg-[#22243E] hover:text-white disabled:opacity-50"
                         >
                           <div 
                             className="w-3 h-3 rounded-full flex-shrink-0"
@@ -390,7 +390,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
                             key={folder.id}
                             onClick={() => handleBatchMove(project.id, folder.id)}
                             disabled={isProcessing}
-                            className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 ml-4 text-slate-300 hover:bg-slate-700 hover:text-white disabled:opacity-50"
+                            className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 ml-4 text-[#CFCFF6] hover:bg-[#22243E] hover:text-white disabled:opacity-50"
                           >
                             <Folder className="w-4 h-4 flex-shrink-0" />
                             <span className="truncate">{folder.name}</span>
@@ -402,8 +402,8 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
 
                   {accessibleProjects.length === 0 && !loadingProjects && (
                     <div className="text-center py-4">
-                      <Folder className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                      <p className="text-slate-500 text-xs">No accessible projects</p>
+                      <Folder className="w-8 h-8 text-[#CFCFF6]/30 mx-auto mb-2" />
+                      <p className="text-[#CFCFF6]/50 text-xs">No accessible projects</p>
                     </div>
                   )}
                 </div>
@@ -415,28 +415,28 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-surface border border-dark-surface rounded-xl w-full max-w-md">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md">
             <div className="p-6">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center">
                   <Trash2 className="w-6 h-6 text-red-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Delete Files</h3>
-                  <p className="text-slate-400 text-sm">This action cannot be undone</p>
+                  <h3 className="text-lg font-bold text-[#CFCFF6]">Delete Files</h3>
+                  <p className="text-[#CFCFF6]/60 text-sm">This action cannot be undone</p>
                 </div>
               </div>
               
-              <p className="text-slate-300 mb-6">
-                Are you sure you want to delete <span className="font-medium text-white">{selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''}</span>?
+              <p className="text-[#CFCFF6]/80 mb-6">
+                Are you sure you want to delete <span className="font-medium text-[#CFCFF6]">{selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''}</span>?
               </p>
 
               <div className="flex space-x-3">
                 <button
                   onClick={handleBatchDelete}
                   disabled={isProcessing}
-                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors duration-200"
+                  className="flex-1 px-4 py-2 border-2 border-red-500 bg-red-500/20 hover:bg-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
                 >
                   {isProcessing ? (
                     <div className="flex items-center justify-center space-x-2">
@@ -450,7 +450,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={isProcessing}
-                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white rounded-lg font-medium transition-colors duration-200"
+                  className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] disabled:opacity-50 text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
                 >
                   Cancel
                 </button>
