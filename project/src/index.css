@@ -56,7 +56,7 @@
     --card-light: 240 30% 10%; /* #12142A - Lighter navy for cards and interactive elements */
     
     /* Sidebar Navy Colors */
-    --sidebar-background: 236 38% 16%; /* #1A1C3A - Matches upload sheet */
+    --sidebar-background: 240 30% 4%; /* #080A15 - Darker navy-black sidebar */
     --sidebar-foreground: 240 10% 90%; /* #E4E5F1 - Soft off-white text */
     --sidebar-primary: 220 85% 45%; /* #1E40AF - Royal blue primary */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - White text on primary */
@@ -70,7 +70,7 @@
     --sidebar-width-icon: 5rem; /* 80px - Collapsed width */
   }
   .dark {
-    --sidebar-background: 236 38% 16%; /* #1A1C3A - Matches upload sheet */
+    --sidebar-background: 240 30% 4%; /* #080A15 - Darker navy-black sidebar */
     --sidebar-foreground: 240 10% 90%; /* #E4E5F1 - Soft off-white text */
     --sidebar-primary: 220 85% 45%; /* #1E40AF - Royal blue primary */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - White text on primary */
@@ -357,9 +357,9 @@
   width: calc(100% - var(--sidebar-width-icon) - 4px) !important;
 }
 
-/* Sidebar color change when upload sheet is open */
+/* Sidebar color change when upload sheet is open - matches upload sheet */
 .upload-sheet-open [data-sidebar="sidebar"] {
-  background-color: hsl(var(--surface)) !important;
+  background-color: #1A1C3A !important;
   transition: background-color 0.3s ease-in-out;
 }
 
