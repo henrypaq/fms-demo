@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { RiPriceTag3Line, RiAddLine, RiDeleteBinLine, RiAlertLine, RiLoader4Line, RiInformationLine } from '@remixicon/react';
 import { useFileData } from '../../hooks/useFileData';
 import { getAllTags } from '../../hooks/useFileSearch';
@@ -675,21 +676,46 @@ const TagView: React.FC<TagViewProps> = ({
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible">
-              {taggedFiles.map(file => (
-                <FileCard
+            <motion.div 
+              className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.04
+                  }
+                }
+              }}
+            >
+              {taggedFiles.map((file) => (
+                <motion.div
                   key={file.id}
-                  file={file}
-                  onToggleFavorite={toggleFavorite}
-                  onUpdate={async (fileId, updates) => {
-                    await updateFile(fileId, updates);
-                    // Re-fetch tagged files to show updated tags
-                    await fetchTaggedFiles(selectedTags);
+                  variants={{
+                    hidden: { opacity: 0, y: 8 },
+                    visible: { 
+                      opacity: 1, 
+                      y: 0,
+                      transition: {
+                        duration: 0.18,
+                        ease: [0.16, 1, 0.3, 1]
+                      }
+                    }
                   }}
-                  userRole={userRole}
-                />
+                >
+                  <FileCard
+                    file={file}
+                    onToggleFavorite={toggleFavorite}
+                    onUpdate={async (fileId, updates) => {
+                      await updateFile(fileId, updates);
+                      // Re-fetch tagged files to show updated tags
+                      await fetchTaggedFiles(selectedTags);
+                    }}
+                    userRole={userRole}
+                  />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       </div>

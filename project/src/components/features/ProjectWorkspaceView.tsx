@@ -1314,10 +1314,32 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
       <>
         {/* Folders Grid - Google Drive Compact Style */}
         {childFolders.length > 0 && (
-          <div className="mb-4 grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 overflow-visible">
+          <motion.div 
+            className="mb-4 grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 overflow-visible"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.04
+                }
+              }
+            }}
+          >
             {childFolders.map(folder => (
-              <div
+              <motion.div
                 key={folder.id}
+                variants={{
+                  hidden: { opacity: 0, y: 8 },
+                  visible: { 
+                    opacity: 1, 
+                    y: 0,
+                    transition: {
+                      duration: 0.18,
+                      ease: [0.16, 1, 0.3, 1]
+                    }
+                  }
+                }}
                 className={`group flex items-center justify-between w-full rounded-lg px-4 py-3 h-[52px] cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.2)] active:scale-[0.99] ${
                   dragOverFolder === folder.id
                     ? 'bg-[#6049E3]/20 border-[#6049E3] ring-2 ring-[#6049E3]/50'
@@ -1386,15 +1408,37 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                 >
                   <MoreVertical className="w-4 h-4" />
                 </button>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
         {/* Files Grid */}
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible">
+        <motion.div 
+          className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            visible: {
+              transition: {
+                staggerChildren: 0.04
+              }
+            }
+          }}
+        >
           {filteredAndSortedFiles.map((file) => (
-            <div
+            <motion.div
               key={file.id}
+              variants={{
+                hidden: { opacity: 0, y: 8 },
+                visible: { 
+                  opacity: 1, 
+                  y: 0,
+                  transition: {
+                    duration: 0.18,
+                    ease: [0.16, 1, 0.3, 1]
+                  }
+                }
+              }}
               draggable
               onDragStart={(e) => handleDragStart(e, file.id, 'file')}
               onDragEnd={handleDragEnd}
@@ -1430,9 +1474,9 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                 userRole="admin"
                 className="w-full"
               />
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </>
     );
   };

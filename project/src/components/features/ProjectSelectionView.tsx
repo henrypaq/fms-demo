@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { 
   Plus, 
   X, 
@@ -432,11 +433,33 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
         }}
       >
       <div className="px-6 pb-4 overflow-visible">
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-10 items-start pb-12">
+        <motion.div 
+          className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-10 items-start pb-12"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            visible: {
+              transition: {
+                staggerChildren: 0.05
+              }
+            }
+          }}
+        >
           {/* Existing Projects */}
           {projects.map((project) => (
-            <div
+            <motion.div
               key={project.id}
+              variants={{
+                hidden: { opacity: 0, y: 8 },
+                visible: { 
+                  opacity: 1, 
+                  y: 0,
+                  transition: {
+                    duration: 0.18,
+                    ease: [0.16, 1, 0.3, 1]
+                  }
+                }
+              }}
               className="group transition-all duration-200 ease-out cursor-pointer relative folder-card hover:scale-[1.02] hover:brightness-110"
               style={{
                 background: '#111235',
@@ -529,11 +552,22 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
           
           {/* Add New Project Card */}
-          <div
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 8 },
+              visible: { 
+                opacity: 1, 
+                y: 0,
+                transition: {
+                  duration: 0.18,
+                  ease: [0.16, 1, 0.3, 1]
+                }
+              }
+            }}
             onClick={() => setShowCreateProject(true)}
             className="group transition-all duration-200 cursor-pointer flex flex-col items-center justify-center folder-card hover:scale-[1.02]"
             style={{
@@ -580,8 +614,8 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
       </div>
 
