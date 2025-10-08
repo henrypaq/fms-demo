@@ -74,31 +74,31 @@ const CreateProjectModal: React.FC<{
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-light-text/70 mb-2">Project Name</label>
+              <label className="block text-sm font-medium text-[#CFCFF6]/70 mb-2">Project Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter project name..."
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50"
                 autoFocus
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-light-text/70 mb-2">Description (Optional)</label>
+              <label className="block text-sm font-medium text-[#CFCFF6]/70 mb-2">Description (Optional)</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Project description..."
                 rows={3}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-3 py-2 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50 resize-none"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-light-text/70 mb-2">
+              <label className="block text-sm font-medium text-[#CFCFF6]/70 mb-2">
                 <Palette className="w-4 h-4 inline mr-1" />
                 Color
               </label>
@@ -180,40 +180,40 @@ const EditProjectModal: React.FC<{
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-dark-surface border border-dark-surface rounded-xl w-full max-w-md">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-white">Edit Project</h3>
+            <h3 className="text-xl font-bold text-[#CFCFF6]">Edit Project</h3>
             <Button onClick={onClose} variant="ghost" size="icon" className="h-10 w-10">
               <X className="w-5 h-5" />
             </Button>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-light-text/70 mb-2">Project Name</label>
+              <label className="block text-sm font-medium text-[#CFCFF6]/70 mb-2">Project Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter project name..."
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50"
                 autoFocus
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-light-text/70 mb-2">Description (Optional)</label>
+              <label className="block text-sm font-medium text-[#CFCFF6]/70 mb-2">Description (Optional)</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Project description..."
                 rows={3}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-3 py-2 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50 resize-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-light-text/70 mb-2">
+              <label className="block text-sm font-medium text-[#CFCFF6]/70 mb-2">
                 <Palette className="w-4 h-4 inline mr-1" />
                 Color
               </label>
