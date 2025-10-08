@@ -673,9 +673,16 @@ function AppContentWithWorkspace({
               />
             )}
             
-            <div className={`h-full raised-panel w-full mx-0 overflow-y-auto overflow-x-visible ${showProjectV3View && selectedProject ? 'flex-1' : ''}`}>
+            {/* Tags View - Render at flex level like ProjectFolderSidebar */}
+            {showTagsView ? (
+              <TagView 
+                userRole={currentUser?.role || 'employee'}
+                triggerCreateTag={triggerCreateTag}
+              />
+            ) : (
+              <div className={`h-full raised-panel w-full mx-0 overflow-y-auto overflow-x-visible ${showProjectV3View && selectedProject ? 'flex-1' : ''}`}>
             {/* Secondary Content Header - Filter Bar and CTA */}
-            {!showAdminDashboard && (
+            {!showAdminDashboard && !showTagsView && (
               <div className="flex items-center justify-between py-2 border-b border-border mx-0 px-6 mb-4">
                 {/* Left Side - Page Title */}
                 <div className="flex items-center">
@@ -792,7 +799,7 @@ function AppContentWithWorkspace({
             )}
 
             {/* Assets Bar - Show on pages that don't have their own assets bar */}
-            {!showAdminDashboard && !showProjectV3View && (
+            {!showAdminDashboard && !showProjectV3View && !showTagsView && (
               <AssetBar
                 assetCount={filteredFiles.length}
                 totalSize={filteredFiles.reduce((total: number, file: any) => total + (file.fileSize || 0), 0)}
@@ -820,12 +827,6 @@ function AppContentWithWorkspace({
                 onProjectBackClick={handleBackToProjectsList}
                 triggerCreateProject={triggerCreateProject}
                 selectedProject={selectedProject}
-              />
-            ) : showTagsView ? (
-              /* Tags View - no wrapper padding as it manages its own */
-              <TagView 
-                userRole={currentUser?.role || 'employee'}
-                triggerCreateTag={triggerCreateTag}
               />
             ) : showAdminDashboard ? (
               /* Admin Dashboard */
@@ -873,8 +874,9 @@ function AppContentWithWorkspace({
                 )}
               </div>
             ) : null}
+              </div>
+            )}
           </div>
-        </div>
         </div>
 
         {/* Uploads Panel */}
