@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProjectSelectionView from './ProjectSelectionView';
 import ProjectWorkspaceView from './ProjectWorkspaceView';
 
@@ -8,10 +8,24 @@ interface ProjectV3ViewProps {
   onSidebarDataChange?: (data: any) => void;
   onProjectBackClick?: () => void;
   triggerCreateProject?: number;
+  selectedProject?: any | null; // NEW: Receive selected project from parent
 }
 
-const ProjectV3View: React.FC<ProjectV3ViewProps> = ({ onBack, onProjectChange, onSidebarDataChange, onProjectBackClick, triggerCreateProject }) => {
+const ProjectV3View: React.FC<ProjectV3ViewProps> = ({ 
+  onBack, 
+  onProjectChange, 
+  onSidebarDataChange, 
+  onProjectBackClick, 
+  triggerCreateProject,
+  selectedProject: parentSelectedProject // NEW: Use parent state
+}) => {
   const [selectedProject, setSelectedProject] = useState<any>(null);
+
+  // NEW: Sync local state with parent state
+  useEffect(() => {
+    console.log('🔄 Syncing selectedProject from parent:', parentSelectedProject?.name || 'null');
+    setSelectedProject(parentSelectedProject);
+  }, [parentSelectedProject]);
 
   const handleProjectSelect = (project: any) => {
     console.log('🎯 ProjectV3View: Project selected:', project?.name);
@@ -26,10 +40,14 @@ const ProjectV3View: React.FC<ProjectV3ViewProps> = ({ onBack, onProjectChange, 
   };
 
   const handleBackToProjects = () => {
-    console.log('Back to projects from ProjectWorkspaceView');
+    console.log('🔙 Back to projects list clicked');
     setSelectedProject(null);
-    onProjectChange?.(null);
-    onProjectBackClick?.();
+    if (onProjectChange) {
+      onProjectChange(null);
+    }
+    if (onProjectBackClick) {
+      onProjectBackClick();
+    }
   };
 
   const handleBackToMain = () => {

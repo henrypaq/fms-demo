@@ -811,6 +811,7 @@ function AppContentWithWorkspace({
                 onSidebarDataChange={setSidebarData}
                 onProjectBackClick={handleBackToProjectsList}
                 triggerCreateProject={triggerCreateProject}
+                selectedProject={selectedProject}
               />
             ) : showTagsView ? (
               /* Tags View - no wrapper padding as it manages its own */
