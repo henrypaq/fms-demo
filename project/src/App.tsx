@@ -267,11 +267,17 @@ function AppContentWithWorkspace({
   
   // Debug: Log when sidebarData changes
   React.useEffect(() => {
-    console.log('📥 App.tsx received sidebarData:', sidebarData ? {
+    console.log('📥 App.tsx received sidebarData update:', sidebarData ? {
       folderTreeLength: sidebarData.folderTree?.length,
-      hasFunctions: !!(sidebarData.onSelectFolder && sidebarData.onToggleFolder)
-    } : 'null');
-  }, [sidebarData]);
+      folderTree: sidebarData.folderTree,
+      hasFunctions: !!(sidebarData.onSelectFolder && sidebarData.onToggleFolder),
+      currentFolder: sidebarData.currentFolder?.name || 'Root'
+    } : 'NULL - sidebar will not render!');
+    
+    if (showProjectV3View && selectedProject && !sidebarData) {
+      console.error('❌ ERROR: Inside project but sidebarData is null! The sidebar will not render.');
+    }
+  }, [sidebarData, showProjectV3View, selectedProject]);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showUploadsView, setShowUploadsView] = useState(false);
   const [showTagsView, setShowTagsView] = useState(false);
@@ -629,28 +635,37 @@ function AppContentWithWorkspace({
         <div className="flex-1 overflow-hidden content-gutter">
           <div className="h-full flex gap-1">
             {/* Project Sidebar - Only show when inside a project */}
-            {showProjectV3View && selectedProject && sidebarData && (() => {
-              console.log('🎨 Rendering ProjectFolderSidebar with:', {
-                project: selectedProject.name,
-                folderCount: sidebarData.folderTree?.length,
-                currentFolder: sidebarData.currentFolder?.name || 'Root'
+            {showProjectV3View && selectedProject && (() => {
+              console.log('🔍 Checking ProjectFolderSidebar render conditions:', {
+                showProjectV3View,
+                hasSelectedProject: !!selectedProject,
+                projectName: selectedProject?.name,
+                hasSidebarData: !!sidebarData,
+                folderCount: sidebarData?.folderTree?.length ?? 'no data yet'
               });
+              
+              // Render sidebar even if sidebarData isn't ready yet (it will show "No folders yet")
+              if (!sidebarData) {
+                console.warn('⚠️ sidebarData is null - sidebar will show loading state');
+                return false; // Don't render until we have data
+              }
+              
               return true;
-            })() && (
+            })() && sidebarData && (
               <ProjectFolderSidebar
                 key={selectedProject?.id} // Force remount when project changes
-                folderTree={sidebarData.folderTree}
-                currentFolder={sidebarData.currentFolder}
-                expandedFolders={sidebarData.expandedFolders}
-                draggedItem={sidebarData.draggedItem}
-                dragOverFolder={sidebarData.dragOverFolder}
-                onSelectFolder={sidebarData.onSelectFolder}
-                onToggleFolder={sidebarData.onToggleFolder}
-                onCreateFolder={sidebarData.onCreateFolder}
-                onDragOver={sidebarData.onDragOver}
-                onDragLeave={sidebarData.onDragLeave}
-                onDrop={sidebarData.onDrop}
-                onDragStart={sidebarData.onDragStart}
+                folderTree={sidebarData.folderTree || []}
+                currentFolder={sidebarData.currentFolder || null}
+                expandedFolders={sidebarData.expandedFolders || new Set()}
+                draggedItem={sidebarData.draggedItem || null}
+                dragOverFolder={sidebarData.dragOverFolder || null}
+                onSelectFolder={sidebarData.onSelectFolder || (() => {})}
+                onToggleFolder={sidebarData.onToggleFolder || (() => {})}
+                onCreateFolder={sidebarData.onCreateFolder || (() => {})}
+                onDragOver={sidebarData.onDragOver || (() => {})}
+                onDragLeave={sidebarData.onDragLeave || (() => {})}
+                onDrop={sidebarData.onDrop || (() => {})}
+                onDragStart={sidebarData.onDragStart || (() => {})}
               />
             )}
             

@@ -1251,11 +1251,14 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
   // Expose sidebar data to parent
   useEffect(() => {
+    console.log('🔄 useEffect for onSidebarDataChange triggered');
     if (onSidebarDataChange) {
       console.log('📤 Sending sidebar data to parent:', {
         folderTreeLength: folderTree.length,
+        folderTreeData: folderTree,
         currentFolder: currentFolder?.name || 'Root',
-        expandedCount: expandedFolders.size
+        expandedCount: expandedFolders.size,
+        hasFunctions: !!(selectFolder && toggleFolder)
       });
       onSidebarDataChange({
         folderTree,
@@ -1277,8 +1280,10 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
           setDraggedItem({ id: folder.id, type: 'folder' });
         },
       });
+    } else {
+      console.warn('⚠️ onSidebarDataChange callback is not provided!');
     }
-  }, [folderTree, currentFolder, expandedFolders, draggedItem, dragOverFolder, selectFolder, toggleFolder, handleDragOver, handleDragLeave, handleDrop]);
+  }, [folderTree, currentFolder, expandedFolders, draggedItem, dragOverFolder, onSidebarDataChange]);
 
   return (
     <div className={`flex-1 flex flex-col h-full ${renderSidebar ? 'gap-6 p-6' : ''}`}>
