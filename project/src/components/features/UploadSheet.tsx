@@ -162,7 +162,14 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
       // Upload files using the standard upload system
       console.log('🚀 Starting upload for', filesToUpload.length, 'files');
       try {
-        await uploadFiles(filesToUpload, currentWorkspace.id, targetProjectId, targetFolderId);
+        // uploadFiles signature: (files, manualTags, autoTaggingEnabled, projectId, folderId)
+        await uploadFiles(
+          filesToUpload, 
+          [], // manualTags
+          autoTaggingEnabled, 
+          targetProjectId, 
+          targetFolderId
+        );
         
         // Force immediate refresh of file list
         console.log('✅ Upload complete - refreshing file list');
