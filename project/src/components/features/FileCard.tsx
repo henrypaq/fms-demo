@@ -38,6 +38,11 @@ export interface FileItem {
   workspaceId: string;
   projectId?: string;
   folderId?: string;
+  // Optimistic upload properties
+  isOptimistic?: boolean;
+  uploadProgress?: number;
+  uploadStatus?: 'uploading' | 'processing' | 'complete' | 'error';
+  uploadError?: string;
 }
 
 interface FileCardProps {
@@ -393,6 +398,36 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                 {file.name}
               </h3>
             </div>
+
+            {/* Optimistic upload loading overlay */}
+            {file.isOptimistic && (
+              <div className="absolute inset-0 bg-[hsl(240,30%,10%)]/90 backdrop-blur-sm flex flex-col items-center justify-center">
+                {/* Loading spinner */}
+                <div className="relative w-16 h-16 mb-3">
+                  <div className="absolute inset-0 border-4 border-[#6049E3]/20 rounded-full"></div>
+                  <div className="absolute inset-0 border-4 border-transparent border-t-[#6049E3] rounded-full animate-spin"></div>
+                  {/* Progress percentage in center */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">
+                      {file.uploadProgress || 0}%
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Status text */}
+                <p className="text-[#CFCFF6] text-xs font-medium mb-2">
+                  {file.uploadStatus === 'processing' ? 'Processing...' : 'Uploading...'}
+                </p>
+                
+                {/* Progress bar */}
+                <div className="w-32 h-1.5 bg-[#1A1C3A] rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#6049E3] to-[#8b5cf6] transition-all duration-300 ease-out"
+                    style={{ width: `${file.uploadProgress || 0}%` }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
         

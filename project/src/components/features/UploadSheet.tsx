@@ -69,7 +69,6 @@ CustomSheetContent.displayName = SheetPrimitive.Content.displayName;
 interface UploadSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onUploadComplete?: () => void;
   projectContext?: boolean;
   projectId?: string;
   folderId?: string;
@@ -81,11 +80,10 @@ interface RecentUpload extends FileRecord {
 
 const UploadSheet: React.FC<UploadSheetProps> = ({ 
   isOpen, 
-  onOpenChange,
-  onUploadComplete,
+  onOpenChange, 
   projectContext = false,
   projectId,
-  folderId
+  folderId 
 }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -168,9 +166,9 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
           autoTaggingEnabled
         );
         
-        if (success && onUploadComplete) {
-          // Trigger file list refresh
-          onUploadComplete();
+        // Optimistic upload system automatically handles file list updates
+        if (success) {
+          console.log('✅ Upload complete - optimistic system will update UI automatically');
         }
       } catch (error) {
         console.error('Upload failed:', error);

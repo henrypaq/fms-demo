@@ -21,6 +21,7 @@ import { useFileData } from './hooks/useFileData';
 import { useFileSearch, SearchFilters } from './hooks/useFileSearch';
 import { useFileFilters } from './hooks/useFileFilters';
 import { useGlobalSearch } from './hooks/useGlobalSearch';
+import { useOptimisticFileUpload } from './hooks/useOptimisticFileUpload';
 import { ViewMode, FilterType } from './types/ui';
 import { FileItem } from './components/features/FileCard';
 import { LoadingSpinner, EmptyState, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './components/ui';
@@ -162,7 +163,13 @@ function AppWithFileData({ currentWorkspace, currentUser }: { currentWorkspace: 
     handleSortChange
   } = useFileData(false, false); // No trash view
 
-  // Optimistic uploads disabled for now
+  // Enable optimistic uploads for instant UI feedback
+  const { optimisticFiles } = useOptimisticFileUpload();
+
+  // Merge optimistic files with real files (optimistic files appear first)
+  const allFiles = React.useMemo(() => {
+    return [...optimisticFiles, ...(files as FileItem[])];
+  }, [optimisticFiles, files]);
 
   // Handle loading and error states
   if (loading) {
@@ -187,7 +194,7 @@ function AppWithFileData({ currentWorkspace, currentUser }: { currentWorkspace: 
     <AppContentWithWorkspace 
       currentWorkspace={currentWorkspace} 
       currentUser={currentUser}
-      files={files}
+      files={allFiles}
       loading={loading}
       currentPage={currentPage}
       totalPages={totalPages}
@@ -882,26 +889,12 @@ function AppContentWithWorkspace({
         <UploadSheet
           isOpen={showUploadSheet}
           onOpenChange={setShowUploadSheet}
-          onUploadComplete={() => {
-            // Refresh files after upload completes
-            console.log('Upload complete - refreshing file list');
-            setTimeout(() => {
-              refreshFiles(currentActiveView);
-            }, 500); // Small delay to ensure DB updates are complete
-          }}
         />
 
         {/* Upload Modal (for header CTA) */}
         <UploadModal
           isOpen={showUploadModal}
           onClose={() => setShowUploadModal(false)}
-          onUploadComplete={() => {
-            // Refresh files after upload completes
-            console.log('Upload complete - refreshing file list');
-            setTimeout(() => {
-              refreshFiles(currentActiveView);
-            }, 500); // Small delay to ensure DB updates are complete
-          }}
         />
 
         {/* File Preview Modal */}

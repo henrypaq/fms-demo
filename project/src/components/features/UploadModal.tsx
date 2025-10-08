@@ -8,10 +8,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUploadComplete?: () => void;
 }
 
-const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComplete }) => {
+const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -54,12 +53,6 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
     try {
       await uploadFiles(selectedFiles, currentWorkspace.id);
       setSelectedFiles([]);
-      
-      // Call the onUploadComplete callback to refresh file list
-      if (onUploadComplete) {
-        onUploadComplete();
-      }
-      
       onClose();
     } catch (error) {
       console.error('Upload failed:', error);
