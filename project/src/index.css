@@ -56,7 +56,7 @@
     --card-light: 240 30% 10%; /* #12142A - Lighter navy for cards and interactive elements */
     
     /* Sidebar Navy Colors */
-    --sidebar-background: 237 38% 16%; /* #1A1C3A - Matches upload sheet */
+    --sidebar-background: 236 38% 16%; /* #1A1C3A - Matches upload sheet */
     --sidebar-foreground: 240 10% 90%; /* #E4E5F1 - Soft off-white text */
     --sidebar-primary: 220 85% 45%; /* #1E40AF - Royal blue primary */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - White text on primary */
@@ -70,7 +70,7 @@
     --sidebar-width-icon: 5rem; /* 80px - Collapsed width */
   }
   .dark {
-    --sidebar-background: 237 38% 16%; /* #1A1C3A - Matches upload sheet */
+    --sidebar-background: 236 38% 16%; /* #1A1C3A - Matches upload sheet */
     --sidebar-foreground: 240 10% 90%; /* #E4E5F1 - Soft off-white text */
     --sidebar-primary: 220 85% 45%; /* #1E40AF - Royal blue primary */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - White text on primary */
@@ -270,9 +270,9 @@
     @apply hidden !important;
   }
   
-  /* Make sidebar background match the main background */
+  /* Sidebar uses its own background color defined in --sidebar-background */
   [data-sidebar="sidebar"] {
-    @apply bg-background;
+    background-color: hsl(var(--sidebar-background)) !important;
   }
   
   /* Card hover effects */
