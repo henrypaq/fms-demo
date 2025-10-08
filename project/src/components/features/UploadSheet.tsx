@@ -27,7 +27,7 @@ const CustomSheetContent = React.forwardRef<
       ref={ref}
       data-sidebar-upload-sheet
       className={cn(
-        "fixed top-0 bottom-0 right-0 z-[60] h-full w-[420px] bg-[#1A1C3A] text-[#CFCFF6] border-l border-[#2A2C45] shadow-xl rounded-lg",
+        "fixed top-0 bottom-0 right-0 z-[60] h-full w-[420px] bg-[#1A1C3A] text-[#CFCFF6] shadow-xl rounded-lg",
         className
       )}
       style={{
