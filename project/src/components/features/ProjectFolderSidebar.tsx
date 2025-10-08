@@ -72,18 +72,22 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
             backgroundColor: isSelected ? 'rgba(26, 28, 58, 0.5)' : isDragOver ? '#059669' : 'transparent',
             color: '#CFCFF6',
             border: '1px solid transparent',
+            transform: 'translateX(0px)',
+            transition: 'all 0.2s ease-out',
           }}
           onMouseEnter={(e) => {
             if (!isSelected && !isDragOver) {
               e.currentTarget.style.backgroundColor = 'rgba(26, 28, 58, 0.3)';
+              e.currentTarget.style.transform = 'translateX(2px)';
             }
           }}
           onMouseLeave={(e) => {
             if (!isSelected && !isDragOver) {
               e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.transform = 'translateX(0px)';
             }
           }}
-          className="flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer transition-all duration-200 group"
+          className="flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer group"
           onClick={() => onSelectFolder(folder)}
         >
           {hasChildren && (
