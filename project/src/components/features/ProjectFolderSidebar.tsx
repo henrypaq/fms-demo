@@ -69,11 +69,21 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
           }}
           style={{ 
             paddingLeft: `${level * 16 + 12}px`,
-            backgroundColor: isSelected ? '#1A1C3A99' : isDragOver ? '#059669' : 'transparent',
-            color: (isSelected || isDragOver) ? 'white' : '#CFCFF6',
-            border: isSelected ? '1px solid rgba(96, 73, 227, 0.4)' : '1px solid transparent',
+            backgroundColor: isSelected ? 'rgba(26, 28, 58, 0.5)' : isDragOver ? '#059669' : 'transparent',
+            color: '#CFCFF6',
+            border: '1px solid transparent',
           }}
-          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer transition-all duration-200 group hover:bg-[#1A1C3A]/30 hover:text-white`}
+          onMouseEnter={(e) => {
+            if (!isSelected && !isDragOver) {
+              e.currentTarget.style.backgroundColor = 'rgba(26, 28, 58, 0.3)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isSelected && !isDragOver) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }}
+          className="flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer transition-all duration-200 group"
           onClick={() => onSelectFolder(folder)}
         >
           {hasChildren && (
@@ -131,11 +141,23 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
         <div
           style={{
             backgroundColor: !currentFolder ? 'rgba(96, 73, 227, 0.2)' : dragOverFolder === null ? '#059669' : 'transparent',
-            border: !currentFolder ? '2px solid #6049E3' : '2px solid transparent',
+            border: !currentFolder ? '2px solid #6049E3' : dragOverFolder === null ? '2px solid #059669' : '2px solid transparent',
             color: '#CFCFF6',
             fontWeight: !currentFolder ? '500' : '400',
           }}
-          className="flex items-center space-x-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 mb-1 hover:bg-[#6049E3]/10 hover:border-[#6049E3]/30 hover:text-white"
+          onMouseEnter={(e) => {
+            if (currentFolder && dragOverFolder !== null) {
+              e.currentTarget.style.backgroundColor = 'rgba(96, 73, 227, 0.1)';
+              e.currentTarget.style.borderColor = 'rgba(96, 73, 227, 0.3)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (currentFolder && dragOverFolder !== null) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.borderColor = 'transparent';
+            }
+          }}
+          className="flex items-center space-x-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 mb-1"
           onClick={() => onSelectFolder(null)}
           onDragOver={(e) => onDragOver(e, null)}
           onDragLeave={onDragLeave}
