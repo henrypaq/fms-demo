@@ -9,6 +9,7 @@ interface ProjectV3ViewProps {
   onProjectBackClick?: () => void;
   triggerCreateProject?: number;
   selectedProject?: any | null; // NEW: Receive selected project from parent
+  onRefreshFiles?: (refreshFn: () => Promise<void>) => void;
 }
 
 const ProjectV3View: React.FC<ProjectV3ViewProps> = ({ 
@@ -17,7 +18,8 @@ const ProjectV3View: React.FC<ProjectV3ViewProps> = ({
   onSidebarDataChange, 
   onProjectBackClick, 
   triggerCreateProject,
-  selectedProject: parentSelectedProject // NEW: Use parent state
+  selectedProject: parentSelectedProject, // NEW: Use parent state
+  onRefreshFiles
 }) => {
   const [selectedProject, setSelectedProject] = useState<any>(null);
 
@@ -64,6 +66,7 @@ const ProjectV3View: React.FC<ProjectV3ViewProps> = ({
         onBack={handleBackToProjects}
         renderSidebar={false}
         onSidebarDataChange={onSidebarDataChange}
+        onRefreshFiles={onRefreshFiles}
       />
     );
   }

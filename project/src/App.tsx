@@ -289,6 +289,9 @@ function AppContentWithWorkspace({
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [triggerCreateProject, setTriggerCreateProject] = useState(0);
   const [triggerCreateTag, setTriggerCreateTag] = useState(0);
+  
+  // Store project refresh function for external refresh triggers
+  const projectRefreshRef = React.useRef<(() => Promise<void>) | null>(null);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     query: '',
     tags: []
@@ -827,6 +830,10 @@ function AppContentWithWorkspace({
                 onProjectBackClick={handleBackToProjectsList}
                 triggerCreateProject={triggerCreateProject}
                 selectedProject={selectedProject}
+                onRefreshFiles={(refreshFn) => {
+                  console.log('📝 Storing project refresh function');
+                  projectRefreshRef.current = refreshFn;
+                }}
               />
             ) : showAdminDashboard ? (
               /* Admin Dashboard */
@@ -901,10 +908,22 @@ function AppContentWithWorkspace({
               projectId: selectedProject?.id,
               folderId: sidebarData?.currentFolder?.id
             });
-            // Small delay to ensure DB commit
-            setTimeout(() => {
-              refreshFiles(currentActiveView);
-            }, 500);
+            
+            // Refresh files based on context
+            if (!showProjectV3View) {
+              // Main files view - use global refresh
+              setTimeout(() => {
+                refreshFiles(currentActiveView);
+              }, 500);
+            } else if (projectRefreshRef.current) {
+              // Inside project - call project's refresh function directly
+              console.log('🔄 Calling project refresh function');
+              setTimeout(() => {
+                projectRefreshRef.current?.();
+              }, 500);
+            } else {
+              console.log('⚠️ Project refresh function not available yet');
+            }
           }}
         />
 
@@ -921,10 +940,22 @@ function AppContentWithWorkspace({
               projectId: selectedProject?.id,
               folderId: sidebarData?.currentFolder?.id
             });
-            // Small delay to ensure DB commit
-            setTimeout(() => {
-              refreshFiles(currentActiveView);
-            }, 500);
+            
+            // Refresh files based on context
+            if (!showProjectV3View) {
+              // Main files view - use global refresh
+              setTimeout(() => {
+                refreshFiles(currentActiveView);
+              }, 500);
+            } else if (projectRefreshRef.current) {
+              // Inside project - call project's refresh function directly
+              console.log('🔄 Calling project refresh function');
+              setTimeout(() => {
+                projectRefreshRef.current?.();
+              }, 500);
+            } else {
+              console.log('⚠️ Project refresh function not available yet');
+            }
           }}
         />
 

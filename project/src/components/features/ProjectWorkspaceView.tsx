@@ -48,6 +48,7 @@ interface ProjectWorkspaceViewProps {
   onBack: () => void;
   renderSidebar?: boolean;
   onSidebarDataChange?: (data: any) => void;
+  onRefreshFiles?: (refreshFn: () => Promise<void>) => void;
 }
 
 type SortOption = 'name' | 'date' | 'size' | 'type';
@@ -226,7 +227,8 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
   project, 
   onBack, 
   renderSidebar = true,
-  onSidebarDataChange 
+  onSidebarDataChange,
+  onRefreshFiles 
 }) => {
   const { currentWorkspace } = useWorkspace();
   
@@ -369,6 +371,13 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
       loadFiles();
     }
   }, [currentFolder]);
+
+  // Expose loadFiles function to parent for external refresh triggers
+  useEffect(() => {
+    if (onRefreshFiles) {
+      onRefreshFiles(loadFiles);
+    }
+  }, [onRefreshFiles, loadFiles]);
 
   const createFolder = async (folderData: any) => {
     try {
