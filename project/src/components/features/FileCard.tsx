@@ -305,14 +305,17 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
   const currentSelected = isSelected || internalSelected;
 
   return (
-    <div className={`relative flex flex-col ${className} ${showExpandedTags ? 'z-[120]' : ''}`}>
-      {/* Dimmed overlay when tags are expanded */}
+    <>
+      {/* Full-screen dimmed overlay when tags are expanded - covers EVERYTHING */}
       {showExpandedTags && (
         <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110]"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]"
           onClick={() => setShowExpandedTags(false)}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
         />
       )}
+      
+      <div className={`relative flex flex-col ${className} ${showExpandedTags ? 'z-[210]' : ''}`}>
       
       <Card 
         className={`
@@ -329,7 +332,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           transition-all duration-150 ease-out
           cursor-pointer group
           flex flex-col
-          relative z-[120]
+          relative z-[210]
           ${currentSelected && !showExpandedTags
             ? 'ring-2 ring-[#6049E3] shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(96,73,227,0.4)]' 
             : !showExpandedTags ? 'hover:scale-[1.02] hover:shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(0,0,0,0.5)]' : ''
@@ -507,10 +510,10 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
         </div>
       </Card>
 
-      {/* Tags floating underneath the card - max 2 rows when not expanded */}
+      {/* Tags floating underneath the card - ALWAYS max 2 rows */}
       {tagsVisible && displayTags.length > 0 && (
         <div 
-          className={`flex flex-wrap gap-1.5 mt-2 px-1 cursor-pointer relative z-[120] ${showExpandedTags ? 'max-w-none' : ''}`}
+          className={`flex flex-wrap gap-1.5 mt-2 px-1 cursor-pointer relative z-[210] ${showExpandedTags ? 'max-w-none' : ''}`}
           onClick={(e) => {
             if (!showExpandedTags) {
               e.stopPropagation();
@@ -519,10 +522,17 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           }}
         >
           {showExpandedTags ? (
-            // Show all tags when expanded
-            displayTags.map((tag, index) => (
-              <TagBadge key={index} tag={tag} variant="default" />
-            ))
+            // Show up to 8 tags when expanded (approx 2 rows) + indicator
+            <>
+              {displayTags.slice(0, 8).map((tag, index) => (
+                <TagBadge key={index} tag={tag} variant="default" />
+              ))}
+              {displayTags.length > 8 && (
+                <span className="text-xs text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[#6049E3]/30 border border-[#6049E3] transition-colors flex items-center gap-1">
+                  +{displayTags.length - 8} more
+                </span>
+              )}
+            </>
           ) : (
             // Show only first 6 tags normally
             <>
@@ -541,7 +551,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
 
       {/* Close hint when expanded */}
       {showExpandedTags && (
-        <div className="mt-2 text-center relative z-[120]">
+        <div className="mt-2 text-center relative z-[210]">
           <span className="text-xs text-[#8A8C8E]">
             Click anywhere to close
           </span>
@@ -690,6 +700,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
         userRole={userRole}
       />
     </div>
+    </>
   );
 });
 
