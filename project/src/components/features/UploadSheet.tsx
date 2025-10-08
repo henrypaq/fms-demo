@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Upload, File, CheckCircle, AlertCircle, Loader, Clock } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useFileUpload } from '../../hooks/useFileUpload';
 import { FileRecord } from '../../lib/supabase';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
@@ -68,7 +69,6 @@ CustomSheetContent.displayName = SheetPrimitive.Content.displayName;
 interface UploadSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  uploadMultipleFiles: (files: File[], projectId?: string, folderId?: string, autoTagging?: boolean) => Promise<boolean>;
   projectContext?: boolean;
   projectId?: string;
   folderId?: string;
@@ -81,7 +81,6 @@ interface RecentUpload extends FileRecord {
 const UploadSheet: React.FC<UploadSheetProps> = ({ 
   isOpen, 
   onOpenChange, 
-  uploadMultipleFiles,
   projectContext = false,
   projectId,
   folderId 
@@ -97,6 +96,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploads, isUploading, uploadFiles } = useFileUpload();
+  const { queryClient } = useQueryClient();
 
   // Add/remove class to body to trigger sidebar color change
   useEffect(() => {
@@ -159,19 +159,19 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
       const filesToUpload = [...selectedFiles];
       setSelectedFiles([]);
       
-      // Use optimistic upload system
-      console.log('🚀 Starting optimistic upload for', filesToUpload.length, 'files');
+      // Upload files using the standard upload system
+      console.log('🚀 Starting upload for', filesToUpload.length, 'files');
       try {
-        const success = await uploadMultipleFiles(
-          filesToUpload,
-          targetProjectId,
-          targetFolderId,
-          autoTaggingEnabled
-        );
+        await uploadFiles(filesToUpload, currentWorkspace.id, targetProjectId, targetFolderId);
         
-        // Optimistic upload system automatically handles file list updates
-        if (success) {
-          console.log('✅ Upload complete - optimistic files should be visible in grid');
+        // Force immediate refresh of file list
+        console.log('✅ Upload complete - refreshing file list');
+        queryClient.invalidateQueries({ queryKey: ['files'] });
+        await queryClient.refetchQueries({ queryKey: ['files'] });
+        
+        // Also trigger a browser event for any listeners
+        if (window.dispatchEvent) {
+          window.dispatchEvent(new CustomEvent('filesUpdated'));
         }
       } catch (error) {
         console.error('❌ Upload failed:', error);
