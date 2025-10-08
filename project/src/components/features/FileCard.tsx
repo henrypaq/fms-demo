@@ -94,6 +94,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
   selectionMode = false
 }) => {
   const [showPreview, setShowPreview] = useState(false);
+  const [previewInitialTab, setPreviewInitialTab] = useState<'comments' | 'fields'>('comments');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [internalSelected, setInternalSelected] = useState(false);
@@ -195,7 +196,8 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
       clickTimeoutRef.current = null;
     }
 
-    // Immediately open preview (no delay)
+    // Immediately open preview with Comments tab (default preview behavior)
+    setPreviewInitialTab('comments');
     setShowPreview(true);
     onDoubleClick?.(file);
   }, [onDoubleClick, file]);
@@ -459,11 +461,19 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowPreview(true); }}>
+                <DropdownMenuItem onClick={(e) => { 
+                  e.stopPropagation(); 
+                  setPreviewInitialTab('comments'); 
+                  setShowPreview(true); 
+                }}>
                   <Eye className="w-4 h-4 mr-2" />
                   Preview
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowPreview(true); }}>
+                <DropdownMenuItem onClick={(e) => { 
+                  e.stopPropagation(); 
+                  setPreviewInitialTab('fields'); 
+                  setShowPreview(true); 
+                }}>
                   <Info className="w-4 h-4 mr-2" />
                   Details
                 </DropdownMenuItem>
@@ -717,6 +727,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           onUpdate={onUpdate}
           onToggleFavorite={onToggleFavorite}
           userRole={userRole}
+          initialTab={previewInitialTab}
         />,
         document.body
       )}

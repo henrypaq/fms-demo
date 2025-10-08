@@ -50,6 +50,7 @@ interface FilePreviewModalProps {
   onToggleFavorite?: (fileId: string) => void;
   userRole?: 'admin' | 'employee';
   isPreviewMode?: boolean;
+  initialTab?: 'comments' | 'fields';
 }
 
 const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
@@ -59,7 +60,8 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
   onUpdate,
   onToggleFavorite,
   userRole = 'admin',
-  isPreviewMode = false
+  isPreviewMode = false,
+  initialTab = 'comments'
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState('');
@@ -76,6 +78,13 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
   const [comments, setComments] = useState<FileComment[]>([]);
   const [loadingComments, setLoadingComments] = useState(false);
   const [savingComment, setSavingComment] = useState(false);
+
+  // Set initial tab when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
 
   // Check permissions
   const canEdit = userRole === 'admin';
