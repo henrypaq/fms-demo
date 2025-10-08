@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, ChevronDown, Eye, Star } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui';
 import { Button } from '../ui';
 import { OptimisticFileItem } from '../../hooks/useOptimisticFileUpload';
+import BatchActionBar from '../BatchActionBar';
 
 interface FileGridSimpleProps {
   files: FileItem[];
@@ -395,6 +396,38 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
           </div>
         )}
       </div>
+
+      {/* Batch Action Bar - appears when files are selected */}
+      {selectedFiles.size > 0 && (
+        <BatchActionBar
+          selectedFiles={files.filter(f => selectedFiles.has(f.id))}
+          onClearSelection={() => {
+            if (onSelectionChange) {
+              onSelectionChange(new Set());
+            } else {
+              setInternalSelectedFiles(new Set());
+            }
+          }}
+          onBatchMove={async (fileIds, projectId, folderId) => {
+            // Move each file
+            if (onFileMove) {
+              for (const fileId of fileIds) {
+                await onFileMove(fileId, projectId, folderId);
+              }
+            }
+          }}
+          onBatchDelete={async (fileIds) => {
+            // Delete each file
+            if (onFileDelete) {
+              for (const fileId of fileIds) {
+                await onFileDelete(fileId);
+              }
+            }
+          }}
+          userRole={userRole}
+          userProjectAccess={userProjectAccess}
+        />
+      )}
     </div>
   );
 };
