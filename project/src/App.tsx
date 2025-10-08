@@ -164,10 +164,11 @@ function AppWithFileData({ currentWorkspace, currentUser }: { currentWorkspace: 
   } = useFileData(false, false); // No trash view
 
   // Enable optimistic uploads for instant UI feedback
-  const { optimisticFiles } = useOptimisticFileUpload();
+  const { optimisticFiles, uploadMultipleFiles } = useOptimisticFileUpload();
 
   // Merge optimistic files with real files (optimistic files appear first)
   const allFiles = React.useMemo(() => {
+    console.log('📦 Merging files:', { optimisticCount: optimisticFiles.length, realCount: (files as any[]).length });
     return [...optimisticFiles, ...(files as FileItem[])];
   }, [optimisticFiles, files]);
 
@@ -214,6 +215,7 @@ function AppWithFileData({ currentWorkspace, currentUser }: { currentWorkspace: 
       prevPage={prevPage}
       goToPage={goToPage}
       handleSortChange={handleSortChange}
+      uploadMultipleFiles={uploadMultipleFiles}
     />
   );
 }
@@ -239,7 +241,8 @@ function AppContentWithWorkspace({
   nextPage,
   prevPage,
   goToPage,
-  handleSortChange
+  handleSortChange,
+  uploadMultipleFiles
 }: { 
   currentWorkspace: unknown; 
   currentUser: unknown;
@@ -263,6 +266,7 @@ function AppContentWithWorkspace({
   prevPage: () => void;
   goToPage: (page: number) => void;
   handleSortChange: (sortBy: string, sortDirection: string) => void;
+  uploadMultipleFiles: (files: File[], projectId?: string, folderId?: string, autoTagging?: boolean) => Promise<boolean>;
 }) {
   // All hooks are called at the top level without any early returns
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
@@ -889,6 +893,7 @@ function AppContentWithWorkspace({
         <UploadSheet
           isOpen={showUploadSheet}
           onOpenChange={setShowUploadSheet}
+          uploadMultipleFiles={uploadMultipleFiles}
         />
 
         {/* Upload Modal (for header CTA) */}

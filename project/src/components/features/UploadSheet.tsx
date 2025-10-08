@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Upload, File, CheckCircle, AlertCircle, Loader, Clock } from 'lucide-react';
 import { useFileUpload } from '../../hooks/useFileUpload';
-import { useOptimisticFileUpload } from '../../hooks/useOptimisticFileUpload';
 import { FileRecord } from '../../lib/supabase';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useUploads } from '../../contexts/UploadContext';
@@ -69,6 +68,7 @@ CustomSheetContent.displayName = SheetPrimitive.Content.displayName;
 interface UploadSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  uploadMultipleFiles: (files: File[], projectId?: string, folderId?: string, autoTagging?: boolean) => Promise<boolean>;
   projectContext?: boolean;
   projectId?: string;
   folderId?: string;
@@ -81,6 +81,7 @@ interface RecentUpload extends FileRecord {
 const UploadSheet: React.FC<UploadSheetProps> = ({ 
   isOpen, 
   onOpenChange, 
+  uploadMultipleFiles,
   projectContext = false,
   projectId,
   folderId 
@@ -96,7 +97,6 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploads, isUploading, uploadFiles } = useFileUpload();
-  const { uploadMultipleFiles } = useOptimisticFileUpload();
 
   // Add/remove class to body to trigger sidebar color change
   useEffect(() => {
@@ -160,6 +160,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
       setSelectedFiles([]);
       
       // Use optimistic upload system
+      console.log('🚀 Starting optimistic upload for', filesToUpload.length, 'files');
       try {
         const success = await uploadMultipleFiles(
           filesToUpload,
@@ -170,10 +171,10 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
         
         // Optimistic upload system automatically handles file list updates
         if (success) {
-          console.log('✅ Upload complete - optimistic system will update UI automatically');
+          console.log('✅ Upload complete - optimistic files should be visible in grid');
         }
       } catch (error) {
-        console.error('Upload failed:', error);
+        console.error('❌ Upload failed:', error);
         setErrorMessage(error instanceof Error ? error.message : 'Upload failed. Please try again.');
       }
       
