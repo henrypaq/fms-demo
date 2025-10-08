@@ -158,6 +158,15 @@ export const useOptimisticFileUpload = () => {
       return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
     };
 
+    // Create thumbnail preview for videos
+    let thumbnailPreview: string | undefined = undefined;
+    if (file.type.startsWith('image/')) {
+      thumbnailPreview = URL.createObjectURL(file);
+    } else if (file.type.startsWith('video/')) {
+      // For videos, we'll generate a quick preview
+      thumbnailPreview = URL.createObjectURL(file);
+    }
+
     return {
       id: uploadId,
       name: file.name,
@@ -168,7 +177,7 @@ export const useOptimisticFileUpload = () => {
             file.type.includes('pdf') || file.type.includes('document') ? 'document' :
             file.type.includes('zip') || file.type.includes('archive') ? 'archive' : 'other',
       modifiedDate: new Date(now).toLocaleDateString(),
-      thumbnail: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
+      thumbnail: thumbnailPreview,
       isFavorite: false,
       tags: [],
       originalName: file.name,
@@ -251,8 +260,90 @@ export const useOptimisticFileUpload = () => {
         reader.onerror = () => resolve({ thumbnailPath: null, thumbnailUrl: null });
         reader.readAsDataURL(file);
       } else if (file.type.startsWith('video/')) {
-        // Generate video thumbnail (simplified)
-        resolve({ thumbnailPath: null, thumbnailUrl: null });
+        // Generate video thumbnail from first frame
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        video.muted = true;
+        video.playsInline = true;
+        
+        const videoUrl = URL.createObjectURL(file);
+        video.src = videoUrl;
+        
+        video.onloadedmetadata = async () => {
+          // Seek to 1 second or 10% of video duration for better thumbnail
+          const seekTime = Math.min(1, video.duration * 0.1);
+          video.currentTime = seekTime;
+        };
+        
+        video.onseeked = async () => {
+          try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const maxSize = 600;
+            
+            let { videoWidth: width, videoHeight: height } = video;
+            
+            // Scale to max size while maintaining aspect ratio
+            if (width > height) {
+              if (width > maxSize) {
+                height = (height * maxSize) / width;
+                width = maxSize;
+              }
+            } else {
+              if (height > maxSize) {
+                width = (width * maxSize) / height;
+                height = maxSize;
+              }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            ctx?.drawImage(video, 0, 0, width, height);
+            
+            const thumbnailBlob = await new Promise<Blob>((resolve) => {
+              canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', 0.92);
+            });
+            
+            const timestamp = Date.now();
+            const randomId = Math.random().toString(36).substring(2);
+            const thumbnailPath = `thumbnails/${currentWorkspace?.id}/thumb-video-${timestamp}-${randomId}.jpg`;
+            
+            const { error: thumbError } = await supabase.storage
+              .from('files')
+              .upload(thumbnailPath, thumbnailBlob, {
+                cacheControl: '3600',
+                upsert: false
+              });
+            
+            if (thumbError) {
+              console.warn('Video thumbnail upload failed:', thumbError);
+              URL.revokeObjectURL(videoUrl);
+              resolve({ thumbnailPath: null, thumbnailUrl: null });
+              return;
+            }
+            
+            const { data: urlData } = supabase.storage.from('files').getPublicUrl(thumbnailPath);
+            console.log('✅ Video thumbnail generated:', thumbnailPath);
+            URL.revokeObjectURL(videoUrl);
+            resolve({ thumbnailPath, thumbnailUrl: urlData.publicUrl });
+          } catch (error) {
+            console.warn('Video thumbnail generation failed:', error);
+            URL.revokeObjectURL(videoUrl);
+            resolve({ thumbnailPath: null, thumbnailUrl: null });
+          }
+        };
+        
+        video.onerror = () => {
+          console.warn('Video loading error');
+          URL.revokeObjectURL(videoUrl);
+          resolve({ thumbnailPath: null, thumbnailUrl: null });
+        };
+        
+        // Timeout fallback
+        setTimeout(() => {
+          URL.revokeObjectURL(videoUrl);
+          resolve({ thumbnailPath: null, thumbnailUrl: null });
+        }, 10000); // 10 second timeout
       } else {
         resolve({ thumbnailPath: null, thumbnailUrl: null });
       }
