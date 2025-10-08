@@ -96,6 +96,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
   const [savingComment, setSavingComment] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [showNativeEmojiPicker, setShowNativeEmojiPicker] = useState(false);
 
   // Set initial tab when modal opens
   useEffect(() => {
@@ -242,19 +243,35 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
         parent_comment_id: parentCommentId
       };
 
-      const { error } = await supabase
-        .from('file_comments')
-        .insert([replyData]);
+      console.log('💾 Saving reply with data:', replyData);
 
-      if (error) throw error;
+      const { data, error } = await supabase
+        .from('file_comments')
+        .insert([replyData])
+        .select();
+
+      if (error) {
+        console.error('❌ Supabase error saving reply:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        throw error;
+      }
+
+      console.log('✅ Reply saved successfully:', data);
 
       // Reload comments
       await loadComments();
       setReplyText('');
       setReplyingTo(null);
-    } catch (error) {
-      console.error('Error saving reply:', error);
-      alert('Failed to save reply. Please try again.');
+    } catch (error: any) {
+      console.error('❌ Error saving reply:', {
+        message: error?.message || 'Unknown error',
+        error: error
+      });
+      alert(`Failed to save reply: ${error?.message || 'Please check console for details'}`);
     } finally {
       setSavingComment(false);
     }
@@ -269,17 +286,24 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
       const currentUserEmail = user?.email || 'demo@example.com';
       const currentUserName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Demo User';
 
+      console.log('🎭 Toggling reaction:', { commentId, emoji, userEmail: currentUserEmail });
+
       // Check if user already reacted with this emoji
-      const { data: existingReaction } = await supabase
+      const { data: existingReaction, error: fetchError } = await supabase
         .from('comment_reactions')
         .select('*')
         .eq('comment_id', commentId)
         .eq('user_email', currentUserEmail)
         .eq('emoji', emoji)
-        .single();
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('❌ Error fetching existing reaction:', fetchError);
+      }
 
       if (existingReaction) {
         // Remove reaction
+        console.log('➖ Removing reaction');
         const { error } = await supabase
           .from('comment_reactions')
           .delete()
@@ -287,9 +311,14 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
           .eq('user_email', currentUserEmail)
           .eq('emoji', emoji);
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Error removing reaction:', error);
+          throw error;
+        }
+        console.log('✅ Reaction removed');
       } else {
         // Add reaction
+        console.log('➕ Adding reaction');
         const reactionData = {
           comment_id: commentId,
           user_id: user?.id || null,
@@ -302,13 +331,20 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
           .from('comment_reactions')
           .insert([reactionData]);
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Error adding reaction:', error);
+          throw error;
+        }
+        console.log('✅ Reaction added');
       }
 
       // Reload comments to update reactions
       await loadComments();
-    } catch (error) {
-      console.error('Error toggling reaction:', error);
+    } catch (error: any) {
+      console.error('❌ Error toggling reaction:', {
+        message: error?.message || 'Unknown error',
+        error: error
+      });
     }
   };
 
@@ -671,31 +707,75 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                                 </button>
                                 
                                 {/* Emoji Picker */}
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <button className="text-[#CFCFF6] hover:text-emerald-400 transition-colors">
-                                      <Smile className="w-4 h-4" />
-                                    </button>
-                                  </PopoverTrigger>
-                                  <PopoverContent 
-                                    className="w-auto p-2 bg-[#111111] border border-[#2A2A2A] shadow-lg"
-                                    sideOffset={5}
-                                  >
-                                    <div className="flex gap-1">
-                                      {['👍', '❤️', '😂', '😮', '👏'].map((emoji) => (
+                                <div className="relative inline-block">
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <button 
+                                        className="text-[#CFCFF6] hover:text-emerald-400 transition-colors"
+                                        title="Add reaction"
+                                      >
+                                        <Smile className="w-4 h-4" />
+                                      </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent 
+                                      className="w-auto p-2 bg-[#111111] border border-[#2A2A2A] shadow-lg z-[10000]"
+                                      sideOffset={5}
+                                      align="start"
+                                    >
+                                      <div className="flex flex-col gap-2">
+                                        <div className="flex gap-1">
+                                          {['👍', '❤️', '😂', '😮', '👏'].map((emoji) => (
+                                            <button
+                                              key={emoji}
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                toggleReaction(comment.id, emoji);
+                                              }}
+                                              className="text-xl p-2 rounded-md hover:bg-[#2A2A2A] transition-all duration-150"
+                                              title={`React with ${emoji}`}
+                                            >
+                                              {emoji}
+                                            </button>
+                                          ))}
+                                        </div>
+                                        {/* Native emoji picker trigger */}
                                         <button
-                                          key={emoji}
                                           onClick={() => {
-                                            toggleReaction(comment.id, emoji);
+                                            const input = document.createElement('input');
+                                            input.type = 'text';
+                                            input.style.position = 'absolute';
+                                            input.style.opacity = '0';
+                                            input.style.pointerEvents = 'none';
+                                            document.body.appendChild(input);
+                                            
+                                            // Try to trigger native emoji picker
+                                            input.focus();
+                                            
+                                            input.addEventListener('input', (e) => {
+                                              const emoji = (e.target as HTMLInputElement).value;
+                                              if (emoji) {
+                                                toggleReaction(comment.id, emoji);
+                                              }
+                                              document.body.removeChild(input);
+                                            });
+                                            
+                                            input.addEventListener('blur', () => {
+                                              setTimeout(() => {
+                                                if (document.body.contains(input)) {
+                                                  document.body.removeChild(input);
+                                                }
+                                              }, 100);
+                                            });
                                           }}
-                                          className="text-xl p-2 rounded-md hover:bg-[#2A2A2A] transition-all duration-150"
+                                          className="text-xs text-[#CFCFF6]/60 hover:text-[#CFCFF6] transition-colors px-2 py-1 rounded border border-[#2A2A2A] hover:border-[#3A3A3A]"
                                         >
-                                          {emoji}
+                                          More emojis...
                                         </button>
-                                      ))}
-                                    </div>
-                                  </PopoverContent>
-                                </Popover>
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -792,29 +872,70 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                                     )}
                                     
                                     {/* Emoji Picker for Replies */}
-                                    <div className="mt-2">
+                                    <div className="mt-2 relative inline-block">
                                       <Popover>
                                         <PopoverTrigger asChild>
-                                          <button className="text-[#CFCFF6]/60 hover:text-emerald-400 transition-colors">
+                                          <button 
+                                            className="text-[#CFCFF6]/60 hover:text-emerald-400 transition-colors"
+                                            title="Add reaction"
+                                          >
                                             <Smile className="w-3 h-3" />
                                           </button>
                                         </PopoverTrigger>
                                         <PopoverContent 
-                                          className="w-auto p-2 bg-[#111111] border border-[#2A2A2A] shadow-lg"
+                                          className="w-auto p-2 bg-[#111111] border border-[#2A2A2A] shadow-lg z-[10000]"
                                           sideOffset={5}
+                                          align="start"
                                         >
-                                          <div className="flex gap-1">
-                                            {['👍', '❤️', '😂', '😮', '👏'].map((emoji) => (
-                                              <button
-                                                key={emoji}
-                                                onClick={() => {
-                                                  toggleReaction(reply.id, emoji);
-                                                }}
-                                                className="text-lg p-1.5 rounded-md hover:bg-[#2A2A2A] transition-all duration-150"
-                                              >
-                                                {emoji}
-                                              </button>
-                                            ))}
+                                          <div className="flex flex-col gap-2">
+                                            <div className="flex gap-1">
+                                              {['👍', '❤️', '😂', '😮', '👏'].map((emoji) => (
+                                                <button
+                                                  key={emoji}
+                                                  onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    toggleReaction(reply.id, emoji);
+                                                  }}
+                                                  className="text-lg p-1.5 rounded-md hover:bg-[#2A2A2A] transition-all duration-150"
+                                                  title={`React with ${emoji}`}
+                                                >
+                                                  {emoji}
+                                                </button>
+                                              ))}
+                                            </div>
+                                            {/* Native emoji picker trigger */}
+                                            <button
+                                              onClick={() => {
+                                                const input = document.createElement('input');
+                                                input.type = 'text';
+                                                input.style.position = 'absolute';
+                                                input.style.opacity = '0';
+                                                input.style.pointerEvents = 'none';
+                                                document.body.appendChild(input);
+                                                
+                                                input.focus();
+                                                
+                                                input.addEventListener('input', (e) => {
+                                                  const emoji = (e.target as HTMLInputElement).value;
+                                                  if (emoji) {
+                                                    toggleReaction(reply.id, emoji);
+                                                  }
+                                                  document.body.removeChild(input);
+                                                });
+                                                
+                                                input.addEventListener('blur', () => {
+                                                  setTimeout(() => {
+                                                    if (document.body.contains(input)) {
+                                                      document.body.removeChild(input);
+                                                    }
+                                                  }, 100);
+                                                });
+                                              }}
+                                              className="text-xs text-[#CFCFF6]/60 hover:text-[#CFCFF6] transition-colors px-2 py-1 rounded border border-[#2A2A2A] hover:border-[#3A3A3A]"
+                                            >
+                                              More emojis...
+                                            </button>
                                           </div>
                                         </PopoverContent>
                                       </Popover>
