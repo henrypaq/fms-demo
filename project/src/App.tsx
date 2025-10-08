@@ -891,8 +891,16 @@ function AppContentWithWorkspace({
         <UploadSheet
           isOpen={showUploadSheet}
           onOpenChange={setShowUploadSheet}
+          projectContext={showProjectV3View && !!selectedProject}
+          projectId={showProjectV3View && selectedProject ? selectedProject.id : undefined}
+          folderId={showProjectV3View && sidebarData?.currentFolder ? sidebarData.currentFolder.id : undefined}
           onUploadComplete={() => {
-            console.log('🔄 [App.tsx] Upload complete - refreshing main files view');
+            console.log('🔄 [App.tsx] Upload complete - refreshing files');
+            console.log('📍 Context:', {
+              isProject: showProjectV3View,
+              projectId: selectedProject?.id,
+              folderId: sidebarData?.currentFolder?.id
+            });
             // Small delay to ensure DB commit
             setTimeout(() => {
               refreshFiles(currentActiveView);
@@ -904,8 +912,15 @@ function AppContentWithWorkspace({
         <UploadModal
           isOpen={showUploadModal}
           onClose={() => setShowUploadModal(false)}
+          projectId={showProjectV3View && selectedProject ? selectedProject.id : undefined}
+          folderId={showProjectV3View && sidebarData?.currentFolder ? sidebarData.currentFolder.id : undefined}
           onUploadComplete={() => {
-            console.log('🔄 [App.tsx] Upload complete - refreshing main files view');
+            console.log('🔄 [App.tsx] Upload complete - refreshing files');
+            console.log('📍 Context:', {
+              isProject: showProjectV3View,
+              projectId: selectedProject?.id,
+              folderId: sidebarData?.currentFolder?.id
+            });
             // Small delay to ensure DB commit
             setTimeout(() => {
               refreshFiles(currentActiveView);

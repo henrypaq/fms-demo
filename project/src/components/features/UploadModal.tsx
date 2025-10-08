@@ -9,9 +9,11 @@ interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onUploadComplete?: () => void;
+  projectId?: string;
+  folderId?: string;
 }
 
-const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComplete }) => {
+const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComplete, projectId, folderId }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -54,7 +56,8 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
     try {
       // uploadFiles signature: (files, manualTags, autoTaggingEnabled, projectId, folderId)
       // Always enable auto-tagging (3rd parameter = true)
-      await uploadFiles(selectedFiles, [], true);
+      console.log('📤 [UploadModal] Uploading to:', { projectId, folderId });
+      await uploadFiles(selectedFiles, [], true, projectId || undefined, folderId || undefined);
       setSelectedFiles([]);
       
       // Call completion callback to refresh file list
