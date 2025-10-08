@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, 
   Plus, 
@@ -1665,106 +1666,149 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
         </div>
       )}
       {/* Rename Folder Modal */}
-      {showRenameFolder && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-surface border border-dark-surface rounded-xl w-full max-w-md p-6">
-            <h3 className="text-lg font-bold text-white mb-4">Rename Folder</h3>
-            <input
-              type="text"
-              value={renameFolderName}
-              onChange={e => setRenameFolderName(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white mb-4"
-              autoFocus
-              maxLength={50}
-              disabled={isRenaming}
-            />
-            {renameError && <p className="text-red-400 text-sm mb-2">{renameError}</p>}
-            <div className="flex space-x-2">
-              <button
-                onClick={() => renameFolder(showRenameFolder.folder.id, renameFolderName)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium disabled:opacity-50"
-                disabled={isRenaming || !renameFolderName.trim()}
-              >{isRenaming ? 'Renaming...' : 'Rename'}</button>
-              <button
-                onClick={() => setShowRenameFolder(null)}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium"
+      <AnimatePresence>
+        {showRenameFolder && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          >
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.98, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: 10 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="bg-[#1A1C3A]/85 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md p-6"
+            >
+              <h3 className="text-xl font-bold text-[#CFCFF6] mb-4">Rename Folder</h3>
+              <input
+                type="text"
+                value={renameFolderName}
+                onChange={e => setRenameFolderName(e.target.value)}
+                className="w-full px-3 py-2 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50 mb-4"
+                autoFocus
+                maxLength={50}
                 disabled={isRenaming}
-              >Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
+              />
+              {renameError && <p className="text-red-400 text-sm mb-2">{renameError}</p>}
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => renameFolder(showRenameFolder.folder.id, renameFolderName)}
+                  className="flex-1 px-4 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isRenaming || !renameFolderName.trim()}
+                >{isRenaming ? 'Renaming...' : 'Rename'}</button>
+                <button
+                  onClick={() => setShowRenameFolder(null)}
+                  className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                  disabled={isRenaming}
+                >Cancel</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Delete Folder Modal */}
-      {showDeleteFolder && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-surface border border-dark-surface rounded-xl w-full max-w-md p-6">
-            <h3 className="text-lg font-bold text-white mb-4">Delete Folder</h3>
-            <p className="text-slate-400 mb-4">Are you sure you want to delete the folder <span className="text-white font-semibold">{showDeleteFolder.folder.name}</span>?</p>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => deleteFolder(showDeleteFolder.folder.id)}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium disabled:opacity-50"
-                disabled={isDeleting}
-              >{isDeleting ? 'Deleting...' : 'Delete'}</button>
-              <button
-                onClick={() => setShowDeleteFolder(null)}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium"
-                disabled={isDeleting}
-              >Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showDeleteFolder && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          >
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.98, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: 10 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="bg-[#1A1C3A]/85 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md p-6"
+            >
+              <h3 className="text-xl font-bold text-[#CFCFF6] mb-4">Delete Folder</h3>
+              <p className="text-[#CFCFF6]/70 mb-6">
+                Are you sure you want to delete the folder <span className="text-[#CFCFF6] font-semibold">{showDeleteFolder.folder.name}</span>?
+              </p>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => deleteFolder(showDeleteFolder.folder.id)}
+                  className="flex-1 px-4 py-2 border-2 border-red-500 bg-red-500/20 text-[#CFCFF6] hover:bg-red-500/30 hover:text-white hover:border-red-500 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isDeleting}
+                >{isDeleting ? 'Deleting...' : 'Delete'}</button>
+                <button
+                  onClick={() => setShowDeleteFolder(null)}
+                  className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                  disabled={isDeleting}
+                >Cancel</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Move Folder Modal */}
-      {showMoveFolder && (() => {
-        const folderToMove = showMoveFolder.folder;
-        
-        // Recursive function to check if a folder is a child of the folder being moved
-        const isChildOfMovedFolder = (folderId: string): boolean => {
-          if (folderId === folderToMove.id) return true;
-          const folder = folders.find(f => f.id === folderId);
-          if (!folder || !folder.parent_id) return false;
-          return isChildOfMovedFolder(folder.parent_id);
-        };
-
-        // Recursive function to render folder tree with selection
-        const renderFolderOption = (folder: any, level: number = 0): JSX.Element | null => {
-          const isDisabled = folder.id === folderToMove.id || isChildOfMovedFolder(folder.id);
+      <AnimatePresence>
+        {showMoveFolder && (() => {
+          const folderToMove = showMoveFolder.folder;
           
-          return (
-            <div key={folder.id}>
-              <button
-                type="button"
-                disabled={isDisabled || isMoving}
-                onClick={() => {
-                  setIsMoving(true);
-                  moveFolder(folderToMove.id, folder.id).finally(() => {
-                    setIsMoving(false);
-                    setShowMoveFolder(null);
-                  });
-                }}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ${
-                  isDisabled
-                    ? 'text-[#8A8C8E] opacity-50 cursor-not-allowed'
-                    : 'text-[#CFCFF6] hover:bg-[#22243E] hover:text-white'
-                }`}
-                style={{ paddingLeft: `${(level + 1) * 16 + 12}px` }}
-              >
-                <span className="flex items-center gap-2">
-                  <Folder className="w-4 h-4" />
-                  {folder.name}
-                  {isDisabled && ' (cannot move here)'}
-                </span>
-              </button>
-              {folder.children && folder.children.map((child: any) => renderFolderOption(child, level + 1))}
-            </div>
-          );
-        };
+          // Recursive function to check if a folder is a child of the folder being moved
+          const isChildOfMovedFolder = (folderId: string): boolean => {
+            if (folderId === folderToMove.id) return true;
+            const folder = folders.find(f => f.id === folderId);
+            if (!folder || !folder.parent_id) return false;
+            return isChildOfMovedFolder(folder.parent_id);
+          };
 
-        return (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl w-full max-w-md">
+          // Recursive function to render folder tree with selection
+          const renderFolderOption = (folder: any, level: number = 0): JSX.Element | null => {
+            const isDisabled = folder.id === folderToMove.id || isChildOfMovedFolder(folder.id);
+            
+            return (
+              <div key={folder.id}>
+                <button
+                  type="button"
+                  disabled={isDisabled || isMoving}
+                  onClick={() => {
+                    setIsMoving(true);
+                    moveFolder(folderToMove.id, folder.id).finally(() => {
+                      setIsMoving(false);
+                      setShowMoveFolder(null);
+                    });
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ${
+                    isDisabled
+                      ? 'text-[#8A8C8E] opacity-50 cursor-not-allowed'
+                      : 'text-[#CFCFF6] hover:bg-[#22243E] hover:text-white'
+                  }`}
+                  style={{ paddingLeft: `${(level + 1) * 16 + 12}px` }}
+                >
+                  <span className="flex items-center gap-2">
+                    <Folder className="w-4 h-4" />
+                    {folder.name}
+                    {isDisabled && ' (cannot move here)'}
+                  </span>
+                </button>
+                {folder.children && folder.children.map((child: any) => renderFolderOption(child, level + 1))}
+              </div>
+            );
+          };
+
+          return (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            >
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="bg-[#1A1C3A]/85 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md"
+              >
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-bold text-[#CFCFF6]">Move Folder</h3>
@@ -1818,10 +1862,11 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
-        );
-      })()}
+              </motion.div>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
     </div>
   );
 };
