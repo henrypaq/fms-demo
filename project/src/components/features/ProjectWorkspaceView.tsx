@@ -1494,11 +1494,11 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
       })() && (
         <div
           ref={folderMenuRef}
-          className="fixed z-[100] bg-[#1A1C3A]/95 backdrop-blur-md border border-[#6049E3]/40 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.6)] py-2 px-1 min-w-[160px]"
+          className="fixed z-[100] bg-[#1A1C3A] border border-[#2A2C45] rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.5)] py-1.5 px-1 min-w-[160px]"
           style={{ left: folderMenu.x, top: folderMenu.y }}
         >
           <button
-            className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-md transition-all duration-150 font-medium"
+            className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-[#CFCFF6] hover:bg-[#22243E] hover:text-white rounded-md transition-colors duration-150 font-medium"
             onClick={() => {
               console.log('✏️ Rename clicked for:', folderMenu.folder.name);
               setShowRenameFolder({ folder: folderMenu.folder });
@@ -1512,7 +1512,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
             Rename
           </button>
           <button
-            className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-md transition-all duration-150 font-medium"
+            className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-[#22243E] hover:text-red-300 rounded-md transition-colors duration-150 font-medium"
             onClick={() => {
               console.log('🗑️ Delete clicked for:', folderMenu.folder.name);
               setShowDeleteFolder({ folder: folderMenu.folder });
