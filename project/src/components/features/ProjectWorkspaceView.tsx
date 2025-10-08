@@ -260,6 +260,8 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
   const [isRenaming, setIsRenaming] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [renameError, setRenameError] = useState<string | null>(null);
+  const [showMoveFolder, setShowMoveFolder] = useState<{ folder: any } | null>(null);
+  const [isMoving, setIsMoving] = useState(false);
 
   const loadFolders = async () => {
     try {
@@ -943,7 +945,20 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                   {childFolders.map(folder => (
                     <tr
                       key={folder.id}
-                      className="hover:bg-slate-700 transition-colors duration-200 cursor-pointer"
+                      className={`hover:bg-slate-700 transition-colors duration-200 cursor-pointer ${
+                        dragOverFolder === folder.id ? 'bg-[#6049E3]/20 ring-2 ring-[#6049E3]' : ''
+                      } ${
+                        draggedItem?.type === 'folder' && draggedItem?.id === folder.id ? 'opacity-50' : ''
+                      }`}
+                      draggable
+                      onDragStart={(e) => {
+                        console.log('🎬 List folder drag started:', folder.name);
+                        handleDragStart(e, folder.id, 'folder');
+                      }}
+                      onDragEnd={handleDragEnd}
+                      onDragOver={(e) => handleDragOver(e, folder.id)}
+                      onDragLeave={handleDragLeave}
+                      onDrop={(e) => handleDrop(e, folder.id)}
                       onClick={() => selectFolder(folder)}
                       onContextMenu={(e) => {
                         e.preventDefault();
@@ -956,6 +971,11 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-white font-medium" colSpan={6}>
                         {folder.name}
+                        {dragOverFolder === folder.id && draggedItem && (
+                          <span className="ml-2 text-[#6049E3] text-xs">
+                            Drop to move here
+                          </span>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -1179,7 +1199,15 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
             {childFolders.map(folder => (
               <div
                 key={folder.id}
-                className="group bg-[#262626] border border-slate-600 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-[#262626]/80 transition-colors"
+                className={`group bg-[#262626] border rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-[#262626]/80 transition-all duration-200 ${
+                  dragOverFolder === folder.id
+                    ? 'border-[#6049E3] ring-2 ring-[#6049E3]/50 bg-[#6049E3]/10'
+                    : 'border-slate-600'
+                } ${
+                  draggedItem?.type === 'folder' && draggedItem?.id === folder.id
+                    ? 'opacity-50 scale-95'
+                    : ''
+                }`}
                 onClick={() => selectFolder(folder)}
                 onContextMenu={(e) => {
                   console.log('📌 Grid folder right-clicked:', folder.name);
@@ -1189,11 +1217,22 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                   setFolderMenu({ folder, x: e.clientX, y: e.clientY });
                 }}
                 draggable={true}
-                onDragStart={(e) => handleDragStart(e, folder.id, 'folder')}
+                onDragStart={(e) => {
+                  console.log('🎬 Grid folder drag started:', folder.name);
+                  handleDragStart(e, folder.id, 'folder');
+                }}
                 onDragEnd={handleDragEnd}
+                onDragOver={(e) => handleDragOver(e, folder.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, folder.id)}
               >
                 <Icon Icon={RiFolder3Line} size={IconSizes.card} color="#60a5fa" className="mb-2" />
                 <span className="text-white font-medium text-sm truncate w-full text-center">{folder.name}</span>
+                {dragOverFolder === folder.id && draggedItem && (
+                  <span className="text-[#6049E3] text-xs mt-1 font-medium">
+                    Drop here
+                  </span>
+                )}
               </div>
             ))}
           </div>
@@ -1512,6 +1551,19 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
             Rename
           </button>
           <button
+            className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-[#CFCFF6] hover:bg-[#22243E] hover:text-white rounded-md transition-colors duration-150 font-medium"
+            onClick={() => {
+              console.log('📦 Move clicked for:', folderMenu.folder.name);
+              setShowMoveFolder({ folder: folderMenu.folder });
+              setFolderMenu(null);
+            }}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+            Move
+          </button>
+          <button
             className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-[#22243E] hover:text-red-300 rounded-md transition-colors duration-150 font-medium"
             onClick={() => {
               console.log('🗑️ Delete clicked for:', folderMenu.folder.name);
@@ -1577,6 +1629,113 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Move Folder Modal */}
+      {showMoveFolder && (() => {
+        const folderToMove = showMoveFolder.folder;
+        
+        // Recursive function to check if a folder is a child of the folder being moved
+        const isChildOfMovedFolder = (folderId: string): boolean => {
+          if (folderId === folderToMove.id) return true;
+          const folder = folders.find(f => f.id === folderId);
+          if (!folder || !folder.parent_id) return false;
+          return isChildOfMovedFolder(folder.parent_id);
+        };
+
+        // Recursive function to render folder tree with selection
+        const renderFolderOption = (folder: any, level: number = 0): JSX.Element | null => {
+          const isDisabled = folder.id === folderToMove.id || isChildOfMovedFolder(folder.id);
+          
+          return (
+            <div key={folder.id}>
+              <button
+                type="button"
+                disabled={isDisabled || isMoving}
+                onClick={() => {
+                  setIsMoving(true);
+                  moveFolder(folderToMove.id, folder.id).finally(() => {
+                    setIsMoving(false);
+                    setShowMoveFolder(null);
+                  });
+                }}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ${
+                  isDisabled
+                    ? 'text-[#8A8C8E] opacity-50 cursor-not-allowed'
+                    : 'text-[#CFCFF6] hover:bg-[#22243E] hover:text-white'
+                }`}
+                style={{ paddingLeft: `${(level + 1) * 16 + 12}px` }}
+              >
+                <span className="flex items-center gap-2">
+                  <Folder className="w-4 h-4" />
+                  {folder.name}
+                  {isDisabled && ' (cannot move here)'}
+                </span>
+              </button>
+              {folder.children && folder.children.map((child: any) => renderFolderOption(child, level + 1))}
+            </div>
+          );
+        };
+
+        return (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl w-full max-w-md">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-[#CFCFF6]">Move Folder</h3>
+                  <button
+                    onClick={() => setShowMoveFolder(null)}
+                    disabled={isMoving}
+                    className="p-2 rounded-lg text-[#CFCFF6]/60 hover:text-white hover:bg-[#1A1C3A]/60 transition-colors duration-200 disabled:opacity-50"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="mb-4">
+                  <p className="text-sm text-[#CFCFF6]/70 mb-2">
+                    Moving: <span className="text-[#CFCFF6] font-medium">{folderToMove.name}</span>
+                  </p>
+                  <p className="text-sm text-[#CFCFF6]/70 mb-4">Select destination folder:</p>
+                </div>
+
+                <div className="max-h-[400px] overflow-y-auto border border-[#2A2C45]/40 rounded-lg bg-[#1A1C3A]/40 p-2">
+                  {/* Root / Project Root option */}
+                  <button
+                    type="button"
+                    disabled={isMoving}
+                    onClick={() => {
+                      setIsMoving(true);
+                      moveFolder(folderToMove.id, null).finally(() => {
+                        setIsMoving(false);
+                        setShowMoveFolder(null);
+                      });
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-[#CFCFF6] hover:bg-[#22243E] hover:text-white transition-colors duration-150"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Home className="w-4 h-4" />
+                      Project Root
+                    </span>
+                  </button>
+
+                  {/* Folder tree */}
+                  {folderTree.map(folder => renderFolderOption(folder, 0))}
+                </div>
+
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={() => setShowMoveFolder(null)}
+                    disabled={isMoving}
+                    className="flex-1 px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
