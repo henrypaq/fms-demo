@@ -50,6 +50,8 @@ const TagView: React.FC<TagViewProps> = ({
   const [renameTagValue, setRenameTagValue] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagSearch, setTagSearch] = useState('');
+  const [taggedFiles, setTaggedFiles] = useState<FileItem[]>([]);
+  const [loadingTaggedFiles, setLoadingTaggedFiles] = useState(false);
 
   // Check permissions
   const canEditTags = userRole === 'admin';
@@ -58,6 +60,120 @@ const TagView: React.FC<TagViewProps> = ({
   const normalizeTag = (tag: string): string => {
     return tag.toLowerCase().trim();
   };
+
+  // Fetch ALL files with selected tags from database
+  const fetchTaggedFiles = async (tags: string[]) => {
+    if (tags.length === 0 || !currentWorkspace) {
+      setTaggedFiles([]);
+      return;
+    }
+
+    setLoadingTaggedFiles(true);
+    try {
+      console.log('🔍 Fetching files with tags:', tags);
+      
+      // For PostgreSQL array contains query, we need to match any of the selected tags
+      // Using the @> operator to check if the tags array contains the search tags
+      const { data, error } = await supabase
+        .from('files')
+        .select('*')
+        .eq('workspace_id', currentWorkspace.id)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('❌ Failed to fetch tagged files:', error);
+        throw error;
+      }
+
+      console.log('📦 Fetched files:', data?.length || 0);
+
+      // Filter files that have ALL selected tags (case-insensitive)
+      const normalizedSelectedTags = tags.map((t: string) => normalizeTag(t));
+      const filteredFiles = (data || []).filter(file => {
+        if (!file.tags || file.tags.length === 0) return false;
+        const fileTags = file.tags.map((t: string) => normalizeTag(t));
+        return normalizedSelectedTags.every((selTag: string) => fileTags.includes(selTag));
+      });
+
+      console.log('✅ Filtered files with all selected tags:', filteredFiles.length);
+
+      // Convert to FileItem format
+      const fileItems: FileItem[] = filteredFiles.map(file => ({
+        id: file.id,
+        name: file.name,
+        type: file.file_category as any,
+        size: formatBytes(file.file_size),
+        modifiedDate: new Date(file.updated_at || file.created_at).toLocaleDateString(),
+        thumbnail: file.thumbnail_url,
+        isFavorite: file.is_favorite,
+        tags: file.tags || [],
+        originalName: file.original_name,
+        filePath: file.file_path,
+        fileType: file.file_type,
+        fileSize: file.file_size,
+        fileUrl: file.file_url,
+        workspaceId: file.workspace_id,
+        projectId: file.project_id,
+        folderId: file.folder_id
+      }));
+
+      setTaggedFiles(fileItems);
+    } catch (err) {
+      console.error('Failed to fetch tagged files:', err);
+      setTaggedFiles([]);
+    } finally {
+      setLoadingTaggedFiles(false);
+    }
+  };
+
+  // Helper to format bytes
+  const formatBytes = (bytes: number): string => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
+  // Fetch tagged files when selected tags change
+  useEffect(() => {
+    fetchTaggedFiles(selectedTags);
+  }, [selectedTags, currentWorkspace]);
+
+  // Real-time subscription for file changes
+  useEffect(() => {
+    if (!currentWorkspace) return;
+
+    console.log('📡 Setting up real-time subscription for tag changes');
+
+    const channel = supabase
+      .channel('tag-files-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'files',
+          filter: `workspace_id=eq.${currentWorkspace.id}`
+        },
+        (payload) => {
+          console.log('🔄 File change detected:', payload);
+          // Re-fetch tagged files if we have selected tags
+          if (selectedTags.length > 0) {
+            fetchTaggedFiles(selectedTags);
+          }
+          // Also refresh the main files list for tag stats
+          refreshFiles();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('🔌 Cleaning up tag changes subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [currentWorkspace, selectedTags, refreshFiles]);
 
   // Don't render if workspace is not available
   if (!currentWorkspace) {
@@ -231,6 +347,10 @@ const TagView: React.FC<TagViewProps> = ({
 
       setShowRenameTag(null);
       await refreshFiles();
+      // Re-fetch tagged files if we have any selected
+      if (selectedTags.length > 0) {
+        await fetchTaggedFiles(selectedTags);
+      }
       
     } catch (error) {
       console.error('Failed to rename tag:', error);
@@ -278,6 +398,10 @@ const TagView: React.FC<TagViewProps> = ({
       }
 
       await refreshFiles();
+      // Re-fetch tagged files if we have any selected
+      if (selectedTags.length > 0) {
+        await fetchTaggedFiles(selectedTags);
+      }
       
     } catch (error) {
       console.error('Failed to merge tags:', error);
@@ -319,6 +443,10 @@ const TagView: React.FC<TagViewProps> = ({
 
       setShowDeleteConfirm(null);
       await refreshFiles();
+      // Re-fetch tagged files if we have any selected
+      if (selectedTags.length > 0) {
+        await fetchTaggedFiles(selectedTags);
+      }
       
     } catch (error) {
       console.error('Failed to delete tag:', error);
@@ -329,14 +457,6 @@ const TagView: React.FC<TagViewProps> = ({
   };
 
   const tagStats = getTagStats();
-
-  const selectedTagFiles = selectedTags.length > 0
-    ? files.filter(file =>
-        selectedTags.every(selTag =>
-          file.tags && file.tags.some(fileTag => normalizeTag(fileTag) === normalizeTag(selTag))
-        )
-      )
-    : [];
 
   if (loading) {
     return (
@@ -449,25 +569,39 @@ const TagView: React.FC<TagViewProps> = ({
                 <p className="text-[#8A8C8E]">Select one or more tags to view files with those tags.</p>
               </div>
             </div>
-          ) : selectedTagFiles.length === 0 ? (
+          ) : loadingTaggedFiles ? (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center space-y-4">
+                <RiLoader4Line className="w-8 h-8 text-[#6049E3] animate-spin mx-auto" />
+                <p className="text-[#8A8C8E]">Loading tagged files...</p>
+              </div>
+            </div>
+          ) : taggedFiles.length === 0 ? (
             <div className="flex items-center justify-center min-h-[400px]">
               <div className="text-center space-y-4">
                 <RiPriceTag3Line className="w-12 h-12 mx-auto text-[#8A8C8E]" />
-                <p className="text-[#8A8C8E]">No files found with all selected tags.</p>
+                <p className="text-[#CFCFF6]">No files found with all selected tags</p>
+                <p className="text-[#8A8C8E] text-sm">
+                  Selected tags: {selectedTags.map(t => `"${t}"`).join(', ')}
+                </p>
               </div>
             </div>
           ) : (
             <div className="space-y-4 overflow-visible">
               <h3 className="text-[#CFCFF6] font-semibold text-lg">
-                Files with {selectedTags.length} tag{selectedTags.length > 1 ? 's' : ''} selected ({selectedTagFiles.length})
+                Files with {selectedTags.length} tag{selectedTags.length > 1 ? 's' : ''} selected ({taggedFiles.length})
               </h3>
               <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible">
-                {selectedTagFiles.map(file => (
+                {taggedFiles.map(file => (
                   <FileCard
                     key={file.id}
                     file={file}
                     onToggleFavorite={toggleFavorite}
-                    onUpdate={updateFile}
+                    onUpdate={async (fileId, updates) => {
+                      await updateFile(fileId, updates);
+                      // Re-fetch tagged files to show updated tags
+                      await fetchTaggedFiles(selectedTags);
+                    }}
                     userRole={userRole}
                   />
                 ))}

@@ -344,22 +344,40 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
       
       if (updates.name !== undefined) dbUpdates.name = updates.name;
       if (updates.tags !== undefined) {
-        // Normalize tags to lowercase and remove duplicates
-        const normalizedTags = [...new Set(updates.tags.map(tag => tag.toLowerCase()))];
+        // Trim whitespace and remove duplicates (case-insensitive)
+        const normalizedTags: string[] = [];
+        const seenLowercase = new Set<string>();
+        
+        for (const tag of updates.tags) {
+          const trimmed = tag.trim();
+          const lowercase = trimmed.toLowerCase();
+          if (trimmed && !seenLowercase.has(lowercase)) {
+            normalizedTags.push(trimmed); // Keep original case
+            seenLowercase.add(lowercase);
+          }
+        }
+        
         dbUpdates.tags = normalizedTags;
+        dbUpdates.updated_at = new Date().toISOString();
       }
       if (updates.isFavorite !== undefined) dbUpdates.is_favorite = updates.isFavorite;
       if (updates.projectId !== undefined) dbUpdates.project_id = updates.projectId || undefined;
       if (updates.folderId !== undefined) dbUpdates.folder_id = updates.folderId || undefined;
       if (updates.fileUrl !== undefined) dbUpdates.file_url = updates.fileUrl || undefined;
 
+      console.log('🏷️ Updating file tags:', { fileId, updates: dbUpdates });
 
       const { error } = await supabase
         .from('files')
         .update(dbUpdates)
         .eq('id', fileId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Tag update failed:', error);
+        throw error;
+      }
+
+      console.log('✅ Tag update successful');
 
       // Update local state immediately for better UX
       setFiles(prev => prev.map(file => 
@@ -368,11 +386,11 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
 
       markFilesAsUpdated();
 
-      // If we moved the file to a different project/folder, refresh to update the view
-      if (updates.projectId !== undefined || updates.folderId !== undefined) {
+      // If we updated tags or moved the file, refresh to ensure consistency
+      if (updates.tags !== undefined || updates.projectId !== undefined || updates.folderId !== undefined) {
         setTimeout(() => {
           loadFiles(currentPage, false, undefined, undefined, activeView);
-        }, 100);
+        }, 200);
       }
 
     } catch (err) {
