@@ -326,7 +326,6 @@ function AppContentWithWorkspace({
 
   // Apply search filters using the hook - must be called at top level
   const searchFilteredFiles = useFileSearch(files, searchFilters);
-  console.log('🔍 After search filter:', { inputCount: (files as any[]).length, outputCount: searchFilteredFiles.length });
 
   // Apply additional filters using the new hook - this handles favorites filtering
   const { filteredFiles } = useFileFilters({
@@ -339,18 +338,6 @@ function AppContentWithWorkspace({
     selectedTags: searchFilters.tags,
     activeView: currentActiveView
   });
-  console.log('🎯 After all filters:', { inputCount: searchFilteredFiles.length, outputCount: filteredFiles.length, files: filteredFiles.map((f: any) => ({ name: f.name, isOptimistic: f.isOptimistic })) });
-
-  // Separate optimistic files from regular files for proper rendering
-  const optimisticFilesOnly = React.useMemo(() => {
-    return filteredFiles.filter((f: any) => f.isOptimistic);
-  }, [filteredFiles]);
-  
-  const regularFilesOnly = React.useMemo(() => {
-    return filteredFiles.filter((f: any) => !f.isOptimistic);
-  }, [filteredFiles]);
-  
-  console.log('🔀 Split files:', { optimistic: optimisticFilesOnly.length, regular: regularFilesOnly.length });
 
   // Selection handlers - must be after filteredFiles is defined
   const handleSelectAll = useCallback(() => {
@@ -861,8 +848,7 @@ function AppContentWithWorkspace({
                   />
                 ) : (
                   <FileGridSimple
-                    files={regularFilesOnly}
-                    optimisticFiles={optimisticFilesOnly as any}
+                    files={filteredFiles}
                     onFileClick={(file) => setSelectedFile(file)}
                     onFileDoubleClick={handleFileDoubleClick}
                     onFileUpdate={handleFileUpdate}
