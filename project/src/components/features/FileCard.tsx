@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { 
   Image, 
   Music, 
@@ -95,7 +95,18 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
   const [newName, setNewName] = useState(file.name);
   const [showTagsEdit, setShowTagsEdit] = useState(false);
   const [editedTags, setEditedTags] = useState<string[]>(file.tags || []);
+  
+  // Ref to store click timeout for double-click detection
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Check if employee has access to this file's project
   const hasProjectAccess = userRole === 'admin' || 
@@ -149,19 +160,34 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
 
 
   const handleCardClick = useCallback(() => {
-    // Toggle internal selection state
-    const newSelected = !internalSelected;
-    setInternalSelected(newSelected);
-    
-    // Call external handlers if provided
-    if (onSelectionChange) {
-      onSelectionChange(file.id, newSelected);
-    } else {
-      onClick?.(file);
+    // Clear any existing timeout
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
     }
+
+    // Set a delay for single-click action (250ms is standard for double-click detection)
+    clickTimeoutRef.current = setTimeout(() => {
+      // Toggle internal selection state
+      const newSelected = !internalSelected;
+      setInternalSelected(newSelected);
+      
+      // Call external handlers if provided
+      if (onSelectionChange) {
+        onSelectionChange(file.id, newSelected);
+      } else {
+        onClick?.(file);
+      }
+    }, 250);
   }, [internalSelected, onSelectionChange, onClick, file]);
 
   const handleDoubleClick = useCallback(() => {
+    // Cancel the pending single-click action
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
+
+    // Immediately open preview (no delay)
     setShowPreview(true);
     onDoubleClick?.(file);
   }, [onDoubleClick, file]);
