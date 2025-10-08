@@ -594,7 +594,14 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
   // Folders to show in the main content area (children of currentFolder)
   const childFolders = useMemo(() => {
-    return folders.filter(f => (currentFolder ? f.parent_id === currentFolder.id : !f.parent_id));
+    const result = folders.filter(f => (currentFolder ? f.parent_id === currentFolder.id : !f.parent_id));
+    console.log('📁 Child folders for main grid:', {
+      currentFolder: currentFolder?.name || 'Root',
+      totalFolders: folders.length,
+      childFoldersCount: result.length,
+      childFolders: result.map(f => f.name)
+    });
+    return result;
   }, [folders, currentFolder]);
 
   // Filter and sort files
