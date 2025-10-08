@@ -271,12 +271,23 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
         .is('deleted_at', null)
         .order('path');
 
-      if (foldersError) throw foldersError;
+      if (foldersError) {
+        console.error('❌ Supabase error loading folders:', {
+          message: foldersError.message,
+          details: foldersError.details,
+          hint: foldersError.hint,
+          code: foldersError.code,
+          fullError: foldersError
+        });
+        throw foldersError;
+      }
 
-      console.log('📂 Loaded folders:', foldersData?.length || 0, foldersData);
+      console.log('✅ Successfully loaded folders:', foldersData?.length || 0, foldersData);
       setFolders(foldersData || []);
     } catch (err) {
-      console.error('Error loading folders:', err);
+      console.error('❌ Error loading folders - Full error object:', err);
+      console.error('❌ Error message:', err instanceof Error ? err.message : 'Unknown error');
+      console.error('❌ Error details:', JSON.stringify(err, null, 2));
     }
   };
 
