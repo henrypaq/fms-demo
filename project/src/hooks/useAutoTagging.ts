@@ -1,7 +1,68 @@
 import { useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
-const N8N_WEBHOOK_URL = 'https://njord-gear.app.n8n.cloud/webhook/d2855857-3e7b-4465-b627-89ed188f2151';
+/**
+ * N8N Auto-Tagging Webhook Configuration
+ * 
+ * Webhook URL: https://callistoai.app.n8n.cloud/webhook/d2855857-3e7b-4465-b627-89ed188f2151
+ * 
+ * HOW TAGS ARE STORED IN SUPABASE:
+ * ================================
+ * - Table: "files"
+ * - Column: "tags" 
+ * - Type: text[] (PostgreSQL text array)
+ * - Default: '{}' (empty array)
+ * 
+ * TAG PAYLOAD SENT TO N8N:
+ * ========================
+ * The webhook receives:
+ * {
+ *   fileId: string,              // UUID of the file in Supabase
+ *   fileName: string,             // Display name (no extension)
+ *   originalName: string,         // Full file name with extension
+ *   fileType: string,             // MIME type (e.g., "image/jpeg")
+ *   fileCategory: string,         // Category: "image", "video", "audio", "document", "archive", "other"
+ *   fileSize: number,             // Size in bytes
+ *   fileUrl: string,              // Public URL to download/analyze the file
+ *   thumbnailUrl: string | null,  // Public thumbnail URL (for images/videos)
+ *   filePath: string,             // Storage path in Supabase
+ *   workspaceId: string,          // Workspace UUID
+ *   projectId: string | null,     // Project UUID (if in a project)
+ *   folderId: string | null,      // Folder UUID (if in a folder)
+ *   currentTags: string[],        // Existing tags (for manual re-tagging)
+ *   timestamp: string,            // ISO 8601 timestamp
+ *   triggerType: string,          // "manual" or "automatic"
+ *   context: {
+ *     workspace?: string,
+ *     uploadSource: string        // "filevault-manual-retag" or "filevault-web"
+ *   }
+ * }
+ * 
+ * EXPECTED N8N RESPONSE:
+ * ======================
+ * The n8n workflow should return:
+ * {
+ *   tags: string[]                // Array of tag strings (e.g., ["design", "ui", "mockup"])
+ * }
+ * 
+ * TAG SYNCING LOGIC:
+ * ==================
+ * 1. File uploaded → webhook triggered → n8n analyzes → returns tags array
+ * 2. Tags stored directly in files.tags column as PostgreSQL text array
+ * 3. No separate tags table - tags are embedded in each file record
+ * 4. Tags can be updated via: 
+ *    UPDATE files SET tags = ARRAY['tag1', 'tag2'] WHERE id = 'file-uuid'
+ * 
+ * IMPORTANT NOTES FOR N8N WORKFLOW:
+ * ==================================
+ * - Return tags as a JSON array of strings
+ * - Tags should be lowercase for consistency
+ * - Empty array [] is valid (means "no tags")
+ * - n8n can use fileUrl to download and analyze the file
+ * - thumbnailUrl is available for visual content analysis
+ * - The workflow should respond within 30 seconds to avoid timeouts
+ */
+const N8N_WEBHOOK_URL = 'https://callistoai.app.n8n.cloud/webhook/d2855857-3e7b-4465-b627-89ed188f2151';
 
 export interface AutoTaggingResult {
   success: boolean;

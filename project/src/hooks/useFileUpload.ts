@@ -11,7 +11,25 @@ interface UploadProgress {
   error?: string;
 }
 
-const N8N_WEBHOOK_URL = 'https://njord-gear.app.n8n.cloud/webhook/d2855857-3e7b-4465-b627-89ed188f2151';
+/**
+ * N8N Auto-Tagging Webhook for File Uploads
+ * 
+ * This webhook is triggered automatically when files are uploaded.
+ * It sends file metadata to n8n for AI-powered tag generation.
+ * 
+ * Webhook URL: https://callistoai.app.n8n.cloud/webhook/d2855857-3e7b-4465-b627-89ed188f2151
+ * 
+ * WORKFLOW:
+ * 1. File uploaded to Supabase Storage → Public URL generated
+ * 2. Thumbnail generated (if image/video) → Public thumbnail URL
+ * 3. File record created in Supabase "files" table
+ * 4. Webhook triggered with file metadata + URLs
+ * 5. n8n analyzes file and returns tags array
+ * 6. Tags stored in files.tags column (text[] array)
+ * 
+ * See useAutoTagging.ts for detailed webhook documentation.
+ */
+const N8N_WEBHOOK_URL = 'https://callistoai.app.n8n.cloud/webhook/d2855857-3e7b-4465-b627-89ed188f2151';
 
 export const useFileUpload = () => {
   const [uploads, setUploads] = useState<UploadProgress[]>([]);
