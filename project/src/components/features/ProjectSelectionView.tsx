@@ -66,7 +66,7 @@ const CreateProjectModal: React.FC<{
       <div className="bg-dark-surface border border-dark-surface rounded-xl w-full max-w-md">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-white">Create Project</h3>
+            <h3 className="text-xl font-bold text-[#CFCFF6]">Create Project</h3>
             <Button onClick={onClose} variant="ghost" size="icon" className="h-10 w-10">
               <X className="w-5 h-5" />
             </Button>
@@ -123,7 +123,7 @@ const CreateProjectModal: React.FC<{
               <button
                 type="submit"
                 disabled={!name.trim()}
-                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-light-text hover:bg-light-text/90 disabled:bg-dark-surface disabled:cursor-not-allowed text-dark-bg rounded-lg font-medium transition-colors duration-200"
+                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4" />
                 <span>Create Project</span>
@@ -131,7 +131,7 @@ const CreateProjectModal: React.FC<{
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-dark-surface hover:bg-dark-bg text-light-text rounded-lg font-medium transition-colors duration-200"
+                className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200"
               >
                 Cancel
               </button>
