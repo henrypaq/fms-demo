@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, 
@@ -19,7 +19,8 @@ import {
   Play,
   Pause,
   MessageSquare,
-  Info
+  Info,
+  Loader
 } from 'lucide-react';
 import { RiFile3Line, RiVideoLine } from '@remixicon/react';
 import { Icon, IconSizes, IconColors } from './ui/Icon';
@@ -28,6 +29,18 @@ import { supabase } from '../lib/supabase';
 import AutoTaggingButton from './AutoTaggingButton';
 import TagInput from './TagInput';
 import VideoPlayer from './VideoPlayer';
+
+interface FileComment {
+  id: string;
+  file_id: string;
+  user_id: string | null;
+  user_name: string;
+  user_email: string;
+  comment_text: string;
+  timestamp_seconds: number | null;
+  created_at: string;
+  updated_at: string;
+}
 
 interface FilePreviewModalProps {
   file: FileItem | null;
@@ -60,18 +73,78 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
   const [commentText, setCommentText] = useState('');
   const [videoCurrentTime, setVideoCurrentTime] = useState(0);
   const [showTimestamp, setShowTimestamp] = useState(true);
+  const [comments, setComments] = useState<FileComment[]>([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [savingComment, setSavingComment] = useState(false);
 
   // Check permissions
   const canEdit = userRole === 'admin';
   const canEditTags = userRole === 'admin';
 
-  React.useEffect(() => {
+  const loadComments = async () => {
+    if (!file) return;
+    
+    setLoadingComments(true);
+    try {
+      const { data, error } = await supabase
+        .from('file_comments')
+        .select('*')
+        .eq('file_id', file.id)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setComments(data || []);
+    } catch (error) {
+      console.error('Error loading comments:', error);
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+  // Load comments when file changes
+  useEffect(() => {
     if (file) {
       setEditedName(file.name);
       setEditedTags(file.tags || []);
       setEditedFileUrl(file.fileUrl || '');
+      loadComments();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
+
+  const saveComment = async () => {
+    if (!commentText.trim() || !file) return;
+
+    setSavingComment(true);
+    try {
+      // Get current user or use demo user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const commentData = {
+        file_id: file.id,
+        user_id: user?.id || null,
+        user_name: user?.user_metadata?.name || user?.email?.split('@')[0] || 'Demo User',
+        user_email: user?.email || 'demo@example.com',
+        comment_text: commentText.trim(),
+        timestamp_seconds: (file.type === 'video' && showTimestamp) ? videoCurrentTime : null
+      };
+
+      const { error } = await supabase
+        .from('file_comments')
+        .insert([commentData]);
+
+      if (error) throw error;
+
+      // Reload comments
+      await loadComments();
+      setCommentText('');
+    } catch (error) {
+      console.error('Error saving comment:', error);
+      alert('Failed to save comment. Please try again.');
+    } finally {
+      setSavingComment(false);
+    }
+  };
 
 
   // Prevent drag operations on the modal content
@@ -368,14 +441,49 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                   <h3 className="text-lg font-semibold text-[#CFCFF6]">Comments</h3>
                 </div>
                 <div className="space-y-4 flex-1">
-                  {/* Placeholder for comments - not functional yet */}
-                  <div className="text-center py-8">
-                    <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <User className="w-6 h-6 text-slate-400" />
+                  {loadingComments ? (
+                    <div className="text-center py-8">
+                      <Loader className="w-8 h-8 text-[#6049E3] animate-spin mx-auto mb-3" />
+                      <p className="text-[#CFCFF6]/60 text-sm">Loading comments...</p>
                     </div>
-                    <p className="text-slate-400 text-sm">No comments yet</p>
-                    <p className="text-slate-500 text-xs mt-1">Be the first to add a comment</p>
-                  </div>
+                  ) : comments.length > 0 ? (
+                    comments.map((comment) => (
+                      <div key={comment.id} className="bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg p-3">
+                        <div className="flex items-start space-x-3">
+                          <div className="w-8 h-8 bg-[#6049E3]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <User className="w-4 h-4 text-[#6049E3]" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="text-sm font-medium text-[#CFCFF6]">{comment.user_name}</p>
+                              <p className="text-xs text-[#CFCFF6]/50">
+                                {new Date(comment.created_at).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </p>
+                            </div>
+                            {comment.timestamp_seconds !== null && (
+                              <div className="bg-amber-900/40 text-amber-300 px-2 py-0.5 rounded text-xs font-mono inline-block mb-2">
+                                {formatTime(comment.timestamp_seconds)}
+                              </div>
+                            )}
+                            <p className="text-sm text-[#CFCFF6]/80 break-words">{comment.comment_text}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="w-12 h-12 bg-[#1A1C3A]/60 border border-[#2A2C45] rounded-full flex items-center justify-center mx-auto mb-3">
+                        <MessageSquare className="w-6 h-6 text-[#8A8C8E]" />
+                      </div>
+                      <p className="text-[#CFCFF6]/60 text-sm">No comments yet</p>
+                      <p className="text-[#CFCFF6]/40 text-xs mt-1">Be the first to add a comment</p>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Comment Input within sidebar */}
@@ -397,8 +505,9 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                         onChange={(e) => setCommentText(e.target.value)}
                         className="flex-1 min-w-0 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg px-3 py-2 text-[#CFCFF6] placeholder-[#CFCFF6]/40 text-sm focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50 transition-all duration-200"
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' && commentText.trim()) {
-                            setCommentText('');
+                          if (e.key === 'Enter' && commentText.trim() && !savingComment) {
+                            e.preventDefault();
+                            saveComment();
                           }
                         }}
                       />
@@ -419,17 +528,18 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                       
                       {/* Send Button */}
                       <button
-                        onClick={() => {
-                          if (commentText.trim()) {
-                            setCommentText('');
-                          }
-                        }}
-                        className="border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white p-2 rounded-lg transition-all duration-200"
+                        onClick={saveComment}
+                        disabled={!commentText.trim() || savingComment}
+                        className="border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed p-2 rounded-lg transition-all duration-200"
                         title="Send comment"
                       >
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                        </svg>
+                        {savingComment ? (
+                          <Loader className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                          </svg>
+                        )}
                       </button>
                     </div>
                   </div>
