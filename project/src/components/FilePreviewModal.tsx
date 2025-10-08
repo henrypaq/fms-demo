@@ -325,7 +325,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: 10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="bg-[#1A1C3A]/85 backdrop-blur-md rounded-xl border border-[#2A2C45]/60 w-full max-w-[calc(100vw-4rem)] max-h-[calc(100vh-4rem)] overflow-hidden shadow-2xl relative"
+            className="bg-[#080A15]/95 backdrop-blur-md rounded-xl border border-[#2A2C45]/40 w-full max-w-[calc(100vw-4rem)] max-h-[calc(100vh-4rem)] overflow-hidden shadow-2xl relative"
             draggable={false}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
@@ -512,7 +512,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                         placeholder="Leave your comment..."
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
-                        className="flex-1 min-w-0 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg px-3 py-2 text-[#CFCFF6] placeholder-[#CFCFF6]/40 text-sm focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50 transition-all duration-200"
+                        className="flex-1 min-w-0 bg-[#1A1C3A]/60 border-2 border-[#2A2C45]/60 rounded-lg px-3 py-2 text-[#CFCFF6] placeholder-[#CFCFF6]/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#6049E3] focus:border-[#6049E3] hover:bg-[#1A1C3A]/80 hover:border-[#2A2C45]/80 transition-all duration-200"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && commentText.trim() && !savingComment) {
                             e.preventDefault();
@@ -568,7 +568,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                     type="text"
                     value={editedName}
                     onChange={(e) => setEditedName(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg text-[#CFCFF6] focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50 transition-all duration-200"
+                    className="w-full px-3 py-2 bg-[#1A1C3A]/60 border-2 border-[#2A2C45]/60 rounded-lg text-[#CFCFF6] focus:outline-none focus:ring-2 focus:ring-[#6049E3] focus:border-[#6049E3] hover:bg-[#1A1C3A]/80 hover:border-[#2A2C45]/80 transition-all duration-200"
                   />
                 ) : (
                   <p className="text-[#CFCFF6] font-medium">{file.name}</p>
