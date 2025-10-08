@@ -93,10 +93,22 @@ export const useOptimisticFileUpload = () => {
 
       const result = await response.json();
       console.log('✅ n8n webhook response:', result);
+      console.log('📋 Full webhook response data:', JSON.stringify(result, null, 2));
 
-      // If n8n returns tags immediately, update the file
+      // n8n workflow is asynchronous - it returns {"message":"Workflow was started"}
+      // n8n will analyze the file and update the database directly with tags
+      // Our Realtime subscription will detect the update and refresh the file list
+      
+      if (result.message === 'Workflow was started') {
+        console.log('🚀 n8n workflow started successfully - tags will be added asynchronously');
+        console.log('⏳ n8n will analyze the file and update tags in the database');
+        console.log('🔄 Realtime subscription will auto-refresh when tags are updated');
+      }
+
+      // If n8n returns tags immediately (synchronous mode), update the file
       if (result.tags && Array.isArray(result.tags) && result.tags.length > 0) {
-        console.log('🏷️ Updating file with tags:', result.tags);
+        console.log('🏷️ n8n returned tags immediately:', result.tags);
+        console.log('📝 Updating file with tags:', result.tags);
         
         const { error: updateError } = await supabase
           .from('files')
@@ -110,6 +122,8 @@ export const useOptimisticFileUpload = () => {
           // Trigger a refresh of the file list
           queryClient.invalidateQueries({ queryKey: ['files'] });
         }
+      } else {
+        console.log('⏭️ No immediate tags returned - waiting for n8n to update database');
       }
 
     } catch (error) {
