@@ -89,15 +89,29 @@ const TagView: React.FC<TagViewProps> = ({
 
       console.log('📦 Fetched files:', data?.length || 0);
 
-      // Filter files that have ALL selected tags (case-insensitive)
-      const normalizedSelectedTags = tags.map((t: string) => normalizeTag(t));
-      const filteredFiles = (data || []).filter(file => {
-        if (!file.tags || file.tags.length === 0) return false;
-        const fileTags = file.tags.map((t: string) => normalizeTag(t));
-        return normalizedSelectedTags.every((selTag: string) => fileTags.includes(selTag));
-      });
-
-      console.log('✅ Filtered files with all selected tags:', filteredFiles.length);
+      // Check if "(empty)" tag is selected
+      const hasEmptyTag = tags.includes('(empty)');
+      
+      let filteredFiles;
+      if (hasEmptyTag && tags.length === 1) {
+        // Show only files with no tags
+        filteredFiles = (data || []).filter(file => !file.tags || file.tags.length === 0);
+        console.log('📭 Showing untagged files:', filteredFiles.length);
+      } else {
+        // Filter files that have ALL selected tags (case-insensitive)
+        // Exclude "(empty)" from the normalized tags
+        const normalizedSelectedTags = tags
+          .filter(t => t !== '(empty)')
+          .map((t: string) => normalizeTag(t));
+        
+        filteredFiles = (data || []).filter(file => {
+          if (!file.tags || file.tags.length === 0) return false;
+          const fileTags = file.tags.map((t: string) => normalizeTag(t));
+          return normalizedSelectedTags.every((selTag: string) => fileTags.includes(selTag));
+        });
+        
+        console.log('✅ Filtered files with all selected tags:', filteredFiles.length);
+      }
 
       // Convert to FileItem format
       const fileItems: FileItem[] = filteredFiles.map(file => ({
@@ -209,6 +223,17 @@ const TagView: React.FC<TagViewProps> = ({
         color: getTagHexColor(tag)
       });
     });
+
+    // Add special "(empty)" tag for untagged files
+    const untaggedFiles = files.filter(file => !file.tags || file.tags.length === 0);
+    if (untaggedFiles.length > 0) {
+      tagStats.push({
+        tag: '(empty)',
+        count: untaggedFiles.length,
+        files: untaggedFiles,
+        color: '#8A8C8E' // Gray color for empty tag
+      });
+    }
 
     // Apply filtering
     let filteredStats = tagStats;

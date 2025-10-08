@@ -38,8 +38,10 @@ interface FileComment {
   user_email: string;
   comment_text: string;
   timestamp_seconds: number | null;
+  parent_comment_id: string | null;
   created_at: string;
   updated_at: string;
+  replies?: FileComment[];
 }
 
 interface FilePreviewModalProps {
@@ -78,6 +80,8 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
   const [comments, setComments] = useState<FileComment[]>([]);
   const [loadingComments, setLoadingComments] = useState(false);
   const [savingComment, setSavingComment] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
 
   // Set initial tab when modal opens
   useEffect(() => {
@@ -102,7 +106,16 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setComments(data || []);
+      
+      // Structure comments with replies
+      const allComments = data || [];
+      const topLevelComments = allComments.filter(c => !c.parent_comment_id);
+      const structuredComments = topLevelComments.map(comment => ({
+        ...comment,
+        replies: allComments.filter(c => c.parent_comment_id === comment.id)
+      }));
+      
+      setComments(structuredComments);
     } catch (error) {
       console.error('Error loading comments:', error);
     } finally {
@@ -135,7 +148,8 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
         user_name: user?.user_metadata?.name || user?.email?.split('@')[0] || 'Demo User',
         user_email: user?.email || 'demo@example.com',
         comment_text: commentText.trim(),
-        timestamp_seconds: (file.type === 'video' && showTimestamp) ? videoCurrentTime : null
+        timestamp_seconds: (file.type === 'video' && showTimestamp) ? videoCurrentTime : null,
+        parent_comment_id: null
       };
 
       const { error } = await supabase
@@ -150,6 +164,42 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
     } catch (error) {
       console.error('Error saving comment:', error);
       alert('Failed to save comment. Please try again.');
+    } finally {
+      setSavingComment(false);
+    }
+  };
+
+  const saveReply = async (parentCommentId: string) => {
+    if (!replyText.trim() || !file) return;
+
+    setSavingComment(true);
+    try {
+      // Get current user or use demo user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const replyData = {
+        file_id: file.id,
+        user_id: user?.id || null,
+        user_name: user?.user_metadata?.name || user?.email?.split('@')[0] || 'Demo User',
+        user_email: user?.email || 'demo@example.com',
+        comment_text: replyText.trim(),
+        timestamp_seconds: null,
+        parent_comment_id: parentCommentId
+      };
+
+      const { error } = await supabase
+        .from('file_comments')
+        .insert([replyData]);
+
+      if (error) throw error;
+
+      // Reload comments
+      await loadComments();
+      setReplyText('');
+      setReplyingTo(null);
+    } catch (error) {
+      console.error('Error saving reply:', error);
+      alert('Failed to save reply. Please try again.');
     } finally {
       setSavingComment(false);
     }
@@ -457,31 +507,117 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                     </div>
                   ) : comments.length > 0 ? (
                     comments.map((comment) => (
-                      <div key={comment.id} className="bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg p-3">
-                        <div className="flex items-start space-x-3">
-                          <div className="w-8 h-8 bg-[#6049E3]/20 rounded-full flex items-center justify-center flex-shrink-0">
-                            <User className="w-4 h-4 text-[#6049E3]" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-1">
-                              <p className="text-sm font-medium text-[#CFCFF6]">{comment.user_name}</p>
-                              <p className="text-xs text-[#CFCFF6]/50">
-                                {new Date(comment.created_at).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </p>
+                      <div key={comment.id} className="space-y-3">
+                        {/* Main Comment */}
+                        <div className="bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg p-3">
+                          <div className="flex items-start space-x-3">
+                            <div className="w-8 h-8 bg-[#6049E3]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                              <User className="w-4 h-4 text-[#6049E3]" />
                             </div>
-                            {comment.timestamp_seconds !== null && (
-                              <div className="bg-amber-900/40 text-amber-300 px-2 py-0.5 rounded text-xs font-mono inline-block mb-2">
-                                {formatTime(comment.timestamp_seconds)}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-1">
+                                <p className="text-sm font-medium text-[#CFCFF6]">{comment.user_name}</p>
+                                <p className="text-xs text-[#CFCFF6]/50">
+                                  {new Date(comment.created_at).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </p>
                               </div>
-                            )}
-                            <p className="text-sm text-[#CFCFF6]/80 break-words">{comment.comment_text}</p>
+                              {comment.timestamp_seconds !== null && (
+                                <div className="bg-amber-900/40 text-amber-300 px-2 py-0.5 rounded text-xs font-mono inline-block mb-2">
+                                  {formatTime(comment.timestamp_seconds)}
+                                </div>
+                              )}
+                              <p className="text-sm text-[#CFCFF6]/80 break-words">{comment.comment_text}</p>
+                              
+                              {/* Reply Button */}
+                              <button
+                                onClick={() => setReplyingTo(comment.id)}
+                                className="mt-2 text-xs text-[#6049E3] hover:text-[#7D66FF] transition-colors font-medium"
+                              >
+                                Reply
+                              </button>
+                            </div>
                           </div>
                         </div>
+
+                        {/* Reply Input (if replying to this comment) */}
+                        {replyingTo === comment.id && (
+                          <div className="ml-11 space-y-2">
+                            <div className="flex items-end gap-2">
+                              <input
+                                type="text"
+                                placeholder="Write a reply..."
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                className="flex-1 min-w-0 bg-[#1A1C3A]/60 border-2 border-[#2A2C45]/60 rounded-lg px-3 py-2 text-[#CFCFF6] placeholder-[#CFCFF6]/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#6049E3] focus:border-[#6049E3] hover:bg-[#1A1C3A]/80 hover:border-[#2A2C45]/80 transition-all duration-200"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' && replyText.trim() && !savingComment) {
+                                    e.preventDefault();
+                                    saveReply(comment.id);
+                                  }
+                                  if (e.key === 'Escape') {
+                                    setReplyingTo(null);
+                                    setReplyText('');
+                                  }
+                                }}
+                                autoFocus
+                              />
+                              <button
+                                onClick={() => saveReply(comment.id)}
+                                disabled={!replyText.trim() || savingComment}
+                                className="px-3 py-2 bg-[#6049E3] hover:bg-[#6049E3]/90 text-white rounded-lg font-medium transition-all duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                              >
+                                {savingComment ? (
+                                  <Loader className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <span>Reply</span>
+                                )}
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setReplyingTo(null);
+                                  setReplyText('');
+                                }}
+                                className="px-3 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200 text-sm"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Nested Replies */}
+                        {comment.replies && comment.replies.length > 0 && (
+                          <div className="ml-11 space-y-2">
+                            {comment.replies.map((reply) => (
+                              <div key={reply.id} className="bg-[#1A1C3A]/30 border border-[#2A2C45]/30 rounded-lg p-3">
+                                <div className="flex items-start space-x-3">
+                                  <div className="w-6 h-6 bg-[#6049E3]/15 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <User className="w-3 h-3 text-[#6049E3]" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <p className="text-xs font-medium text-[#CFCFF6]">{reply.user_name}</p>
+                                      <p className="text-xs text-[#CFCFF6]/50">
+                                        {new Date(reply.created_at).toLocaleDateString('en-US', {
+                                          month: 'short',
+                                          day: 'numeric',
+                                          hour: '2-digit',
+                                          minute: '2-digit'
+                                        })}
+                                      </p>
+                                    </div>
+                                    <p className="text-xs text-[#CFCFF6]/80 break-words">{reply.comment_text}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))
                   ) : (

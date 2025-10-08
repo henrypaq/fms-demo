@@ -148,7 +148,7 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
                       </span>
                     </div>
 
-                    {canEditTags && (
+                    {canEditTags && stat.tag !== '(empty)' && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                           <button className={`opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-white/10 transition-all ${isSelected ? 'text-white' : 'text-[#8A8C8E]'}`}>
