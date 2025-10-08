@@ -372,7 +372,7 @@ export const useFileUpload = () => {
           }
 
           // Create database record with only manual tags
-          const fileRecord: Omit<FileRecord, 'id' | 'created_at' | 'updated_at'> = {
+          const fileRecord: any = {
             name: file.name.replace(/\.[^/.]+$/, ''), // Remove extension for display name
             original_name: file.name,
             file_path: filePath,
@@ -380,15 +380,28 @@ export const useFileUpload = () => {
             file_category: getFileCategory(file.type || ''),
             file_size: file.size,
             file_url: fileUrl, // Store public URL for n8n automation
-            thumbnail_url: thumbnailUrl,
-            tags: manualTags || [], // Only manual tags initially
             is_favorite: false,
             workspace_id: currentWorkspace.id,
             project_id: targetProjectId,
             folder_id: targetFolderId,
           };
 
+          // Add thumbnail_url only if it exists
+          if (thumbnailUrl) {
+            fileRecord.thumbnail_url = thumbnailUrl;
+          }
+
+          // Don't include tags field - let database use default
+          // Adding empty array [] causes PostgreSQL "malformed array literal" error
+
           updateUploadProgress(uploadId, 85);
+
+          console.log('📝 [useFileUpload] Inserting file record:', {
+            name: fileRecord.name,
+            project_id: fileRecord.project_id,
+            folder_id: fileRecord.folder_id,
+            workspace_id: fileRecord.workspace_id
+          });
 
           const { data: insertedFile, error: dbError } = await supabase
             .from('files')
@@ -397,11 +410,18 @@ export const useFileUpload = () => {
             .single();
 
           if (dbError) {
-            console.error('Database insert error:', dbError);
+            console.error('❌ [useFileUpload] Database insert error:', {
+              message: dbError.message,
+              code: dbError.code,
+              details: dbError.details,
+              hint: dbError.hint
+            });
             // Try to clean up uploaded file
             await supabase.storage.from('files').remove([filePath]);
             throw new Error(`Database error: ${dbError.message}`);
           }
+
+          console.log('✅ [useFileUpload] File record inserted successfully:', insertedFile.id);
 
           updateUploadProgress(uploadId, 95);
 
