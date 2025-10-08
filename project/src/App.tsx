@@ -394,6 +394,7 @@ function AppContentWithWorkspace({
 
 
   const handleViewChange = useCallback((view: string) => {
+    console.log('View change:', view);
     
     // Reset all view flags first
     setShowAdminDashboard(false);
@@ -401,6 +402,12 @@ function AppContentWithWorkspace({
     setShowUploadsView(false);
     setShowTagsView(false);
     setShowFilesView(false);
+    
+    // Reset project-specific state when leaving project view
+    if (view !== 'project-v3') {
+      setSelectedProject(null);
+      setSidebarData(null);
+    }
     
     // Handle special views
     if (view === 'project-v3') {
@@ -447,9 +454,11 @@ function AppContentWithWorkspace({
 
   const handleBackToProjectsList = useCallback(() => {
     console.log('Back to projects list clicked');
+    // Clear project-specific state
     setSelectedProject(null);
     setSidebarData(null);
-    // Force a clean reset by staying on project view
+    // Don't need to call handleViewChange - the key prop will force remount
+    // The ProjectV3View will automatically show the projects list when selectedProject is null
   }, []);
 
   const handleBackFromAdminDashboard = useCallback(() => {
@@ -508,7 +517,8 @@ function AppContentWithWorkspace({
 
   const getViewTitle = () => {
     if (showProjectV3View) {
-      return 'Projects';
+      // Show project name when inside a project, otherwise show "Projects"
+      return selectedProject ? selectedProject.name : 'Projects';
     }
     if (showAdminDashboard) {
       return 'Admin Dashboard';
@@ -764,8 +774,10 @@ function AppContentWithWorkspace({
               />
             )}
 
+            {/* Mutually exclusive view rendering - only ONE view shows at a time */}
+            
             {/* Projects View - no wrapper padding as it manages its own */}
-            {showProjectV3View && (
+            {showProjectV3View ? (
               <ProjectV3View 
                 key={selectedProject?.id || 'projects-list'} // Force remount on project change
                 onBack={handleBackFromProjectV3}
@@ -774,64 +786,58 @@ function AppContentWithWorkspace({
                 onProjectBackClick={handleBackToProjectsList}
                 triggerCreateProject={triggerCreateProject}
               />
-            )}
-
-            {/* Tags View - no wrapper padding as it manages its own */}
-            {showTagsView && (
+            ) : showTagsView ? (
+              /* Tags View - no wrapper padding as it manages its own */
               <TagView 
                 userRole={currentUser?.role || 'employee'}
                 triggerCreateTag={triggerCreateTag}
               />
-            )}
-
-            <div className={showProjectV3View || showTagsView ? "overflow-visible" : "px-6 py-4 overflow-visible"}>
-              {/* Admin Dashboard */}
-              {showAdminDashboard && (
+            ) : showAdminDashboard ? (
+              /* Admin Dashboard */
+              <div className="px-6 py-4 overflow-visible">
                 <AdminDashboard onClose={handleBackFromAdminDashboard} />
-              )}
-              
-              {/* File Views (Dashboard, Recent, Favorites, Trash) */}
-              {showFilesView && (
-                <div className="h-full">
-                  {shouldShowGlobalSearch ? (
-                <GlobalSearchResults
-                  query={searchFilters.query}
-                  selectedTags={searchFilters.tags}
-                  files={globalSearchResults.files}
-                  loading={globalSearchResults.loading}
-                />
-                  ) : (
-                    <FileGridSimple
-                      files={filteredFiles}
-                      onFileClick={(file) => setSelectedFile(file)}
-                      onFileDoubleClick={handleFileDoubleClick}
-                      onFileUpdate={handleFileUpdate}
-                      onFileDelete={handleFileDelete}
-                      onFileMove={handleFileMove}
-                      filterType={activeView as any}
-                      loading={loading}
-                      totalCount={totalCount}
-                      hasNextPage={hasNextPage}
-                      hasPrevPage={hasPrevPage}
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onNextPage={nextPage}
-                      onPrevPage={prevPage}
-                      onGoToPage={goToPage}
-                      viewMode={viewMode}
-                      onViewModeChange={setViewMode}
-                      sortBy={serverSortBy}
-                      sortDirection={serverSortDirection}
-                      onSortChange={handleSortChange}
-                      isCollapsed={fileGridCollapsed}
-                      tagsVisible={tagsVisible}
-                      selectedFileIds={selectedFileIds}
-                      onSelectionChange={setSelectedFileIds}
-                    />
-                  )}
-                </div>
-              )}
-            </div>
+              </div>
+            ) : showFilesView ? (
+              /* File Views (Dashboard, Recent, Favorites, Trash) */
+              <div className="px-6 py-4 overflow-visible h-full">
+                {shouldShowGlobalSearch ? (
+                  <GlobalSearchResults
+                    query={searchFilters.query}
+                    selectedTags={searchFilters.tags}
+                    files={globalSearchResults.files}
+                    loading={globalSearchResults.loading}
+                  />
+                ) : (
+                  <FileGridSimple
+                    files={filteredFiles}
+                    onFileClick={(file) => setSelectedFile(file)}
+                    onFileDoubleClick={handleFileDoubleClick}
+                    onFileUpdate={handleFileUpdate}
+                    onFileDelete={handleFileDelete}
+                    onFileMove={handleFileMove}
+                    filterType={activeView as any}
+                    loading={loading}
+                    totalCount={totalCount}
+                    hasNextPage={hasNextPage}
+                    hasPrevPage={hasPrevPage}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onNextPage={nextPage}
+                    onPrevPage={prevPage}
+                    onGoToPage={goToPage}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                    sortBy={serverSortBy}
+                    sortDirection={serverSortDirection}
+                    onSortChange={handleSortChange}
+                    isCollapsed={fileGridCollapsed}
+                    tagsVisible={tagsVisible}
+                    selectedFileIds={selectedFileIds}
+                    onSelectionChange={setSelectedFileIds}
+                  />
+                )}
+              </div>
+            ) : null}
           </div>
         </div>
         </div>
