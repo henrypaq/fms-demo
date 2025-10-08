@@ -2,10 +2,9 @@ import React from 'react';
 import { RiPriceTag3Line, RiAddLine, RiEditLine, RiDeleteBinLine, RiMore2Fill, RiSearchLine } from '@remixicon/react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
-import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu-shadcn';
-import { getTagHexColor } from '../ui/TagBadge';
+import { TagBadge } from '../ui/TagBadge';
 
 interface TagStats {
   tag: string;
@@ -133,19 +132,18 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
                   <div
                     className={`group flex items-center justify-between px-3 py-2 rounded-md cursor-pointer transition-all duration-200 ${
                       isSelected
-                        ? 'bg-[#6049E3] text-white'
-                        : 'text-[#CFCFF6] hover:bg-[#1A1C3A] hover:text-white'
+                        ? 'bg-[#1A1C3A]/60 text-white'
+                        : 'text-[#CFCFF6] hover:bg-[#1A1C3A]/40 hover:text-white'
                     }`}
                     onClick={() => onTagSelect(stat.tag)}
                   >
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <Badge
-                        style={{ backgroundColor: getTagHexColor(stat.tag) }}
-                        className="text-white text-xs px-2 py-0.5 truncate font-medium"
-                      >
-                        {stat.tag}
-                      </Badge>
-                      <span className={`text-xs ${isSelected ? 'text-white/70' : 'text-[#8A8C8E]'}`}>
+                      <TagBadge
+                        tag={stat.tag}
+                        variant="sidebar"
+                        className="max-w-[140px]"
+                      />
+                      <span className={`text-xs font-medium ${isSelected ? 'text-[#CFCFF6]/80' : 'text-[#8A8C8E]'}`}>
                         {stat.count}
                       </span>
                     </div>
