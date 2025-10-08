@@ -473,8 +473,9 @@
 }
 
 [data-radix-dropdown-menu-content],
-[data-radix-context-menu-content] {
-  /* Override any inherited transitions */
+[data-radix-context-menu-content],
+[data-radix-popper-content-wrapper] {
+  /* Override any inherited transitions - use only animations */
   transition: none !important;
 }
 
