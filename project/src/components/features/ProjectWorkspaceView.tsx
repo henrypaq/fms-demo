@@ -834,12 +834,17 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
           style={{ paddingLeft: `${8 + level * 16}px` }}
           onClick={() => selectFolder(folder)}
           onContextMenu={(e) => {
+            console.log('📌 Inline sidebar folder right-clicked:', folder.name);
             e.preventDefault();
             e.stopPropagation();
+            console.log('📍 Setting inline folder menu at:', e.clientX, e.clientY);
             setFolderMenu({ folder, x: e.clientX, y: e.clientY });
           }}
           draggable
-          onDragStart={(e) => handleDragStart(e, folder.id, 'folder')}
+          onDragStart={(e) => {
+            console.log('🎬 Inline sidebar drag started:', folder.name);
+            handleDragStart(e, folder.id, 'folder');
+          }}
           onDragOver={(e) => handleDragOver(e, folder.id)}
           onDragLeave={handleDragLeave}
           onDrop={(e) => handleDrop(e, folder.id)}
