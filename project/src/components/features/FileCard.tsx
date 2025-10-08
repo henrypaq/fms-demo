@@ -560,8 +560,8 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4">
-          <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-12 h-12 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center">
@@ -606,15 +606,15 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
 
       {/* Rename Modal */}
       {showRename && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[300] p-4">
-          <div className="bg-card border border-border rounded-xl w-full max-w-md">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" onClick={() => setShowRename(false)}>
+          <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
-              <h3 className="text-lg font-bold text-foreground mb-4">Rename File</h3>
+              <h3 className="text-lg font-bold text-[#CFCFF6] mb-4">Rename File</h3>
               <input
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+                className="w-full px-3 py-2 border border-[#2A2C45] rounded-md bg-[hsl(240,30%,8%)] text-[#CFCFF6] focus:outline-none focus:ring-2 focus:ring-[#6049E3]"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleRename();
@@ -622,12 +622,19 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                 }}
               />
               <div className="flex space-x-3 mt-4">
-                <Button onClick={handleRename} disabled={!newName.trim() || newName === file.name}>
+                <button
+                  onClick={handleRename}
+                  disabled={!newName.trim() || newName === file.name}
+                  className="flex-1 px-4 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 hover:bg-[#6049E3]/30 disabled:opacity-50 disabled:cursor-not-allowed text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
+                >
                   Rename
-                </Button>
-                <Button variant="outline" onClick={() => setShowRename(false)}>
+                </button>
+                <button
+                  onClick={() => setShowRename(false)}
+                  className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
+                >
                   Cancel
-                </Button>
+                </button>
               </div>
             </div>
           </div>
@@ -636,10 +643,10 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
 
       {/* Tags Edit Modal */}
       {showTagsEdit && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[300] p-4">
-          <div className="bg-card border border-border rounded-xl w-full max-w-md">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" onClick={() => setShowTagsEdit(false)}>
+          <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
-              <h3 className="text-lg font-bold text-foreground mb-4">Edit Tags</h3>
+              <h3 className="text-lg font-bold text-[#CFCFF6] mb-4">Edit Tags</h3>
               <div className="space-y-2">
                 {editedTags.map((tag, index) => (
                   <div key={index} className="flex items-center space-x-2">
@@ -651,32 +658,36 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                         newTags[index] = e.target.value;
                         setEditedTags(newTags);
                       }}
-                      className="flex-1 px-3 py-2 border border-border rounded-md bg-background text-foreground"
+                      className="flex-1 px-3 py-2 border border-[#2A2C45] rounded-md bg-[hsl(240,30%,8%)] text-[#CFCFF6] focus:outline-none focus:ring-2 focus:ring-[#6049E3]"
                     />
-                    <Button
-                      variant="outline"
-                      size="sm"
+                    <button
                       onClick={() => setEditedTags(editedTags.filter((_, i) => i !== index))}
+                      className="px-3 py-2 text-xs bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-md transition-all duration-200"
                     >
                       Remove
-                    </Button>
+                    </button>
                   </div>
                 ))}
-                <Button
-                  variant="outline"
+                <button
                   onClick={() => setEditedTags([...editedTags, ''])}
-                  className="w-full"
+                  className="w-full px-4 py-2 border border-[#2A2C45] bg-[#1A1C3A]/40 hover:bg-[#1A1C3A]/60 text-[#CFCFF6] hover:text-white rounded-md transition-all duration-200"
                 >
                   Add Tag
-                </Button>
+                </button>
               </div>
               <div className="flex space-x-3 mt-4">
-                <Button onClick={handleTagsUpdate}>
+                <button
+                  onClick={handleTagsUpdate}
+                  className="flex-1 px-4 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 hover:bg-[#6049E3]/30 text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
+                >
                   Save Tags
-                </Button>
-                <Button variant="outline" onClick={() => setShowTagsEdit(false)}>
+                </button>
+                <button
+                  onClick={() => setShowTagsEdit(false)}
+                  className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
+                >
                   Cancel
-                </Button>
+                </button>
               </div>
             </div>
           </div>
@@ -685,7 +696,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
 
       {/* Share Success Toast */}
       {showShareSuccess && (
-        <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md z-[100]">
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-[9999]">
           Share link copied to clipboard!
         </div>
       )}
