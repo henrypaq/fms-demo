@@ -404,14 +404,35 @@ const TagView: React.FC<TagViewProps> = ({
     
     setIsProcessing(true);
     try {
+      console.log('🗑️ Deleting tag:', { original: tagToDelete, normalized: normalizedTagToDelete, isEmpty: normalizedTagToDelete === '' });
+      
       const filesToUpdate = files.filter(file => 
-        file.tags && file.tags.some(tag => normalizeTag(tag) === normalizedTagToDelete)
+        file.tags && file.tags.some(tag => {
+          const normalizedFileTag = normalizeTag(tag);
+          // For empty tags, match both empty normalized tags AND exact empty/whitespace strings
+          if (normalizedTagToDelete === '') {
+            return normalizedFileTag === '' || tag.trim() === '';
+          }
+          return normalizedFileTag === normalizedTagToDelete;
+        })
       );
+
+      console.log('📝 Files to update:', filesToUpdate.length);
 
       if (filesToUpdate.length > 0) {
         for (const file of filesToUpdate) {
-          if (file.tags && file.tags.some(tag => normalizeTag(tag) === normalizedTagToDelete)) {
-            const updatedTags = file.tags.filter(tag => normalizeTag(tag) !== normalizedTagToDelete);
+          if (file.tags) {
+            // Filter out the tag to delete
+            const updatedTags = file.tags.filter(tag => {
+              const normalizedFileTag = normalizeTag(tag);
+              // For empty tags, remove both empty normalized tags AND exact empty/whitespace strings
+              if (normalizedTagToDelete === '') {
+                return normalizedFileTag !== '' && tag.trim() !== '';
+              }
+              return normalizedFileTag !== normalizedTagToDelete;
+            });
+            
+            console.log('🔄 Updating file:', file.name, 'from', file.tags.length, 'to', updatedTags.length, 'tags');
             
             const { error: updateError } = await supabase
               .from('files')
@@ -419,12 +440,15 @@ const TagView: React.FC<TagViewProps> = ({
               .eq('id', file.id);
 
             if (updateError) {
+              console.error('❌ Update error:', updateError);
               throw new Error(`Failed to update file: ${updateError.message}`);
             }
           }
         }
 
         markFilesAsUpdated();
+      } else {
+        console.log('⚠️ No files found with this tag');
       }
 
       setShowDeleteConfirm(null);
@@ -433,6 +457,8 @@ const TagView: React.FC<TagViewProps> = ({
       if (selectedTags.length > 0) {
         await fetchTaggedFiles(selectedTags);
       }
+      
+      console.log('✅ Tag deleted successfully');
       
     } catch (error) {
       console.error('Failed to delete tag:', error);
@@ -724,8 +750,13 @@ const TagView: React.FC<TagViewProps> = ({
           </DialogHeader>
           
           <p className="text-[#CFCFF6] py-4">
-            Are you sure you want to delete the tag <span className="font-medium text-white">"{showDeleteConfirm}"</span>? 
+            Are you sure you want to delete the tag <span className="font-medium text-white">"{showDeleteConfirm || '(empty)'}"</span>? 
             This will remove it from all files.
+            {showDeleteConfirm?.trim() === '' && (
+              <span className="block mt-2 text-sm text-yellow-400">
+                ⚠️ This is an empty/invalid tag that should be removed.
+              </span>
+            )}
           </p>
 
           <DialogFooter>

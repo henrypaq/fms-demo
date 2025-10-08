@@ -139,7 +139,7 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
                   >
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <TagBadge
-                        tag={stat.tag}
+                        tag={stat.tag || '(empty)'}
                         variant="sidebar"
                         className="max-w-[140px]"
                       />
