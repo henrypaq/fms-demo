@@ -1340,46 +1340,48 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                     }
                   }
                 }}
-                className={`group flex items-center justify-between w-full rounded-lg px-4 py-3 h-[52px] cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.2)] active:scale-[0.99] ${
-                  dragOverFolder === folder.id
-                    ? 'bg-[#6049E3]/20 border-[#6049E3] ring-2 ring-[#6049E3]/50'
-                    : 'bg-[#1A1C3A] border-transparent hover:bg-[#22243E] hover:border-[#2A2C45]'
-                } ${
-                  draggedItem?.type === 'folder' && draggedItem?.id === folder.id
-                    ? 'opacity-50 cursor-grabbing'
-                    : ''
-                } border`}
-                style={{
-                  cursor: draggedItem?.type === 'folder' && draggedItem?.id === folder.id ? 'grabbing' : 'pointer'
-                }}
-                onClick={(e) => {
-                  // Only navigate if it's a simple click (not after dragging)
-                  if (!draggedItem || draggedItem.id !== folder.id) {
-                    selectFolder(folder);
-                  }
-                }}
-                onContextMenu={(e) => {
-                  console.log('📌 Grid folder right-clicked:', folder.name);
-                  e.preventDefault();
-                  e.stopPropagation();
-                  console.log('📍 Setting grid folder menu at:', e.clientX, e.clientY);
-                  setFolderMenu({ folder, x: e.clientX, y: e.clientY });
-                }}
-                draggable={true}
-                onDragStart={(e) => {
-                  console.log('🎬 Grid folder drag started:', folder.name);
-                  e.currentTarget.style.cursor = 'grabbing';
-                  handleDragStart(e, folder.id, 'folder');
-                }}
-                onDragEnd={(e) => {
-                  console.log('🏁 Grid folder drag ended:', folder.name);
-                  e.currentTarget.style.cursor = 'pointer';
-                  handleDragEnd(e);
-                }}
-                onDragOver={(e) => handleDragOver(e, folder.id)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, folder.id)}
               >
+                <div
+                  className={`group flex items-center justify-between w-full rounded-lg px-4 py-3 h-[52px] cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.2)] active:scale-[0.99] ${
+                    dragOverFolder === folder.id
+                      ? 'bg-[#6049E3]/20 border-[#6049E3] ring-2 ring-[#6049E3]/50'
+                      : 'bg-[#1A1C3A] border-transparent hover:bg-[#22243E] hover:border-[#2A2C45]'
+                  } ${
+                    draggedItem?.type === 'folder' && draggedItem?.id === folder.id
+                      ? 'opacity-50 cursor-grabbing'
+                      : ''
+                  } border`}
+                  style={{
+                    cursor: draggedItem?.type === 'folder' && draggedItem?.id === folder.id ? 'grabbing' : 'pointer'
+                  }}
+                  onClick={(e) => {
+                    // Only navigate if it's a simple click (not after dragging)
+                    if (!draggedItem || draggedItem.id !== folder.id) {
+                      selectFolder(folder);
+                    }
+                  }}
+                  onContextMenu={(e) => {
+                    console.log('📌 Grid folder right-clicked:', folder.name);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('📍 Setting grid folder menu at:', e.clientX, e.clientY);
+                    setFolderMenu({ folder, x: e.clientX, y: e.clientY });
+                  }}
+                  draggable={true}
+                  onDragStart={(e) => {
+                    console.log('🎬 Grid folder drag started:', folder.name);
+                    e.currentTarget.style.cursor = 'grabbing';
+                    handleDragStart(e, folder.id, 'folder');
+                  }}
+                  onDragEnd={(e) => {
+                    console.log('🏁 Grid folder drag ended:', folder.name);
+                    e.currentTarget.style.cursor = 'pointer';
+                    handleDragEnd(e);
+                  }}
+                  onDragOver={(e) => handleDragOver(e, folder.id)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, folder.id)}
+                >
                 {/* Folder Icon + Name */}
                 <div className="flex items-center flex-1 min-w-0 mr-2">
                   <Folder className={`w-5 h-5 mr-3 flex-shrink-0 transition-colors duration-150 ${
@@ -1408,6 +1410,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                 >
                   <MoreVertical className="w-4 h-4" />
                 </button>
+              </div>
               </motion.div>
             ))}
           </motion.div>
