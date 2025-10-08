@@ -560,7 +560,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4">
           <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md">
             <div className="p-6">
               <div className="flex items-center space-x-3 mb-4">
@@ -606,7 +606,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
 
       {/* Rename Modal */}
       {showRename && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[300] p-4">
           <div className="bg-card border border-border rounded-xl w-full max-w-md">
             <div className="p-6">
               <h3 className="text-lg font-bold text-foreground mb-4">Rename File</h3>
@@ -636,7 +636,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
 
       {/* Tags Edit Modal */}
       {showTagsEdit && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[300] p-4">
           <div className="bg-card border border-border rounded-xl w-full max-w-md">
             <div className="p-6">
               <h3 className="text-lg font-bold text-foreground mb-4">Edit Tags</h3>

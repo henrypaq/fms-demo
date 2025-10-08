@@ -82,10 +82,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose }) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          style={{
-            left: 'var(--sidebar-width, 5rem)'
-          }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4"
         >
           <motion.div 
             initial={{ opacity: 0, scale: 0.98, y: 10 }}

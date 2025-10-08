@@ -141,7 +141,7 @@ const CreateFolderModal: React.FC<{
   console.log('CreateFolderModal rendering, isOpen:', isOpen);
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4">
       <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
@@ -1700,7 +1700,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4"
           >
             <motion.div 
               initial={{ opacity: 0, scale: 0.98, y: 10 }}
@@ -1744,7 +1744,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4"
           >
             <motion.div 
               initial={{ opacity: 0, scale: 0.98, y: 10 }}
@@ -1827,7 +1827,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4"
             >
               <motion.div 
                 initial={{ opacity: 0, scale: 0.98, y: 10 }}
