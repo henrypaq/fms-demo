@@ -446,29 +446,32 @@
 }
 
 /* ============================================ */
-/* DROPDOWN ANIMATIONS - UNIFIED SYSTEM        */
-/* Smooth, modern animations for all dropdowns */
+/* DROPDOWN ANIMATIONS - LINEAR/VERCEL STYLE   */
+/* Premium fade + scale + tethered motion      */
+/* Used by Linear, Vercel, Superhuman          */
+/* Duration: 140ms | Easing: cubic-bezier      */
+/* opacity: 0→1 | scale: 0.97→1 | y: 4px→0    */
 /* ============================================ */
 
 @keyframes dropdownFastIn {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.97) translateY(4px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 
 @keyframes dropdownFastOut {
   from {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
   to {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.97) translateY(4px);
   }
 }
 
@@ -481,10 +484,10 @@
 
 [data-radix-dropdown-menu-content][data-state="open"],
 [data-radix-context-menu-content][data-state="open"] {
-  animation: dropdownFastIn 150ms ease-out !important;
+  animation: dropdownFastIn 140ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 [data-radix-dropdown-menu-content][data-state="closed"],
 [data-radix-context-menu-content][data-state="closed"] {
-  animation: dropdownFastOut 150ms ease-out !important;
+  animation: dropdownFastOut 140ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
