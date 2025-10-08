@@ -11,7 +11,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/dialog';
-import { Select } from '../ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu-shadcn';
 import { getTagHexColor } from '../ui/TagBadge';
 
 interface TagStats {
@@ -505,11 +505,88 @@ const TagView: React.FC<TagViewProps> = ({
       />
 
       {/* Main Content Area */}
-      <div className="h-full raised-panel flex-1 mx-0 overflow-y-auto overflow-x-visible">
-        <div className={`space-y-6 p-6 ${className}`}>
+      <div className="h-full raised-panel w-full flex-1 mx-0 overflow-y-auto overflow-x-visible">
+        {/* Top Bar - Filter Bar and Controls */}
+        <div className="flex items-center justify-between py-2 border-b border-border mx-0 px-6 mb-4">
+          {/* Left Side - Page Title */}
+          <div className="flex items-center">
+            <h1 className="text-lg font-medium text-foreground">
+              {selectedTags.length > 0 
+                ? `Files with ${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''} (${taggedFiles.length})`
+                : 'Tagged Files'
+              }
+            </h1>
+          </div>
+
+          {/* Right Side - Filters and Controls */}
+          <div className="flex items-center gap-3">
+            {/* View Toggle (Grid only for now) */}
+            <Button variant="ghost" size="sm" className="gap-1.5 h-7 px-2 text-xs hover:bg-muted/50">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+              Grid
+            </Button>
+
+            {/* Tag Filter Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1.5 h-7 px-2 text-xs hover:bg-muted/50">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  </svg>
+                  {filterType === 'all' ? 'All Tags' : filterType === 'used' ? 'Used Tags' : 'Unused Tags'}
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem onClick={() => setFilterType('all')}>
+                  All Tags
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterType('used')}>
+                  Used Tags
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterType('unused')}>
+                  Unused Tags
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Sort Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1.5 h-7 px-2 text-xs hover:bg-muted/50">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                  </svg>
+                  Sort: {sortBy === 'count' ? 'Usage' : sortBy === 'name' ? 'Name' : 'Recent'}
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem onClick={() => setSortBy('count')}>
+                  Sort by Usage
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('name')}>
+                  Sort by Name
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('recent')}>
+                  Sort by Recent
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className={`px-6 pb-6 ${className}`}>
           {/* Employee Permission Notice */}
           {userRole === 'employee' && (
-            <div className="p-4 bg-[#6049E3]/10 border border-[#6049E3]/20 rounded-lg">
+            <div className="p-4 bg-[#6049E3]/10 border border-[#6049E3]/20 rounded-lg mb-6">
               <div className="flex items-center gap-3">
                 <RiInformationLine className="w-5 h-5 text-[#6049E3] flex-shrink-0" />
                 <div className="space-y-1">
@@ -519,33 +596,6 @@ const TagView: React.FC<TagViewProps> = ({
               </div>
             </div>
           )}
-
-          {/* Controls */}
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-            {/* Sort */}
-            <Select 
-              value={sortBy} 
-              onValueChange={(value) => setSortBy(value as 'name' | 'count' | 'recent')}
-              options={[
-                { value: 'count', label: 'Sort by Usage' },
-                { value: 'name', label: 'Sort by Name' },
-                { value: 'recent', label: 'Sort by Recent' }
-              ]}
-              className="w-[180px] bg-[#111235] border-[#1A1C3A] text-[#CFCFF6]"
-            />
-
-            {/* Filter */}
-            <Select 
-              value={filterType} 
-              onValueChange={(value) => setFilterType(value as 'all' | 'used' | 'unused')}
-              options={[
-                { value: 'all', label: 'All Tags' },
-                { value: 'used', label: 'Used Tags' },
-                { value: 'unused', label: 'Unused Tags' }
-              ]}
-              className="w-[180px] bg-[#111235] border-[#1A1C3A] text-[#CFCFF6]"
-            />
-          </div>
 
           {/* Files List */}
           {selectedTags.length === 0 ? (
@@ -573,25 +623,20 @@ const TagView: React.FC<TagViewProps> = ({
               </div>
             </div>
           ) : (
-            <div className="space-y-4 overflow-visible">
-              <h3 className="text-[#CFCFF6] font-semibold text-lg">
-                Files with {selectedTags.length} tag{selectedTags.length > 1 ? 's' : ''} selected ({taggedFiles.length})
-              </h3>
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible">
-                {taggedFiles.map(file => (
-                  <FileCard
-                    key={file.id}
-                    file={file}
-                    onToggleFavorite={toggleFavorite}
-                    onUpdate={async (fileId, updates) => {
-                      await updateFile(fileId, updates);
-                      // Re-fetch tagged files to show updated tags
-                      await fetchTaggedFiles(selectedTags);
-                    }}
-                    userRole={userRole}
-                  />
-                ))}
-              </div>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible">
+              {taggedFiles.map(file => (
+                <FileCard
+                  key={file.id}
+                  file={file}
+                  onToggleFavorite={toggleFavorite}
+                  onUpdate={async (fileId, updates) => {
+                    await updateFile(fileId, updates);
+                    // Re-fetch tagged files to show updated tags
+                    await fetchTaggedFiles(selectedTags);
+                  }}
+                  userRole={userRole}
+                />
+              ))}
             </div>
           )}
         </div>
