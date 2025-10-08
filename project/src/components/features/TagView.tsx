@@ -484,7 +484,7 @@ const TagView: React.FC<TagViewProps> = ({
   };
 
   return (
-    <div className="flex-1 flex gap-1 h-full overflow-hidden mt-1">
+    <div className="flex gap-1 h-full overflow-hidden">
       {/* Tag Sidebar */}
       <TagSidebar
         tagStats={tagStats}
@@ -505,7 +505,7 @@ const TagView: React.FC<TagViewProps> = ({
       />
 
       {/* Main Content Area */}
-      <div className="h-full raised-panel w-full mx-0 overflow-y-auto overflow-x-visible flex-1">
+      <div className="h-full raised-panel flex-1 mx-0 overflow-y-auto overflow-x-visible">
         <div className={`space-y-6 p-6 ${className}`}>
           {/* Employee Permission Notice */}
           {userRole === 'employee' && (
