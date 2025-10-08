@@ -5,6 +5,7 @@ import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu-shadcn';
+import { getTagHexColor } from '../ui/TagBadge';
 
 interface TagStats {
   tag: string;
@@ -139,8 +140,8 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
                   >
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <Badge
-                        style={{ backgroundColor: stat.color || '#6049E3' }}
-                        className="text-white text-xs px-2 py-0.5 truncate"
+                        style={{ backgroundColor: getTagHexColor(stat.tag) }}
+                        className="text-white text-xs px-2 py-0.5 truncate font-medium"
                       >
                         {stat.tag}
                       </Badge>

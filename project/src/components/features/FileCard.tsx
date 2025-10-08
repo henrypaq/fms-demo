@@ -20,6 +20,7 @@ import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '../ui/dropdown-menu-shadcn';
 import FilePreviewModal from '../FilePreviewModal';
+import { TagBadge } from '../ui/TagBadge';
 
 export interface FileItem {
   id: string;
@@ -287,27 +288,6 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
     }
   };
 
-  // Get tag color based on tag name
-  const getTagColor = (tag: string) => {
-    const colors = [
-      'bg-red-500/20 text-red-300 border border-red-500/30',
-      'bg-orange-500/20 text-orange-300 border border-orange-500/30',
-      'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30',
-      'bg-green-500/20 text-green-300 border border-green-500/30',
-      'bg-blue-500/20 text-blue-300 border border-blue-500/30',
-      'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30',
-      'bg-purple-500/20 text-purple-300 border border-purple-500/30',
-      'bg-pink-500/20 text-pink-300 border border-pink-500/30'
-    ];
-    
-    // Use tag name to generate consistent color
-    let hash = 0;
-    for (let i = 0; i < tag.length; i++) {
-      hash = tag.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return colors[Math.abs(hash) % colors.length];
-  };
-
   // Only show actual tags, no placeholder tags
   // Add test tags for demonstration - different amounts for different files
   const displayTags = file.tags && file.tags.length > 0 
@@ -518,12 +498,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
       {tagsVisible && displayTags.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-2 px-1">
           {displayTags.map((tag, index) => (
-            <span
-              key={index}
-              className={`px-2 py-0.5 text-xs font-medium rounded-lg ${getTagColor(tag)}`}
-            >
-              {tag}
-            </span>
+            <TagBadge key={index} tag={tag} variant="default" />
           ))}
         </div>
       )}

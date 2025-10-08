@@ -12,6 +12,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/dialog';
 import { Select } from '../ui/select';
+import { getTagHexColor } from '../ui/TagBadge';
 
 interface TagStats {
   tag: string;
@@ -190,21 +191,6 @@ const TagView: React.FC<TagViewProps> = ({
     );
   }
 
-  // Get tag color based on tag name
-  const getTagColor = (tag: string): string => {
-    const colors = [
-      '#6049E3', '#10B981', '#F59E0B', '#EF4444', 
-      '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16',
-      '#F97316', '#6366F1', '#14B8A6', '#F43F5E'
-    ];
-    
-    let hash = 0;
-    for (let i = 0; i < tag.length; i++) {
-      hash = tag.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return colors[Math.abs(hash) % colors.length];
-  };
-
   // Get all tags with statistics from files only
   const getTagStats = (): TagStats[] => {
     const fileTags = getAllTags(files);
@@ -220,7 +206,7 @@ const TagView: React.FC<TagViewProps> = ({
         tag,
         count: tagFiles.length,
         files: tagFiles,
-        color: getTagColor(tag)
+        color: getTagHexColor(tag)
       });
     });
 
