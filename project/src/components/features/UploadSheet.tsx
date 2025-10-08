@@ -154,13 +154,15 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
       let targetProjectId = projectId;
       let targetFolderId = folderId;
       
-      // Close the sheet immediately after starting uploads
-      onOpenChange(false);
+      // DON'T close the sheet - keep it open to show progress
+      // Clear selected files immediately so user can add more
+      const filesToUpload = [...selectedFiles];
+      setSelectedFiles([]);
       
       // Use optimistic upload system
       try {
         const success = await uploadMultipleFiles(
-          selectedFiles,
+          filesToUpload,
           targetProjectId,
           targetFolderId,
           autoTaggingEnabled
@@ -172,10 +174,8 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
         }
       } catch (error) {
         console.error('Upload failed:', error);
+        setErrorMessage(error instanceof Error ? error.message : 'Upload failed. Please try again.');
       }
-      
-      // Reset form
-      setSelectedFiles([]);
       
     } catch (error) {
       console.error('Upload failed:', error);
@@ -261,7 +261,12 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
           {/* Header */}
           <SheetHeader className="p-6 pb-4 border-b border-[#1A1C3A] space-y-1">
             <SheetTitle className="text-white text-xl font-bold flex items-center justify-between">
-              Upload Files
+              <span>Upload Files</span>
+              {contextUploads.filter(u => u.status === 'uploading').length > 0 && (
+                <span className="text-xs font-normal text-[#6049E3] bg-[#6049E3]/10 px-2 py-1 rounded-md border border-[#6049E3]/30">
+                  {contextUploads.filter(u => u.status === 'uploading').length} active
+                </span>
+              )}
             </SheetTitle>
             <SheetDescription className="text-[#CFCFF6]/60 text-sm">
               → {getUploadLocationText()}
@@ -545,17 +550,24 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
 
           {/* Footer */}
           <SheetFooter className="p-6 pt-4 border-t border-[#1A1C3A] flex-row justify-between items-center space-x-0">
-            {errorMessage && (
+            {errorMessage ? (
               <div className="text-red-400 text-sm flex-1">{errorMessage}</div>
-            )}
+            ) : contextUploads.filter(u => u.status === 'uploading').length > 0 ? (
+              <div className="text-[#6049E3] text-sm flex-1 flex items-center space-x-2">
+                <Loader className="w-3 h-3 animate-spin" />
+                <span>
+                  {contextUploads.filter(u => u.status === 'uploading').length} file{contextUploads.filter(u => u.status === 'uploading').length !== 1 ? 's' : ''} uploading... 
+                  <span className="text-[#CFCFF6]/60 ml-1">You can close this panel</span>
+                </span>
+              </div>
+            ) : null}
             <div className="flex items-center space-x-2 ml-auto">
               <Button
                 onClick={() => onOpenChange(false)}
-                disabled={isUploading}
                 variant="ghost"
                 className="text-[#CFCFF6] hover:bg-[#1A1C3A]"
               >
-                Cancel
+                {contextUploads.filter(u => u.status === 'uploading').length > 0 ? 'Close' : 'Cancel'}
               </Button>
               {selectedFiles.length > 0 && (
                 <Button
@@ -567,7 +579,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                   {isUploading && <Loader className="w-4 h-4 animate-spin" />}
                   <span>
                     {isUploading 
-                      ? 'Uploading...' 
+                      ? 'Starting...' 
                       : `Upload ${selectedFiles.length} File${selectedFiles.length !== 1 ? 's' : ''}`
                     }
                   </span>
