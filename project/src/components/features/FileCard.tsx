@@ -323,7 +323,8 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
               src={getThumbnailUrl()!}
               alt={file.name}
               className="w-full h-full object-cover transition-all duration-150 group-hover:brightness-110"
-              loading="lazy"
+              style={{ imageRendering: '-webkit-optimize-contrast' }}
+              decoding="async"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';

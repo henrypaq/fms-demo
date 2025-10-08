@@ -44,8 +44,8 @@ export const useFileUpload = () => {
               const canvas = document.createElement('canvas');
               const ctx = canvas.getContext('2d');
               
-              // Set thumbnail size
-              const maxSize = 300;
+              // Set thumbnail size - 600px for high-DPI displays (Retina, 4K)
+              const maxSize = 600;
               let { width, height } = img;
               
               if (width > height) {
@@ -63,13 +63,18 @@ export const useFileUpload = () => {
               canvas.width = width;
               canvas.height = height;
               
-              ctx?.drawImage(img, 0, 0, width, height);
+              // Enable image smoothing for better quality
+              if (ctx) {
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(img, 0, 0, width, height);
+              }
               
-              // Create thumbnail blob for upload
+              // Create thumbnail blob for upload with higher quality (92%)
               const thumbnailBlob = await new Promise<Blob>((resolve) => {
                 canvas.toBlob((blob) => {
                   resolve(blob!);
-                }, 'image/jpeg', 0.8);
+                }, 'image/jpeg', 0.92);
               });
               
               // Generate thumbnail path
@@ -123,7 +128,7 @@ export const useFileUpload = () => {
         
         video.onseeked = async () => {
           try {
-            const maxSize = 300;
+            const maxSize = 600;
             let { videoWidth: width, videoHeight: height } = video;
             
             if (width > height) {
@@ -140,13 +145,19 @@ export const useFileUpload = () => {
             
             canvas.width = width;
             canvas.height = height;
-            ctx?.drawImage(video, 0, 0, width, height);
             
-            // Create video thumbnail blob
+            // Enable image smoothing for better quality
+            if (ctx) {
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = 'high';
+              ctx.drawImage(video, 0, 0, width, height);
+            }
+            
+            // Create video thumbnail blob with higher quality (92%)
             const thumbnailBlob = await new Promise<Blob>((resolve) => {
               canvas.toBlob((blob) => {
                 resolve(blob!);
-              }, 'image/jpeg', 0.8);
+              }, 'image/jpeg', 0.92);
             });
             
             // Generate thumbnail path
