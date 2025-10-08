@@ -18,6 +18,7 @@ import {
   List,
   Save,
   Move,
+  MoreVertical,
   AlertTriangle,
   CheckSquare,
   Square,
@@ -1269,21 +1270,21 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
     // Grid view
     return (
       <>
-        {/* Folders Grid */}
+        {/* Folders Grid - Google Drive Compact Style */}
         {childFolders.length > 0 && (
-          <div className="mb-4 grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible">
+          <div className="mb-4 grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 overflow-visible">
             {childFolders.map(folder => (
               <div
                 key={folder.id}
-                className={`group bg-[#262626] border rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] hover:shadow-lg transition-all duration-200 ${
+                className={`group flex items-center justify-between w-full rounded-lg px-4 py-3 h-[52px] cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.2)] active:scale-[0.99] ${
                   dragOverFolder === folder.id
-                    ? 'border-[#6049E3] ring-2 ring-[#6049E3]/50 bg-[#6049E3]/10'
-                    : 'border-slate-600 hover:border-slate-500'
+                    ? 'bg-[#6049E3]/20 border-[#6049E3] ring-2 ring-[#6049E3]/50'
+                    : 'bg-[#1A1C3A] border-transparent hover:bg-[#22243E] hover:border-[#2A2C45]'
                 } ${
                   draggedItem?.type === 'folder' && draggedItem?.id === folder.id
-                    ? 'opacity-50 scale-95 cursor-grabbing'
+                    ? 'opacity-50 cursor-grabbing'
                     : ''
-                }`}
+                } border`}
                 style={{
                   cursor: draggedItem?.type === 'folder' && draggedItem?.id === folder.id ? 'grabbing' : 'pointer'
                 }}
@@ -1315,18 +1316,34 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, folder.id)}
               >
-                <Icon 
-                  Icon={RiFolder3Line} 
-                  size={IconSizes.card} 
-                  color="#60a5fa" 
-                  className="mb-2 transition-transform duration-200 group-hover:scale-110" 
-                />
-                <span className="text-white font-medium text-sm truncate w-full text-center">{folder.name}</span>
-                {dragOverFolder === folder.id && draggedItem && (
-                  <span className="text-[#6049E3] text-xs mt-1 font-medium">
-                    Drop here
+                {/* Folder Icon + Name */}
+                <div className="flex items-center flex-1 min-w-0 mr-2">
+                  <Folder className={`w-5 h-5 mr-3 flex-shrink-0 transition-colors duration-150 ${
+                    dragOverFolder === folder.id 
+                      ? 'text-[#6049E3]' 
+                      : 'text-[#8A8C8E] group-hover:text-[#CFCFF6]'
+                  }`} />
+                  <span className="flex-1 text-sm font-medium text-[#CFCFF6] truncate">
+                    {folder.name}
                   </span>
-                )}
+                  {dragOverFolder === folder.id && draggedItem && (
+                    <span className="text-[#6049E3] text-xs ml-2 font-medium whitespace-nowrap">
+                      Drop here
+                    </span>
+                  )}
+                </div>
+                
+                {/* More Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log('📍 More button clicked for folder:', folder.name);
+                    setFolderMenu({ folder, x: e.clientX, y: e.clientY });
+                  }}
+                  className="w-6 h-6 flex items-center justify-center rounded text-[#8A8C8E] hover:text-white hover:bg-white/10 transition-colors duration-150 flex-shrink-0"
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </button>
               </div>
             ))}
           </div>
