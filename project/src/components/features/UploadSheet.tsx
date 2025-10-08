@@ -93,7 +93,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
   const [recentUploads, setRecentUploads] = useState<RecentUpload[]>([]);
   const { currentWorkspace } = useWorkspace();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { addUpload } = useUploads();
+  const { uploads: contextUploads, addUpload } = useUploads();
   const { state: sidebarState } = useSidebar();
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -364,21 +364,103 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
               </div>
             )}
 
-            {/* Upload Progress */}
-            {uploads.length > 0 && (
+            {/* Upload Progress - Shows active uploads from UploadContext */}
+            {(contextUploads.length > 0 || uploads.length > 0) && (
               <div>
-                <h3 className="text-white font-medium mb-3 text-sm">Upload Progress</h3>
-                <div className="space-y-2">
-                  {uploads.map((upload) => (
-                    <div key={upload.fileId} className="p-3 bg-[#1A1C3A]/50 rounded-lg">
+                <h3 className="text-white font-medium mb-3 text-sm flex items-center justify-between">
+                  <span>Upload Progress</span>
+                  {contextUploads.filter(u => u.status === 'uploading').length > 0 && (
+                    <span className="text-[#CFCFF6]/60 text-xs">
+                      {contextUploads.filter(u => u.status === 'uploading').length} active
+                    </span>
+                  )}
+                </h3>
+                <div className="space-y-3">
+                  {/* Show uploads from UploadContext with detailed info */}
+                  {contextUploads.map((upload) => (
+                    <div key={upload.id} className="p-3 bg-[#1A1C3A]/50 border border-[#2A2C45]/30 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2 flex-1 min-w-0">
+                          {upload.status === 'completed' ? (
+                            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                          ) : upload.status === 'failed' ? (
+                            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                          ) : upload.status === 'paused' ? (
+                            <Clock className="w-4 h-4 text-[#CFCFF6]/60 flex-shrink-0" />
+                          ) : (
+                            <Loader className="w-4 h-4 text-[#6049E3] animate-spin flex-shrink-0" />
+                          )}
+                          <span className="text-white text-sm font-medium truncate">
+                            {upload.name}
+                          </span>
+                        </div>
+                        <span className="text-[#CFCFF6]/60 text-xs flex-shrink-0 font-mono">{upload.progress}%</span>
+                      </div>
+                      
+                      {/* Progress bar with smooth animation */}
+                      <div className="w-full bg-[#1A1C3A] rounded-full h-2 mb-2 overflow-hidden">
+                        <div
+                          className={`h-2 rounded-full transition-all duration-500 ease-out ${
+                            upload.status === 'failed' ? 'bg-red-500' : 
+                            upload.status === 'completed' ? 'bg-green-500' : 
+                            upload.status === 'paused' ? 'bg-[#CFCFF6]/40' : 
+                            'bg-gradient-to-r from-[#6049E3] to-[#8b5cf6]'
+                          }`}
+                          style={{ 
+                            width: `${upload.progress}%`,
+                            animation: upload.status === 'uploading' ? 'pulse 2s ease-in-out infinite' : 'none'
+                          }}
+                        />
+                      </div>
+                      
+                      {/* Upload details */}
+                      {upload.status === 'uploading' && (
+                        <div className="flex items-center justify-between text-xs text-[#CFCFF6]/60">
+                          <span className="flex items-center space-x-2">
+                            <span>{formatFileSize(upload.uploadedBytes)}</span>
+                            <span>/</span>
+                            <span>{formatFileSize(upload.totalBytes)}</span>
+                          </span>
+                          <span className="flex items-center space-x-3">
+                            <span className="font-mono">{upload.speed}</span>
+                            <span>•</span>
+                            <span>{upload.timeRemaining} left</span>
+                          </span>
+                        </div>
+                      )}
+                      
+                      {upload.status === 'completed' && (
+                        <p className="text-green-400 text-xs flex items-center space-x-1">
+                          <CheckCircle className="w-3 h-3" />
+                          <span>Upload completed successfully</span>
+                        </p>
+                      )}
+                      
+                      {upload.status === 'failed' && (
+                        <p className="text-red-400 text-xs flex items-center space-x-1">
+                          <AlertCircle className="w-3 h-3" />
+                          <span>Upload failed - please try again</span>
+                        </p>
+                      )}
+                      
+                      {upload.status === 'paused' && (
+                        <p className="text-[#CFCFF6]/60 text-xs flex items-center space-x-1">
+                          <Clock className="w-3 h-3" />
+                          <span>Upload paused</span>
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {/* Fallback to old uploads if contextUploads is empty */}
+                  {contextUploads.length === 0 && uploads.map((upload) => (
+                    <div key={upload.fileId} className="p-3 bg-[#1A1C3A]/50 border border-[#2A2C45]/30 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2 flex-1 min-w-0">
                           {upload.status === 'complete' ? (
                             <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
                           ) : upload.status === 'error' ? (
                             <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-                          ) : upload.status === 'tagging' ? (
-                            <Loader className="w-4 h-4 text-[#6049E3] flex-shrink-0" />
                           ) : (
                             <Loader className="w-4 h-4 text-[#6049E3] animate-spin flex-shrink-0" />
                           )}
@@ -386,14 +468,14 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                             {upload.fileName}
                           </span>
                         </div>
-                        <span className="text-[#CFCFF6]/60 text-xs flex-shrink-0">{upload.progress}%</span>
+                        <span className="text-[#CFCFF6]/60 text-xs flex-shrink-0 font-mono">{upload.progress}%</span>
                       </div>
-                      <div className="w-full bg-[#1A1C3A] rounded-full h-1.5">
+                      <div className="w-full bg-[#1A1C3A] rounded-full h-2">
                         <div
-                          className={`h-1.5 rounded-full transition-all duration-300 ${
+                          className={`h-2 rounded-full transition-all duration-300 ${
                             upload.status === 'error' ? 'bg-red-500' : 
                             upload.status === 'complete' ? 'bg-green-500' : 
-                            upload.status === 'tagging' ? 'bg-[#6049E3]' : 'bg-[#6049E3]'
+                            'bg-gradient-to-r from-[#6049E3] to-[#8b5cf6]'
                           }`}
                           style={{ width: `${upload.progress}%` }}
                         />
@@ -401,11 +483,6 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                       {upload.status === 'complete' && (
                         <p className="text-green-400 text-xs mt-2">
                           ✓ Upload completed {autoTaggingEnabled ? 'and tagged' : 'successfully'}
-                        </p>
-                      )}
-                      {upload.status === 'tagging' && (
-                        <p className="text-[#6049E3] text-xs mt-2">
-                          Analyzing and tagging your file...
                         </p>
                       )}
                       {upload.error && (
