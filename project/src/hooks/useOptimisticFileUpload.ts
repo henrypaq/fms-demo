@@ -357,18 +357,17 @@ export const useOptimisticFileUpload = () => {
         throw new Error('No workspace selected');
       }
 
-      // Check file size (Supabase free tier limit is 50MB, but we'll set a safer limit)
-      const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
-      const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB for videos (if you have pro plan)
+      // Check file size - allow up to 100MB for all files
+      const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB in bytes for all files
       
-      const sizeLimit = file.type.startsWith('video/') ? MAX_VIDEO_SIZE : MAX_FILE_SIZE;
       const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-      const limitMB = (sizeLimit / (1024 * 1024)).toFixed(0);
+      const limitMB = (MAX_FILE_SIZE / (1024 * 1024)).toFixed(0);
       
-      if (file.size > sizeLimit) {
+      if (file.size > MAX_FILE_SIZE) {
         throw new Error(
           `File too large: ${sizeMB}MB exceeds the ${limitMB}MB limit. ` +
-          `Please compress the file or use a smaller version.`
+          `Please compress the file or use a smaller version. ` +
+          `If you need larger uploads, increase the Supabase storage limit.`
         );
       }
 
@@ -506,15 +505,13 @@ export const useOptimisticFileUpload = () => {
   });
 
   const uploadFile = useCallback((params: UploadFileParams) => {
-    // Validate file size before upload
-    const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-    const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB for videos
+    // Validate file size before upload - allow up to 100MB for all files
+    const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB for all files
     
-    const sizeLimit = params.file.type.startsWith('video/') ? MAX_VIDEO_SIZE : MAX_FILE_SIZE;
     const sizeMB = (params.file.size / (1024 * 1024)).toFixed(2);
-    const limitMB = (sizeLimit / (1024 * 1024)).toFixed(0);
+    const limitMB = (MAX_FILE_SIZE / (1024 * 1024)).toFixed(0);
     
-    if (params.file.size > sizeLimit) {
+    if (params.file.size > MAX_FILE_SIZE) {
       addToast({
         type: 'error',
         title: 'File Too Large',
