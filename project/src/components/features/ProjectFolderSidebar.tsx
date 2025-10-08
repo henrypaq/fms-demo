@@ -24,6 +24,7 @@ interface ProjectFolderSidebarProps {
   onDragLeave: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, folderId: string | null) => void;
   onDragStart: (e: React.DragEvent, folder: Folder) => void;
+  onFolderContextMenu?: (e: React.MouseEvent, folder: Folder) => void;
 }
 
 export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
@@ -39,6 +40,7 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
   onDragLeave,
   onDrop,
   onDragStart,
+  onFolderContextMenu,
 }) => {
   const renderFolder = (folder: Folder, level = 0) => {
     const hasChildren = folder.children && folder.children.length > 0;
@@ -54,6 +56,13 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
           onDragOver={(e) => onDragOver(e, folder.id)}
           onDragLeave={onDragLeave}
           onDrop={(e) => onDrop(e, folder.id)}
+          onContextMenu={(e) => {
+            if (onFolderContextMenu) {
+              e.preventDefault();
+              e.stopPropagation();
+              onFolderContextMenu(e, folder);
+            }
+          }}
           className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer transition-all duration-200 group ${
             isSelected
               ? 'bg-[#6049E3] text-white'

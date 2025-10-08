@@ -1290,6 +1290,11 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
           e.dataTransfer.effectAllowed = 'move';
           setDraggedItem({ id: folder.id, type: 'folder' });
         },
+        onFolderContextMenu: (e: React.MouseEvent, folder: any) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setFolderMenu({ folder, x: e.clientX, y: e.clientY });
+        },
       });
     } else {
       console.warn('⚠️ onSidebarDataChange callback is not provided!');

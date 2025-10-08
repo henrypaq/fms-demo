@@ -666,6 +666,7 @@ function AppContentWithWorkspace({
                 onDragLeave={sidebarData.onDragLeave || (() => {})}
                 onDrop={sidebarData.onDrop || (() => {})}
                 onDragStart={sidebarData.onDragStart || (() => {})}
+                onFolderContextMenu={sidebarData.onFolderContextMenu}
               />
             )}
             
