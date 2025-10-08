@@ -882,12 +882,26 @@ function AppContentWithWorkspace({
         <UploadSheet
           isOpen={showUploadSheet}
           onOpenChange={setShowUploadSheet}
+          onUploadComplete={() => {
+            // Refresh files after upload completes
+            console.log('Upload complete - refreshing file list');
+            setTimeout(() => {
+              refreshFiles(currentActiveView);
+            }, 500); // Small delay to ensure DB updates are complete
+          }}
         />
 
         {/* Upload Modal (for header CTA) */}
         <UploadModal
           isOpen={showUploadModal}
           onClose={() => setShowUploadModal(false)}
+          onUploadComplete={() => {
+            // Refresh files after upload completes
+            console.log('Upload complete - refreshing file list');
+            setTimeout(() => {
+              refreshFiles(currentActiveView);
+            }, 500); // Small delay to ensure DB updates are complete
+          }}
         />
 
         {/* File Preview Modal */}

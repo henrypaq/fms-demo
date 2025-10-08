@@ -69,7 +69,7 @@ CustomSheetContent.displayName = SheetPrimitive.Content.displayName;
 interface UploadSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onUploadComplete?: (uploadedFiles: any[]) => void;
+  onUploadComplete?: () => void;
   projectContext?: boolean;
   projectId?: string;
   folderId?: string;
@@ -169,8 +169,8 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
         );
         
         if (success && onUploadComplete) {
-          // The optimistic system handles UI updates automatically
-          onUploadComplete([]);
+          // Trigger file list refresh
+          onUploadComplete();
         }
       } catch (error) {
         console.error('Upload failed:', error);
