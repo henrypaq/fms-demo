@@ -434,7 +434,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
         {/* Bottom metadata bar - Fixed height */}
         <div className="h-8 flex items-center justify-between px-2 bg-[hsl(240,30%,12%)] border-t border-[hsl(240,25%,15%)]/30">
           <span className="text-xs text-[#8A8C8E]">
-            {(file.fileSize / (1024 * 1024)).toFixed(2)} MB
+            {file.isOptimistic ? file.size : `${(file.fileSize / (1024 * 1024)).toFixed(2)} MB`}
           </span>
           
           {/* Three-dot menu button */}
@@ -443,7 +443,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                 <Button
                   variant="ghost"
                   size="icon"
-                  disabled={userRole === 'employee' && !hasProjectAccess}
+                  disabled={file.isOptimistic || (userRole === 'employee' && !hasProjectAccess)}
                   className={`
                     w-5 h-5
                     p-0
@@ -452,7 +452,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                     text-[#8A8C8E] hover:text-[#CFCFF6]
                     rounded-md
                     transition-all duration-150
-                    ${userRole === 'employee' && !hasProjectAccess ? 'cursor-not-allowed opacity-30' : ''}
+                    ${file.isOptimistic || (userRole === 'employee' && !hasProjectAccess) ? 'cursor-not-allowed opacity-30' : ''}
                   `}
                   onClick={(e) => e.stopPropagation()}
                 >
