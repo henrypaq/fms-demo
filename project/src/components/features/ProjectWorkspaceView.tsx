@@ -1310,11 +1310,15 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
           setDraggedItem({ id: folder.id, type: 'folder' });
         },
         onFolderContextMenu: (e: React.MouseEvent, folder: any) => {
-          console.log('🎯 onFolderContextMenu called for:', folder.name);
+          console.log('🎯 ProjectFolderSidebar context menu triggered for:', folder.name);
           e.preventDefault();
           e.stopPropagation();
-          console.log('📍 Setting folder menu at position:', e.clientX, e.clientY);
-          setFolderMenu({ folder, x: e.clientX, y: e.clientY });
+          const x = e.clientX;
+          const y = e.clientY;
+          console.log('📍 Menu position:', { x, y });
+          console.log('📍 Setting folderMenu state...');
+          setFolderMenu({ folder, x, y });
+          console.log('✅ folderMenu state set:', { folder: folder.name, x, y });
         },
       });
     } else {
@@ -1487,24 +1491,36 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
       {folderMenu && (
         <div
           ref={folderMenuRef}
-          className="fixed z-50 bg-dark-surface border border-dark-surface rounded shadow-lg py-1 px-2 text-sm text-light-text"
+          className="fixed z-[100] bg-[#1A1C3A]/95 backdrop-blur-md border border-[#6049E3]/40 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.6)] py-2 px-1 min-w-[160px]"
           style={{ left: folderMenu.x, top: folderMenu.y }}
         >
           <button
-            className="block w-full text-left px-2 py-1 hover:bg-slate-700 rounded"
+            className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-md transition-all duration-150 font-medium"
             onClick={() => {
+              console.log('✏️ Rename clicked for:', folderMenu.folder.name);
               setShowRenameFolder({ folder: folderMenu.folder });
               setRenameFolderName(folderMenu.folder.name);
               setFolderMenu(null);
             }}
-          >Rename</button>
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Rename
+          </button>
           <button
-            className="block w-full text-left px-2 py-1 hover:bg-slate-700 rounded text-red-400"
+            className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-md transition-all duration-150 font-medium"
             onClick={() => {
+              console.log('🗑️ Delete clicked for:', folderMenu.folder.name);
               setShowDeleteFolder({ folder: folderMenu.folder });
               setFolderMenu(null);
             }}
-          >Delete</button>
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Delete
+          </button>
         </div>
       )}
       {/* Rename Folder Modal */}
