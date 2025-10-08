@@ -264,6 +264,14 @@ function AppContentWithWorkspace({
   const [showProjectV3View, setShowProjectV3View] = useState(false);
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [sidebarData, setSidebarData] = useState<any>(null);
+  
+  // Debug: Log when sidebarData changes
+  React.useEffect(() => {
+    console.log('📥 App.tsx received sidebarData:', sidebarData ? {
+      folderTreeLength: sidebarData.folderTree?.length,
+      hasFunctions: !!(sidebarData.onSelectFolder && sidebarData.onToggleFolder)
+    } : 'null');
+  }, [sidebarData]);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showUploadsView, setShowUploadsView] = useState(false);
   const [showTagsView, setShowTagsView] = useState(false);
@@ -621,7 +629,14 @@ function AppContentWithWorkspace({
         <div className="flex-1 overflow-hidden content-gutter">
           <div className="h-full flex gap-1">
             {/* Project Sidebar - Only show when inside a project */}
-            {showProjectV3View && selectedProject && sidebarData && (
+            {showProjectV3View && selectedProject && sidebarData && (() => {
+              console.log('🎨 Rendering ProjectFolderSidebar with:', {
+                project: selectedProject.name,
+                folderCount: sidebarData.folderTree?.length,
+                currentFolder: sidebarData.currentFolder?.name || 'Root'
+              });
+              return true;
+            })() && (
               <ProjectFolderSidebar
                 key={selectedProject?.id} // Force remount when project changes
                 folderTree={sidebarData.folderTree}

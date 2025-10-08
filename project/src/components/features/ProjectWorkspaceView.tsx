@@ -263,6 +263,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
   const loadFolders = async () => {
     try {
+      console.log('📂 Loading folders for project:', project.id);
       const { data: foldersData, error: foldersError } = await supabase
         .from('folders')
         .select('*')
@@ -272,6 +273,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
       if (foldersError) throw foldersError;
 
+      console.log('📂 Loaded folders:', foldersData?.length || 0, foldersData);
       setFolders(foldersData || []);
     } catch (err) {
       console.error('Error loading folders:', err);
@@ -564,6 +566,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
   // Build folder tree
   const folderTree = useMemo(() => {
+    console.log('🌳 Building folder tree from', folders.length, 'folders');
     const folderMap = new Map();
     const rootFolders: any[] = [];
 
@@ -585,6 +588,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
       }
     });
 
+    console.log('🌳 Built folder tree with', rootFolders.length, 'root folders:', rootFolders);
     return rootFolders;
   }, [folders]);
 
@@ -1241,6 +1245,11 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
   // Expose sidebar data to parent
   useEffect(() => {
     if (onSidebarDataChange) {
+      console.log('📤 Sending sidebar data to parent:', {
+        folderTreeLength: folderTree.length,
+        currentFolder: currentFolder?.name || 'Root',
+        expandedCount: expandedFolders.size
+      });
       onSidebarDataChange({
         folderTree,
         currentFolder,
