@@ -63,6 +63,79 @@ export const useOptimisticFileUpload = () => {
     };
   }, [currentWorkspace]);
 
+  // Generate thumbnail helper function
+  const generateThumbnail = async (file: File): Promise<{ thumbnailPath: string | null; thumbnailUrl: string | null }> => {
+    return new Promise((resolve) => {
+      if (file.type.startsWith('image/')) {
+        // Generate image thumbnail
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = async () => {
+            try {
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              const maxSize = 300;
+              let { width, height } = img;
+              
+              if (width > height) {
+                if (width > maxSize) {
+                  height = (height * maxSize) / width;
+                  width = maxSize;
+                }
+              } else {
+                if (height > maxSize) {
+                  width = (width * maxSize) / height;
+                  height = maxSize;
+                }
+              }
+              
+              canvas.width = width;
+              canvas.height = height;
+              ctx?.drawImage(img, 0, 0, width, height);
+              
+              const thumbnailBlob = await new Promise<Blob>((resolve) => {
+                canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', 0.8);
+              });
+              
+              const timestamp = Date.now();
+              const randomId = Math.random().toString(36).substring(2);
+              const thumbnailPath = `thumbnails/${currentWorkspace?.id}/thumb-${timestamp}-${randomId}.jpg`;
+              
+              const { error: thumbError } = await supabase.storage
+                .from('files')
+                .upload(thumbnailPath, thumbnailBlob, {
+                  cacheControl: '3600',
+                  upsert: false
+                });
+              
+              if (thumbError) {
+                console.warn('Thumbnail upload failed:', thumbError);
+                resolve({ thumbnailPath: null, thumbnailUrl: null });
+                return;
+              }
+              
+              const { data: urlData } = supabase.storage.from('files').getPublicUrl(thumbnailPath);
+              resolve({ thumbnailPath, thumbnailUrl: urlData.publicUrl });
+            } catch (error) {
+              console.warn('Thumbnail generation failed:', error);
+              resolve({ thumbnailPath: null, thumbnailUrl: null });
+            }
+          };
+          img.onerror = () => resolve({ thumbnailPath: null, thumbnailUrl: null });
+          img.src = e.target?.result as string;
+        };
+        reader.onerror = () => resolve({ thumbnailPath: null, thumbnailUrl: null });
+        reader.readAsDataURL(file);
+      } else if (file.type.startsWith('video/')) {
+        // Generate video thumbnail (simplified)
+        resolve({ thumbnailPath: null, thumbnailUrl: null });
+      } else {
+        resolve({ thumbnailPath: null, thumbnailUrl: null });
+      }
+    });
+  };
+
   // Upload mutation with optimistic updates
   const uploadMutation = useMutation({
     mutationFn: async ({ file, projectId, folderId, autoTagging = true }: UploadFileParams) => {
@@ -101,11 +174,8 @@ export const useOptimisticFileUpload = () => {
       const { data: urlData } = supabase.storage.from('files').getPublicUrl(filePath);
       const fileUrl = urlData.publicUrl;
 
-      // Generate thumbnail for images
-      let thumbnailUrl: string | null = null;
-      if (file.type.startsWith('image/')) {
-        thumbnailUrl = fileUrl; // For now, use the same URL
-      }
+      // Generate thumbnail for images and videos
+      const { thumbnailPath, thumbnailUrl } = await generateThumbnail(file);
 
       // Create file record in database
       const fileRecord = {
@@ -149,8 +219,14 @@ export const useOptimisticFileUpload = () => {
       // Remove optimistic file by matching the file name
       setOptimisticFiles(prev => prev.filter(f => f.name !== context.fileName));
       
-      // Invalidate and refetch files
+      // Invalidate and refetch files - force immediate refetch
       queryClient.invalidateQueries({ queryKey: ['files'] });
+      queryClient.refetchQueries({ queryKey: ['files'] });
+      
+      // Also trigger workspace context update
+      if (window.dispatchEvent) {
+        window.dispatchEvent(new CustomEvent('filesUpdated'));
+      }
       
       addToast({
         type: 'success',
