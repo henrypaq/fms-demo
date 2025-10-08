@@ -472,6 +472,12 @@
   }
 }
 
+[data-radix-dropdown-menu-content],
+[data-radix-context-menu-content] {
+  /* Override any inherited transitions */
+  transition: none !important;
+}
+
 [data-radix-dropdown-menu-content][data-state="open"],
 [data-radix-context-menu-content][data-state="open"] {
   animation: dropdownFastIn 150ms ease-out !important;
