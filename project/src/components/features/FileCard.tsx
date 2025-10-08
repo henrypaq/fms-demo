@@ -305,22 +305,34 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
   const currentSelected = isSelected || internalSelected;
 
   return (
-    <div className={`relative flex flex-col ${className}`}>
+    <div className={`relative flex flex-col ${className} ${showExpandedTags ? 'z-[120]' : ''}`}>
+      {/* Dimmed overlay when tags are expanded */}
+      {showExpandedTags && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110]"
+          onClick={() => setShowExpandedTags(false)}
+        />
+      )}
+      
       <Card 
         className={`
           w-full h-[260px]
           p-0
           rounded-xl
           bg-[hsl(240,30%,12%)]
-          border border-[hsl(240,30%,12%)]
+          ${showExpandedTags 
+            ? 'border-2 border-[#6049E3] shadow-[0_8px_32px_rgba(96,73,227,0.5)]' 
+            : 'border border-[hsl(240,30%,12%)]'
+          }
           shadow-[0_4px_10px_rgba(0,0,0,0.3)]
           overflow-hidden
           transition-all duration-150 ease-out
           cursor-pointer group
           flex flex-col
-          ${currentSelected 
+          relative z-[120]
+          ${currentSelected && !showExpandedTags
             ? 'ring-2 ring-[#6049E3] shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(96,73,227,0.4)]' 
-            : 'hover:scale-[1.02] hover:shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(0,0,0,0.5)]'
+            : !showExpandedTags ? 'hover:scale-[1.02] hover:shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(0,0,0,0.5)]' : ''
           }
         `}
         onClick={handleCardClick}
@@ -495,94 +507,44 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
         </div>
       </Card>
 
-      {/* Tags floating underneath the card - max 2 rows */}
+      {/* Tags floating underneath the card - max 2 rows when not expanded */}
       {tagsVisible && displayTags.length > 0 && (
         <div 
-          className="flex flex-wrap gap-1.5 mt-2 px-1 cursor-pointer"
-          onClick={() => setShowExpandedTags(true)}
+          className={`flex flex-wrap gap-1.5 mt-2 px-1 cursor-pointer relative z-[120] ${showExpandedTags ? 'max-w-none' : ''}`}
+          onClick={(e) => {
+            if (!showExpandedTags) {
+              e.stopPropagation();
+              setShowExpandedTags(true);
+            }
+          }}
         >
-          {displayTags.slice(0, 6).map((tag, index) => (
-            <TagBadge key={index} tag={tag} variant="default" />
-          ))}
-          {displayTags.length > 6 && (
-            <span className="text-xs text-[#8A8C8E] hover:text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[hsl(240,30%,10%)] border border-[hsl(240,25%,15%)] transition-colors flex items-center gap-1">
-              +{displayTags.length - 6} more
-            </span>
+          {showExpandedTags ? (
+            // Show all tags when expanded
+            displayTags.map((tag, index) => (
+              <TagBadge key={index} tag={tag} variant="default" />
+            ))
+          ) : (
+            // Show only first 6 tags normally
+            <>
+              {displayTags.slice(0, 6).map((tag, index) => (
+                <TagBadge key={index} tag={tag} variant="default" />
+              ))}
+              {displayTags.length > 6 && (
+                <span className="text-xs text-[#8A8C8E] hover:text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[hsl(240,30%,10%)] border border-[hsl(240,25%,15%)] transition-colors flex items-center gap-1">
+                  +{displayTags.length - 6} more
+                </span>
+              )}
+            </>
           )}
         </div>
       )}
 
-      {/* Expanded Tags Modal */}
+      {/* Close hint when expanded */}
       {showExpandedTags && (
-        <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[110] p-4"
-          onClick={() => setShowExpandedTags(false)}
-        >
-          <div 
-            className="relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* File Card (highlighted) */}
-            <Card 
-              className={`
-                w-[240px] h-[260px] rounded-xl transition-all cursor-default
-                bg-[hsl(240,30%,12%)] border-2 border-[#6049E3] shadow-[0_8px_32px_rgba(96,73,227,0.3)]
-                flex flex-col justify-between p-0
-              `}
-            >
-              {/* Thumbnail / Image Area */}
-              <div className="flex-1 relative rounded-t-lg overflow-hidden group">
-                {file.thumbnail || file.fileUrl ? (
-                  <img 
-                    src={file.thumbnail || file.fileUrl} 
-                    alt={file.name}
-                    className="w-full h-full object-cover transition-all duration-200"
-                    style={{ imageRendering: '-webkit-optimize-contrast' }}
-                    decoding="async"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[hsl(240,25%,15%)] to-[hsl(240,30%,10%)] flex items-center justify-center">
-                    <File className="w-8 h-8 text-[#6049E3] opacity-80" />
-                  </div>
-                )}
-                
-                {/* Favorite Star */}
-                {file.isFavorite && (
-                  <div className="absolute top-2 left-2 bg-[hsl(240,30%,12%)]/70 backdrop-blur-sm rounded-md p-1">
-                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                  </div>
-                )}
-
-                {/* File title overlay */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent px-2 py-1.5 pt-8">
-                  <h3 className="text-sm font-medium text-white truncate leading-tight">
-                    {file.name}
-                  </h3>
-                </div>
-              </div>
-
-              {/* Bottom metadata bar */}
-              <div className="h-8 px-1.5 flex items-center justify-between gap-1 bg-[hsl(240,30%,12%)] border-t border-[hsl(240,30%,12%)]/30">
-                <span className="text-xs text-[#8A8C8E] flex items-center gap-1">
-                  {file.size}
-                </span>
-              </div>
-            </Card>
-
-            {/* All Tags - Expanded View */}
-            <div className="flex flex-wrap gap-1.5 mt-4 max-w-[600px] justify-center">
-              {displayTags.map((tag, index) => (
-                <TagBadge key={index} tag={tag} variant="default" />
-              ))}
-            </div>
-
-            {/* Close hint */}
-            <div className="mt-4 text-center">
-              <span className="text-xs text-[#8A8C8E]">
-                Click anywhere to close
-              </span>
-            </div>
-          </div>
+        <div className="mt-2 text-center relative z-[120]">
+          <span className="text-xs text-[#8A8C8E]">
+            Click anywhere to close
+          </span>
         </div>
       )}
 
