@@ -202,12 +202,10 @@ export const useFileUpload = () => {
 
   const sendToN8nWebhook = async (fileData: FileRecord, fileUrl: string, thumbnailUrl: string | null, autoTaggingEnabled: boolean) => {
     if (!autoTaggingEnabled) {
-      console.log('Auto-tagging disabled, skipping n8n webhook');
       return;
     }
 
     try {
-      console.log('Sending file data to n8n webhook for auto-tagging...');
       
       // Prepare optimized payload for n8n
       const webhookPayload = {
@@ -230,12 +228,6 @@ export const useFileUpload = () => {
         }
       };
 
-      console.log('Webhook payload:', {
-        fileId: webhookPayload.fileId,
-        fileName: webhookPayload.fileName,
-        fileUrl: webhookPayload.fileUrl,
-        thumbnailUrl: webhookPayload.thumbnailUrl
-      });
 
       // Send request to n8n webhook
       const response = await fetch(N8N_WEBHOOK_URL, {
@@ -251,11 +243,9 @@ export const useFileUpload = () => {
       }
 
       const result = await response.json();
-      console.log('N8N webhook response:', result);
 
       // Check if n8n returned tags immediately
       if (result.tags && Array.isArray(result.tags) && result.tags.length > 0) {
-        console.log('Received immediate tags from n8n:', result.tags);
         
         // Update file tags in database
         const { error: updateError } = await supabase
@@ -266,10 +256,8 @@ export const useFileUpload = () => {
         if (updateError) {
           console.error('Failed to update file tags:', updateError);
         } else {
-          console.log('Successfully updated file tags:', result.tags);
         }
       } else {
-        console.log('N8N will process tags asynchronously');
       }
 
     } catch (error) {
@@ -296,20 +284,14 @@ export const useFileUpload = () => {
     const fileArray = Array.from(files);
     
     try {
-      console.log('Starting upload process for', fileArray.length, 'files to workspace:', currentWorkspace.name);
-      console.log('Auto-tagging enabled:', autoTaggingEnabled);
-      console.log('Manual tags:', manualTags);
       
       // Determine target project and folder
       const targetProjectId = overrideProjectId !== undefined ? overrideProjectId : null;
       const targetFolderId = overrideFolderId !== undefined ? overrideFolderId : null;
       
       if (targetProjectId) {
-        console.log('Uploading to project:', targetProjectId);
         if (targetFolderId) {
-          console.log('Uploading to folder:', targetFolderId);
         } else {
-          console.log('Uploading to project root');
         }
       }
 
@@ -327,7 +309,6 @@ export const useFileUpload = () => {
         const uploadId = initialUploads[index].fileId;
         
         try {
-          console.log(`Starting upload for file: ${file.name}`);
           updateUploadProgress(uploadId, 5);
 
           // Generate unique file path with workspace prefix
@@ -348,7 +329,6 @@ export const useFileUpload = () => {
           updateUploadProgress(uploadId, 15);
 
           // Upload file to storage
-          console.log(`Uploading to storage: ${filePath}`);
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('files')
             .upload(filePath, file, {
@@ -361,7 +341,6 @@ export const useFileUpload = () => {
             throw new Error(`Upload failed: ${uploadError.message}`);
           }
 
-          console.log('Storage upload successful:', uploadData);
           updateUploadProgress(uploadId, 40, 'processing');
 
           // Generate public URL for the uploaded file
@@ -398,7 +377,6 @@ export const useFileUpload = () => {
             folder_id: targetFolderId,
           };
 
-          console.log('Inserting database record:', fileRecord);
           updateUploadProgress(uploadId, 85);
 
           const { data: insertedFile, error: dbError } = await supabase
@@ -414,7 +392,6 @@ export const useFileUpload = () => {
             throw new Error(`Database error: ${dbError.message}`);
           }
 
-          console.log('Database insert successful:', insertedFile);
           updateUploadProgress(uploadId, 95);
 
           // Send to n8n webhook for auto-tagging if enabled
@@ -443,10 +420,8 @@ export const useFileUpload = () => {
         )
         .map(result => result.value as FileRecord);
 
-      console.log(`Upload completed. ${successfulUploads.length} of ${fileArray.length} files uploaded successfully`);
 
       if (autoTaggingEnabled && successfulUploads.length > 0) {
-        console.log(`${successfulUploads.length} files sent to n8n for AI auto-tagging`);
       }
 
       // Clear completed uploads after a delay

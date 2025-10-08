@@ -5,9 +5,7 @@ import {
   Search, 
   Upload,
   X,
-  FileText,
   Loader,
-  Folder,
   Home,
   ChevronRight,
   ChevronDown,
@@ -28,20 +26,25 @@ import {
   Video,
   Music,
   Archive,
-  File
+  File,
+  FileText
 } from 'lucide-react';
-import { useWorkspace } from '../contexts/WorkspaceContext';
-import { supabase } from '../lib/supabase';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { supabase } from '../../lib/supabase';
 import FileCard, { FileItem } from './FileCard';
-import UploadModal from './UploadModal';
-import { markFilesAsUpdated } from '../contexts/WorkspaceContext';
-import BatchActionBar from './BatchActionBar';
-import FilterBar, { FilterType } from './FilterBar';
-import FilePreviewModal from './FilePreviewModal';
+import UploadSheet from './UploadSheet';
+import { markFilesAsUpdated } from '../../contexts/WorkspaceContext';
+import BatchActionBar from '../BatchActionBar';
+import { FilterType } from '../../types/ui';
+import FilePreviewModal from '../FilePreviewModal';
+import { RiFolder3Line, RiFile3Line, RiVideoLine } from '@remixicon/react';
+import { Icon, IconSizes, IconColors } from '../ui/Icon';
 
 interface ProjectWorkspaceViewProps {
   project: any;
   onBack: () => void;
+  renderSidebar?: boolean;
+  onSidebarDataChange?: (data: any) => void;
 }
 
 type SortOption = 'name' | 'date' | 'size' | 'type';
@@ -132,8 +135,10 @@ const CreateFolderModal: React.FC<{
 
   if (!isOpen) return null;
 
+  console.log('CreateFolderModal rendering, isOpen:', isOpen);
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-dark-surface border border-dark-surface rounded-xl w-full max-w-md">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
@@ -150,7 +155,7 @@ const CreateFolderModal: React.FC<{
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-2">
-                <Folder className="w-4 h-4 inline mr-1" />
+                <Icon Icon={RiFolder3Line} size={IconSizes.small} color={IconColors.muted} className="inline mr-1" />
                 Folder Name
               </label>
               <input
@@ -214,7 +219,12 @@ const CreateFolderModal: React.FC<{
   );
 };
 
-const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, onBack }) => {
+const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ 
+  project, 
+  onBack, 
+  renderSidebar = true,
+  onSidebarDataChange 
+}) => {
   const { currentWorkspace } = useWorkspace();
   
   // Data state
@@ -227,7 +237,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
 
   // UI state
   const [showCreateFolder, setShowCreateFolder] = useState(false);
-  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showUploadSheet, setShowUploadSheet] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   
   // Enhanced drag and drop state for both files and folders
@@ -322,7 +332,6 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
 
   const createFolder = async (folderData: any) => {
     try {
-      console.log('Creating folder:', folderData.name, 'in project:', project.id);
       
       const { data, error } = await supabase
         .from('folders')
@@ -339,7 +348,6 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
         throw new Error(`Failed to create folder: ${error.message}`);
       }
 
-      console.log('Folder created successfully:', data);
       
       // Reload folders to get updated tree
       await loadFolders();
@@ -369,7 +377,6 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
       };
 
       if (newParentId && isChildOfMovedFolder(newParentId, folderId)) {
-        console.log('Cannot move folder into its own subfolder');
         return;
       }
 
@@ -381,7 +388,6 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
       if (error) throw error;
 
       await loadFolders(); // Reload to get updated tree structure
-      console.log('Folder moved successfully');
     } catch (err) {
       console.error('Error moving folder:', err);
     }
@@ -390,7 +396,6 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
   // Move file to folder
   const moveFile = async (fileId: string, newFolderId: string | null) => {
     try {
-      console.log('Moving file:', fileId, 'to folder:', newFolderId);
       
       const { error } = await supabase
         .from('files')
@@ -404,7 +409,6 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
 
       markFilesAsUpdated();
       await loadFiles(); // Reload files to update the view
-      console.log('File moved successfully');
     } catch (err) {
       console.error('Error moving file:', err);
     }
@@ -412,7 +416,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
 
   const handleFileUpdate = async (fileId: string, updates: Partial<FileItem>) => {
     try {
-      const { supabase } = await import('../lib/supabase');
+      const { supabase } = await import('../../lib/supabase');
       
       const dbUpdates: any = {};
       
@@ -449,7 +453,6 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
 
   const handleFileMove = async (fileId: string, projectId: string | null, folderId: string | null) => {
     try {
-      console.log('Moving file:', fileId, 'to project:', projectId, 'folder:', folderId);
       
       const { error } = await supabase
         .from('files')
@@ -464,7 +467,6 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
       markFilesAsUpdated();
       await loadFiles(); // Reload to update the view
       
-      console.log('File moved successfully');
     } catch (error) {
       console.error('Error moving file:', error);
       throw error;
@@ -497,7 +499,6 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
       // Remove from local state
       setFiles(prev => prev.filter(file => file.id !== fileId));
       
-      console.log('File deleted successfully');
     } catch (error) {
       console.error('Error deleting file:', error);
       throw error;
@@ -705,7 +706,6 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
 
   const handleBatchMove = async (fileIds: string[], projectId: string | null, folderId: string | null) => {
     try {
-      console.log('Batch moving files:', fileIds, 'to project:', projectId, 'folder:', folderId);
       // Move files one by one
       for (const fileId of fileIds) {
         await handleFileMove(fileId, projectId, folderId);
@@ -822,7 +822,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
             </button>
           )}
           {!hasChildren && <div className="w-4" />}
-          <Folder className="w-4 h-4 flex-shrink-0" />
+          <Icon Icon={RiFolder3Line} size={IconSizes.small} color={IconColors.muted} className="flex-shrink-0" />
           <span className="text-sm truncate flex-1">{folder.name}</span>
           {isDraggedOver && (
             <Move className="w-3 h-3 text-green-400" />
@@ -847,17 +847,17 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
     const iconClass = "w-5 h-5";
     switch (type) {
       case 'document':
-        return <FileText className={`${iconClass} text-blue-400`} />;
+        return <Icon Icon={RiFile3Line} size={IconSizes.medium} color="#60a5fa" className={iconClass} />;
       case 'image':
-        return <Image className={`${iconClass} text-green-400`} />;
+        return <Icon Icon={Image} size={IconSizes.medium} color="#4ade80" className={iconClass} />;
       case 'video':
-        return <Video className={`${iconClass} text-purple-400`} />;
+        return <Icon Icon={RiVideoLine} size={IconSizes.medium} color="#a855f7" className={iconClass} />;
       case 'audio':
-        return <Music className={`${iconClass} text-orange-400`} />;
+        return <Icon Icon={Music} size={IconSizes.medium} color="#fb923c" className={iconClass} />;
       case 'archive':
-        return <Archive className={`${iconClass} text-yellow-400`} />;
+        return <Icon Icon={Archive} size={IconSizes.medium} color="#eab308" className={iconClass} />;
       default:
-        return <File className={`${iconClass} text-slate-400`} />;
+        return <Icon Icon={File} size={IconSizes.medium} color="#94a3b8" className={iconClass} />;
     }
   };
 
@@ -909,7 +909,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
                       }}
                     >
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <Folder className="w-5 h-5 text-blue-400" />
+                        <Icon Icon={RiFolder3Line} size={IconSizes.medium} color="#60a5fa" />
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-white font-medium" colSpan={6}>
                         {folder.name}
@@ -1132,7 +1132,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
       <>
         {/* Folders Grid */}
         {childFolders.length > 0 && (
-          <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div className="mb-4 grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible">
             {childFolders.map(folder => (
               <div
                 key={folder.id}
@@ -1145,14 +1145,14 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
                 }}
                 draggable={false}
               >
-                <Folder className="w-8 h-8 text-blue-400 mb-2" />
+                <Icon Icon={RiFolder3Line} size={IconSizes.card} color="#60a5fa" className="mb-2" />
                 <span className="text-white font-medium text-sm truncate w-full text-center">{folder.name}</span>
               </div>
             ))}
           </div>
         )}
         {/* Files Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible">
           {filteredAndSortedFiles.map((file) => (
             <div
               key={file.id}
@@ -1232,16 +1232,43 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
     };
   }, []);
 
+  // Expose sidebar data to parent
+  useEffect(() => {
+    if (onSidebarDataChange) {
+      onSidebarDataChange({
+        folderTree,
+        currentFolder,
+        expandedFolders,
+        draggedItem,
+        dragOverFolder,
+        onSelectFolder: selectFolder,
+        onToggleFolder: toggleFolder,
+        onCreateFolder: () => {
+          console.log('Create folder button clicked');
+          setShowCreateFolder(true);
+        },
+        onDragOver: handleDragOver,
+        onDragLeave: handleDragLeave,
+        onDrop: handleDrop,
+        onDragStart: (e: React.DragEvent, folder: any) => {
+          e.dataTransfer.effectAllowed = 'move';
+          setDraggedItem({ id: folder.id, type: 'folder' });
+        },
+      });
+    }
+  }, [folderTree, currentFolder, expandedFolders, draggedItem, dragOverFolder, selectFolder, toggleFolder, handleDragOver, handleDragLeave, handleDrop]);
+
   return (
-    <div className="flex-1 flex h-full bg-dark-bg">
-      {/* Folder Sidebar */}
-      <div className="w-64 bg-dark-surface border-r border-dark-surface flex flex-col">
-        <div className="p-4 border-b border-slate-700">
+    <div className={`flex-1 flex flex-col h-full ${renderSidebar ? 'gap-6 p-6' : ''}`}>
+      {/* Folder Sidebar Panel - Only render if renderSidebar is true */}
+      {renderSidebar && (
+        <div className="w-[280px] bg-[#111235] border border-[#1A1C3A] rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.3)] flex flex-col transition-all duration-300 ease-in-out overflow-hidden">
+        <div className="p-4 border-b border-[#1A1C3A]">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-slate-400">Folders</h3>
+            <h3 className="text-sm font-semibold text-[#CFCFF6]">Folders</h3>
             <button
               onClick={() => setShowCreateFolder(true)}
-              className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-700 transition-colors duration-200"
+              className="p-1.5 rounded-md text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[#6049E3]/20 transition-colors duration-200"
               title="Create Folder"
             >
               <FolderPlus className="w-4 h-4" />
@@ -1250,12 +1277,12 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
 
           {/* Project Root */}
           <div
-            className={`flex items-center space-x-2 px-2 py-1.5 rounded-lg cursor-pointer transition-all duration-200 mb-1 ${
+            className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer transition-all duration-200 mb-1 ${
               !currentFolder 
-                ? 'bg-blue-600 text-white' 
+                ? 'bg-[#6049E3] text-white' 
                 : dragOverFolder === null
                 ? 'bg-green-600 text-white'
-                : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                : 'text-[#CFCFF6] hover:bg-[#1A1C3A] hover:text-white'
             }`}
             onClick={() => selectFolder(null)}
             onDragOver={(e) => handleDragOver(e, null)}
@@ -1263,7 +1290,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
             onDrop={(e) => handleDrop(e, null)}
           >
             <Home className="w-4 h-4" />
-            <span className="text-sm">Project Root</span>
+            <span className="text-sm font-medium">Project Root</span>
             {dragOverFolder === null && draggedItem && (
               <Move className="w-3 h-3 text-green-400" />
             )}
@@ -1278,11 +1305,11 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
           
           {folderTree.length === 0 && (
             <div className="text-center py-8">
-              <Folder className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-              <p className="text-slate-500 text-sm">No folders yet</p>
+              <Icon Icon={RiFolder3Line} size={IconSizes.card} color="#8A8C8E" className="mx-auto mb-2" />
+              <p className="text-[#8A8C8E] text-sm">No folders yet</p>
               <button
                 onClick={() => setShowCreateFolder(true)}
-                className="text-blue-400 hover:text-blue-300 text-sm mt-1"
+                className="text-[#6049E3] hover:text-[#6049E3]/80 text-sm mt-1 font-medium"
               >
                 Create your first folder
               </button>
@@ -1292,121 +1319,24 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
 
         {/* Drag Instructions */}
         {draggedItem && (
-          <div className="p-3 border-t border-slate-700 bg-slate-700/50">
-            <p className="text-xs text-slate-400 text-center">
+          <div className="p-3 border-t border-[#1A1C3A] bg-[#6049E3]/10">
+            <p className="text-xs text-[#CFCFF6] text-center">
               Drop on a folder or Project Root to move {draggedItem.type}
             </p>
           </div>
         )}
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="bg-dark-surface border-b border-dark-surface">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={onBack}
-                className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors duration-200"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="text-xl font-bold text-white">{project.name}</h1>
-                {currentFolder && (
-                  <p className="text-sm text-slate-400">{currentFolder.path}</p>
-                )}
-              </div>
-            </div>
-
-            <button
-              onClick={() => setShowUploadModal(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200"
-            >
-              <Upload className="w-4 h-4" />
-              <span>Upload</span>
-            </button>
-          </div>
-
-          {/* Search and Controls */}
-          <div className="flex items-center justify-between px-4 pb-4 space-x-4">
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search files..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-10 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            {/* Filter Bar */}
-            <div className="flex-1">
-              <FilterBar
-                viewMode={viewMode}
-                onViewModeChange={setViewMode}
-                sortBy={sortBy}
-                onSortByChange={setSortBy}
-                sortDirection={sortDirection}
-                onSortDirectionChange={setSortDirection}
-                filterType={filterType as FilterType}
-                onFilterTypeChange={setFilterType as (filter: FilterType) => void}
-                totalCount={files.length}
-                filteredCount={filteredAndSortedFiles.length}
-              />
-            </div>
-          </div>
-
-          {/* Selection Controls - Only show when files are selected */}
-          {selectedFiles.size > 0 && (
-            <div className="flex items-center justify-between px-4 pb-4">
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-blue-400 font-medium">
-                  {selectedFiles.size} selected
-                </span>
-                <button
-                  onClick={handleSelectAll}
-                  className="flex items-center space-x-2 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
-                >
-                  {selectedFiles.size === filteredAndSortedFiles.length && filteredAndSortedFiles.length > 0 ? (
-                    <>
-                      <Square className="w-4 h-4" />
-                      <span>Deselect All</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckSquare className="w-4 h-4" />
-                      <span>Select All</span>
-                    </>
-                  )}
-                </button>
-              </div>
-              
-              <p className="text-slate-400 text-sm">
-                Single-click to select, double-click to preview files. Drag selected files to folders.
-              </p>
-            </div>
-          )}
         </div>
+      )}
 
-        {/* File Display */}
+      {/* Main Content Panel */}
+      <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out overflow-hidden ${renderSidebar ? 'bg-[#111235] border border-[#1A1C3A] rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.3)]' : ''}`}>
+        {/* File Display - Only show files */}
         <div className="flex-1 overflow-auto p-6">
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <Loader className="w-8 h-8 text-light-text animate-spin mx-auto mb-4" />
-                <p className="text-slate-400">Loading files...</p>
+                <Loader className="w-8 h-8 text-[#6049E3] animate-spin mx-auto mb-4" />
+                <p className="text-[#8A8C8E]">Loading files...</p>
               </div>
             </div>
           ) : error ? (
@@ -1415,11 +1345,11 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
                 <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <AlertTriangle className="w-8 h-8 text-red-400" />
                 </div>
-                <h3 className="text-lg font-medium text-white mb-2">Error Loading Files</h3>
-                <p className="text-slate-400 mb-4">{error}</p>
+                <h3 className="text-lg font-medium text-[#CFCFF6] mb-2">Error Loading Files</h3>
+                <p className="text-[#8A8C8E] mb-4">{error}</p>
                 <button 
                   onClick={loadFiles}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200"
+                  className="px-6 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white hover:border-[#6049E3] rounded-lg font-medium transition-all duration-200"
                 >
                   Try Again
                 </button>
@@ -1436,7 +1366,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
                 }
               </p>
               <button
-                onClick={() => setShowUploadModal(true)}
+                onClick={() => setShowUploadSheet(true)}
                 className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200"
               >
                 Upload Files
@@ -1461,9 +1391,9 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
       />
 
       {/* Modals */}
-      <UploadModal
-        isOpen={showUploadModal}
-        onClose={() => setShowUploadModal(false)}
+      <UploadSheet
+        isOpen={showUploadSheet}
+        onOpenChange={setShowUploadSheet}
         onUploadComplete={handleUploadComplete}
         projectContext={true}
         projectId={project.id}
@@ -1515,7 +1445,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
       )}
       {/* Rename Folder Modal */}
       {showRenameFolder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-dark-surface border border-dark-surface rounded-xl w-full max-w-md p-6">
             <h3 className="text-lg font-bold text-white mb-4">Rename Folder</h3>
             <input
@@ -1545,7 +1475,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({ project, on
       )}
       {/* Delete Folder Modal */}
       {showDeleteFolder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-dark-surface border border-dark-surface rounded-xl w-full max-w-md p-6">
             <h3 className="text-lg font-bold text-white mb-4">Delete Folder</h3>
             <p className="text-slate-400 mb-4">Are you sure you want to delete the folder <span className="text-white font-semibold">{showDeleteFolder.folder.name}</span>?</p>

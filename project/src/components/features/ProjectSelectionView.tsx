@@ -1,19 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Plus, 
-  Search, 
   X, 
-  Folder,
   Palette,
   Save,
   Loader,
   ArrowRight,
-  FileText,
   Edit3,
-  Trash2
+  Trash2,
+  Edit,
+  Settings
 } from 'lucide-react';
-import { useWorkspace } from '../contexts/WorkspaceContext';
-import { supabase } from '../lib/supabase';
+import { RiFolder3Line, RiMoreFill } from '@remixicon/react';
+import { Icon, IconSizes, IconColors } from '../ui/Icon';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { supabase } from '../../lib/supabase';
+import { Button } from '../ui';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu-shadcn';
+import { AssetBar } from './AssetBar';
 
 interface ProjectSelectionViewProps {
   onProjectSelect: (project: any) => void;
@@ -27,10 +36,10 @@ const CreateProjectModal: React.FC<{
 }> = ({ isOpen, onClose, onSubmit }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [color, setColor] = useState('#3B82F6');
+  const [color, setColor] = useState('#1E40AF');
 
   const colors = [
-    '#3B82F6', '#10B981', '#F59E0B', '#EF4444', 
+    '#1E40AF', '#10B981', '#F59E0B', '#EF4444', 
     '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16',
     '#F97316', '#6366F1', '#14B8A6', '#F43F5E'
   ];
@@ -47,7 +56,7 @@ const CreateProjectModal: React.FC<{
 
     setName('');
     setDescription('');
-    setColor('#3B82F6');
+    setColor('#E74A3F');
   };
 
   if (!isOpen) return null;
@@ -58,9 +67,9 @@ const CreateProjectModal: React.FC<{
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-white">Create Project</h3>
-            <button onClick={onClose} className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors duration-200">
+            <Button onClick={onClose} variant="ghost" size="icon" className="h-10 w-10">
               <X className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -143,16 +152,16 @@ const EditProjectModal: React.FC<{
 }> = ({ isOpen, onClose, onSubmit, initialData }) => {
   const [name, setName] = useState(initialData?.name || '');
   const [description, setDescription] = useState(initialData?.description || '');
-  const [color, setColor] = useState(initialData?.color || '#3B82F6');
+  const [color, setColor] = useState(initialData?.color || '#1E40AF');
 
   useEffect(() => {
     setName(initialData?.name || '');
     setDescription(initialData?.description || '');
-    setColor(initialData?.color || '#3B82F6');
+    setColor(initialData?.color || '#1E40AF');
   }, [initialData]);
 
   const colors = [
-    '#3B82F6', '#10B981', '#F59E0B', '#EF4444', 
+    '#1E40AF', '#10B981', '#F59E0B', '#EF4444', 
     '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16',
     '#F97316', '#6366F1', '#14B8A6', '#F43F5E'
   ];
@@ -176,9 +185,9 @@ const EditProjectModal: React.FC<{
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-white">Edit Project</h3>
-            <button onClick={onClose} className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors duration-200">
+            <Button onClick={onClose} variant="ghost" size="icon" className="h-10 w-10">
               <X className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -248,17 +257,39 @@ const EditProjectModal: React.FC<{
   );
 };
 
-const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSelect }) => {
+const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSelect, triggerCreateProject }) => {
   const { currentWorkspace } = useWorkspace();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [showEditProject, setShowEditProject] = useState(false);
   const [editProjectData, setEditProjectData] = useState<any>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteProjectData, setDeleteProjectData] = useState<any>(null);
+  
+  // Listen for trigger to open create project modal
+  useEffect(() => {
+    if (triggerCreateProject && triggerCreateProject > 0) {
+      setShowCreateProject(true);
+    }
+  }, [triggerCreateProject]);
+  const [projectsCollapsed, setProjectsCollapsed] = useState(false);
+  const [selectedProjectIds, setSelectedProjectIds] = useState<Set<string>>(new Set());
+
+  // Selection handlers
+  const handleSelectAll = useCallback(() => {
+    if (selectedProjectIds.size === projects.length && projects.length > 0) {
+      // Deselect all
+      setSelectedProjectIds(new Set());
+    } else {
+      // Select all
+      setSelectedProjectIds(new Set(projects.map(p => p.id)));
+    }
+  }, [projects, selectedProjectIds]);
+
+  const allSelected = projects.length > 0 && selectedProjectIds.size === projects.length;
+  const someSelected = selectedProjectIds.size > 0 && selectedProjectIds.size < projects.length;
 
   useEffect(() => {
     if (currentWorkspace?.id) {
@@ -343,10 +374,6 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
     }
   };
 
-  const filteredProjects = projects.filter(project =>
-    project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (project.description && project.description.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
 
   if (loading) {
     return (
@@ -380,112 +407,173 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
   }
 
   return (
-    <div className="flex-1 bg-dark-bg p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Select a Project</h1>
-          <p className="text-slate-400">Choose a project to manage your files and folders</p>
-        </div>
-
-        {/* Search and Create */}
-        <div className="flex items-center justify-between mb-8 max-w-2xl mx-auto">
-          <div className="relative flex-1 mr-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search projects..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-dark-bg border border-dark-surface rounded-lg text-light-text placeholder-light-text/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <button
-            onClick={() => setShowCreateProject(true)}
-            className="flex items-center space-x-2 px-6 py-3 bg-light-text hover:bg-light-text/90 text-dark-bg rounded-lg font-medium transition-colors duration-200"
-          >
-            <Plus className="w-5 h-5" />
-            <span>New Project</span>
-          </button>
-        </div>
-
-        {/* Projects Grid */}
-        {filteredProjects.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-dark-surface rounded-full flex items-center justify-center mx-auto mb-6">
-              <Folder className="w-12 h-12 text-slate-400" />
-            </div>
-            <h3 className="text-xl font-medium text-white mb-2">
-              {searchQuery ? 'No projects found' : 'No projects yet'}
-            </h3>
-            <p className="text-slate-400 mb-6">
-              {searchQuery 
-                ? 'Try adjusting your search terms'
-                : 'Create your first project to get started organizing your files'
-              }
-            </p>
-            {!searchQuery && (
-              <button
-                onClick={() => setShowCreateProject(true)}
-                className="px-6 py-3 bg-light-text hover:bg-light-text/90 text-dark-bg rounded-lg font-medium transition-colors duration-200"
-              >
-                Create Your First Project
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProjects.map((project) => (
-              <div
-                key={project.id}
-                className="group bg-dark-surface border border-dark-surface rounded-xl p-6 hover:bg-dark-bg hover:border-light-text/20 transition-all duration-200 cursor-pointer relative"
-              >
-                <div className="absolute top-3 right-3 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setEditProjectData(project); setShowEditProject(true); }}
-                    className="p-2 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-700 transition-colors duration-200"
-                    title="Edit Project"
+    <div className="flex-1">
+      {/* Assets Bar */}
+      <AssetBar
+        assetCount={projects.length}
+        totalSize={0}
+        assetType="Projects"
+        isCollapsed={projectsCollapsed}
+        onToggleCollapse={() => setProjectsCollapsed(!projectsCollapsed)}
+        showTagsToggle={false}
+        allSelected={allSelected}
+        someSelected={someSelected}
+        onSelectAll={handleSelectAll}
+      />
+      
+      {/* Projects Grid - Aligned with Files page */}
+      <div 
+        className="pt-2 transition-all duration-300 ease-in-out"
+        style={{
+          maxHeight: projectsCollapsed ? '0px' : '100000px',
+          opacity: projectsCollapsed ? 0 : 1,
+          overflow: projectsCollapsed ? 'hidden' : 'visible'
+        }}
+      >
+      <div className="px-6 pb-4 overflow-visible">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-10 items-start pb-12">
+          {/* Existing Projects */}
+          {projects.map((project) => (
+            <div
+              key={project.id}
+              className="group transition-all duration-200 cursor-pointer relative folder-card hover:scale-[1.02]"
+              style={{
+                background: '#111235',
+                maskImage: 'url(/folder-shape.svg)',
+                maskSize: 'cover',
+                maskRepeat: 'no-repeat',
+                maskPosition: 'center',
+                WebkitMaskImage: 'url(/folder-shape.svg)',
+                WebkitMaskSize: 'cover',
+                WebkitMaskRepeat: 'no-repeat',
+                WebkitMaskPosition: 'center',
+                filter: 'drop-shadow(0 0 0 1px hsl(240, 25%, 15%)) drop-shadow(0 2px 8px rgba(0,0,0,0.35))'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.filter = 'drop-shadow(0 0 0 2px #6049E3) drop-shadow(0 4px 12px rgba(96, 73, 227, 0.4))';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.filter = 'drop-shadow(0 0 0 1px hsl(240, 25%, 15%)) drop-shadow(0 2px 8px rgba(0,0,0,0.35))';
+              }}
+              onClick={() => onProjectSelect(project)}
+            >
+              {/* Large Image Area - covers most of the folder */}
+              <div className="relative w-full h-full flex flex-col">
+                {/* Main image/content area */}
+                <div className="relative flex-1 overflow-hidden">
+                  {/* Project thumbnail/image placeholder */}
+                  <div 
+                    className="w-full h-full flex items-center justify-center"
+                    style={{ backgroundColor: project.color + '20' }}
                   >
-                    <Edit3 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setDeleteProjectData(project); setShowDeleteConfirm(true); }}
-                    className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-700 transition-colors duration-200"
-                    title="Delete Project"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-                <div onClick={() => onProjectSelect(project)}>
-                  <div className="flex items-start justify-between mb-4">
-                    <div 
-                      className="w-12 h-12 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: project.color }}
-                    >
-                      <Folder className="w-6 h-6 text-white" />
-                    </div>
-                    {/* <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors duration-200" /> */}
+                    <Icon
+                      Icon={RiFolder3Line}
+                      size={IconSizes.card}
+                      color={project.color}
+                      className="w-16 h-16"
+                    />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors duration-200">
-                    {project.name}
-                  </h3>
-                  {project.description && (
-                    <p className="text-slate-400 text-sm mb-4 line-clamp-2">
-                      {project.description}
-                    </p>
-                  )}
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span>Created {new Date(project.created_at).toLocaleDateString()}</span>
-                    <div className="flex items-center space-x-1">
-                      <FileText className="w-3 h-3" />
-                      <span>Project</span>
+                </div>
+
+                {/* Floating details section - positioned at bottom */}
+                <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-gradient-to-t from-background/95 to-transparent backdrop-blur-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors duration-200 mb-1">
+                        {project.name}
+                      </h3>
+                      <div className="text-xs text-muted-foreground">
+                        {project.size || '0 MB'}
+                      </div>
+                    </div>
+                    
+                    {/* 3-dots menu button */}
+                    <div className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); }}
+                            className="p-2 rounded-lg bg-background/80 backdrop-blur-sm text-muted-foreground hover:text-primary hover:bg-background/90 transition-colors duration-200"
+                          >
+                            <Icon Icon={RiMoreFill} size={IconSizes.small} color={IconColors.muted} className="w-4 h-4" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); }}>
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit Project
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); }}>
+                            <Settings className="w-4 h-4 mr-2" />
+                            Project Settings
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={(e) => { e.stopPropagation(); }}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete Project
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
+          ))}
+          
+          {/* Add New Project Card */}
+          <div
+            onClick={() => setShowCreateProject(true)}
+            className="group transition-all duration-200 cursor-pointer flex flex-col items-center justify-center folder-card hover:scale-[1.02]"
+            style={{
+              background: '#111235',
+              maskImage: 'url(/folder-shape.svg)',
+              maskSize: 'cover',
+              maskRepeat: 'no-repeat',
+              maskPosition: 'center',
+              WebkitMaskImage: 'url(/folder-shape.svg)',
+              WebkitMaskSize: 'cover',
+              WebkitMaskRepeat: 'no-repeat',
+              WebkitMaskPosition: 'center',
+              filter: 'drop-shadow(0 0 0 2px #6049E3) drop-shadow(0 2px 8px rgba(96, 73, 227, 0.3))'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.filter = 'drop-shadow(0 0 0 2px #6049E3) drop-shadow(0 4px 12px rgba(96, 73, 227, 0.5))';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.filter = 'drop-shadow(0 0 0 2px #6049E3) drop-shadow(0 2px 8px rgba(96, 73, 227, 0.3))';
+            }}
+          >
+            <div className="relative w-full h-full flex flex-col">
+              {/* Main image/content area */}
+              <div className="relative flex-1 overflow-hidden">
+                {/* Add project placeholder */}
+                <div className="w-full h-full flex items-center justify-center bg-muted/20">
+                  <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors duration-200">
+                    <Plus className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating details section - positioned at bottom */}
+              <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-gradient-to-t from-background/95 to-transparent backdrop-blur-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-200 mb-1">
+                      New Project
+                    </h3>
+                    <div className="text-xs text-muted-foreground">
+                      Create new project
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
+      </div>
       </div>
 
       {/* Create Project Modal */}

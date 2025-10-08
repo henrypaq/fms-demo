@@ -1,13 +1,17 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, CheckSquare, Square, FileText, Image, Video, Music, Archive, File, MoreVertical, Download, Eye, Info, Star, Share2, Edit3, Tag, Move } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CheckSquare, Square, Image, Music, Archive, File, Download, Eye, Info, Star, Share2, Edit3, Tag, Move } from 'lucide-react';
+import { RiFile3Line, RiVideoLine, RiMoreFill } from '@remixicon/react';
+import { Icon, IconSizes, IconColors } from '../../ui/Icon';
 import FileCard, { FileItem } from './FileCard';
-import FilterBar, { ViewMode, SortOption, SortDirection, FilterType } from './FilterBar';
-import BatchActionBar from './BatchActionBar';
-import FileMenuDropdown from './FileMenuDropdown';
-import FilePreviewModal from './FilePreviewModal';
-import UploadPlaceholder from './UploadPlaceholder';
-import { markFilesAsUpdated } from '../contexts/WorkspaceContext';
-import { useUploads } from '../contexts/UploadContext';
+import { ViewMode, SortOption, SortDirection, FilterType } from '../../types/ui';
+import BatchActionBar from '../BatchActionBar';
+import FileMenuDropdown from '../FileMenuDropdown';
+import FilePreviewModal from '../FilePreviewModal';
+import UploadPlaceholder from '../UploadPlaceholder';
+import { markFilesAsUpdated } from '../../contexts/WorkspaceContext';
+import { useUploads } from '../../contexts/UploadContext';
+import { Card, CardContent } from '../ui';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui';
 
 interface FileGridProps {
   files: FileItem[];
@@ -49,7 +53,7 @@ interface FileGridProps {
   className?: string;
 }
 
-const FileGrid: React.FC<FileGridProps> = ({ 
+const FileGrid: React.FC<FileGridProps> = React.memo(({ 
   files, 
   onFileClick, 
   onFileDoubleClick,
@@ -163,7 +167,6 @@ const FileGrid: React.FC<FileGridProps> = ({
     if (selectedFiles.size === 0) return;
     
     const fileIds = Array.from(selectedFiles);
-    console.log('Starting drag for files:', fileIds);
     
     setIsDragging(true);
     e.dataTransfer.effectAllowed = 'move';
@@ -175,7 +178,6 @@ const FileGrid: React.FC<FileGridProps> = ({
 
   // Handle drag end
   const handleDragEnd = useCallback(() => {
-    console.log('Drag ended');
     setIsDragging(false);
     onFilesDragEnd?.();
   }, [onFilesDragEnd]);
@@ -205,7 +207,6 @@ const FileGrid: React.FC<FileGridProps> = ({
   const handleBatchMove = useCallback(async (fileIds: string[], projectId: string | null, folderId: string | null) => {
     if (!onFileMove) return;
 
-    console.log('Batch moving files:', fileIds, 'to project:', projectId, 'folder:', folderId);
 
     // Move files one by one for proper error handling
     const errors: string[] = [];
@@ -302,11 +303,9 @@ const FileGrid: React.FC<FileGridProps> = ({
 
   // Handle file deletion
   const handleFileDelete = useCallback(async (fileId: string) => {
-    console.log('FileGrid: handleFileDelete called for:', fileId);
     if (onFileDelete) {
       try {
         await onFileDelete(fileId);
-        console.log('FileGrid: File deleted successfully');
       } catch (error) {
         console.error('FileGrid: Delete failed:', error);
         throw error;
@@ -321,24 +320,24 @@ const FileGrid: React.FC<FileGridProps> = ({
     const iconClass = "w-5 h-5";
     switch (type) {
       case 'document':
-        return <FileText className={`${iconClass} text-blue-400`} />;
+        return <Icon Icon={RiFile3Line} size={IconSizes.medium} color={IconColors.accent} className={iconClass} />;
       case 'image':
-        return <Image className={`${iconClass} text-green-400`} />;
+        return <Icon Icon={Image} size={IconSizes.medium} color="#10b981" className={iconClass} />;
       case 'video':
-        return <Video className={`${iconClass} text-purple-400`} />;
+        return <Icon Icon={RiVideoLine} size={IconSizes.medium} color="#8b5cf6" className={iconClass} />;
       case 'audio':
-        return <Music className={`${iconClass} text-orange-400`} />;
+        return <Icon Icon={Music} size={IconSizes.medium} color="#f59e0b" className={iconClass} />;
       case 'archive':
-        return <Archive className={`${iconClass} text-yellow-400`} />;
+        return <Icon Icon={Archive} size={IconSizes.medium} color="#eab308" className={iconClass} />;
       default:
-        return <File className={`${iconClass} text-slate-400`} />;
+        return <Icon Icon={File} size={IconSizes.medium} color={IconColors.muted} className={iconClass} />;
     }
   };
 
   // Get tag color based on tag name
   const getTagColor = (tag: string, index: number) => {
     const colors = [
-      'bg-blue-500/20 text-blue-300 border-blue-500/30',
+      'bg-primary/20 text-primary border-primary/30',
       'bg-green-500/20 text-green-300 border-green-500/30',
       'bg-purple-500/20 text-purple-300 border-purple-500/30',
       'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
@@ -476,8 +475,9 @@ const FileGrid: React.FC<FileGridProps> = ({
 
   const renderFilesList = () => {
     if (viewMode === 'list') {
-      return (
-        <div className="bg-dark-surface border border-dark-surface rounded-xl overflow-hidden">
+    return (
+      <div className="p-6">
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-slate-700">
@@ -683,7 +683,8 @@ const FileGrid: React.FC<FileGridProps> = ({
             </table>
           </div>
         </div>
-      );
+      </div>
+    );
     }
 
     // Create a combined list of uploads and files for seamless transition
@@ -711,51 +712,155 @@ const FileGrid: React.FC<FileGridProps> = ({
       return items;
     }, [uploads, filteredFiles]);
 
-    // Grid view with drag and drop support
+    // Responsive grid view with shadcn/ui Cards
     return (
-      <div 
-        className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 ${
-          isDragging ? 'opacity-75' : ''
-        }`}
-        draggable={selectedFiles.size > 0}
-        onDragStart={selectedFiles.size > 0 ? handleDragStart : undefined}
-        onDragEnd={selectedFiles.size > 0 ? handleDragEnd : undefined}
-      >
-        {/* Combined items for seamless transition */}
-        {combinedItems.map((item) => {
-          if (item.type === 'upload') {
-            return (
-              <UploadPlaceholder
-                key={item.id}
-                id={item.data.id}
-                name={item.data.name}
-                progress={item.data.progress}
-                status={item.data.status}
-                onCancel={cancelUpload}
-                className="transition-all duration-500"
-              />
-            );
-          } else {
-            return (
-              <FileCard
-                key={item.id}
-                file={item.data}
-                onClick={onFileClick}
-                onDoubleClick={onFileDoubleClick}
-                onDelete={handleFileDelete}
-                onToggleFavorite={onToggleFavorite}
-                onUpdate={onFileUpdate}
-                onMove={onFileMove}
-                isSelected={selectedFiles.has(item.id)}
-                onSelectionChange={handleSelectionChange}
-                selectionMode={selectedFiles.size > 0}
-                userRole={userRole}
-                userProjectAccess={userProjectAccess}
-                className={selectedFiles.has(item.id) && isDragging ? 'opacity-50' : ''}
-              />
-            );
-          }
-        })}
+      <div className="py-6 overflow-visible">
+        <div 
+          className={`grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible ${
+            isDragging ? 'opacity-75' : ''
+          }`}
+          draggable={selectedFiles.size > 0}
+          onDragStart={selectedFiles.size > 0 ? handleDragStart : undefined}
+          onDragEnd={selectedFiles.size > 0 ? handleDragEnd : undefined}
+        >
+          {/* Combined items for seamless transition */}
+          {combinedItems.map((item) => {
+            if (item.type === 'upload') {
+              return (
+                <Card key={item.id} className="rounded-xl bg-card/80 border border-border/50 transition-transform hover:scale-[1.01] hover:shadow-md">
+                  <CardContent className="p-4">
+                    <UploadPlaceholder
+                      id={item.data.id}
+                      name={item.data.name}
+                      progress={item.data.progress}
+                      status={item.data.status}
+                      onCancel={cancelUpload}
+                      className="transition-all duration-500"
+                    />
+                  </CardContent>
+                </Card>
+              );
+            } else {
+              const file = item.data;
+              const hasAccess = userRole === 'admin' || file.projectAccess.some(pa => userProjectAccess.includes(pa));
+              
+              // Get file type icon
+              const getFileIcon = (fileType: string) => {
+                const type = fileType.toLowerCase();
+                if (type.includes('image')) return <Icon Icon={Image} size={IconSizes.card} color="#3b82f6" className="w-8 h-8" />;
+                if (type.includes('video')) return <Icon Icon={RiVideoLine} size={IconSizes.card} color="#8b5cf6" className="w-8 h-8" />;
+                if (type.includes('audio')) return <Icon Icon={Music} size={IconSizes.card} color="#10b981" className="w-8 h-8" />;
+                if (type.includes('pdf') || type.includes('document')) return <Icon Icon={RiFile3Line} size={IconSizes.card} color="#ef4444" className="w-8 h-8" />;
+                if (type.includes('zip') || type.includes('archive')) return <Icon Icon={Archive} size={IconSizes.card} color="#eab308" className="w-8 h-8" />;
+                return <Icon Icon={File} size={IconSizes.card} color="#6b7280" className="w-8 h-8" />;
+              };
+
+              return (
+                <Card 
+                  key={item.id} 
+                  className={`rounded-xl bg-card/80 border border-border/50 transition-transform hover:scale-[1.01] hover:shadow-md cursor-pointer ${
+                    selectedFiles.has(item.id) ? 'ring-2 ring-primary' : ''
+                  } ${!hasAccess ? 'opacity-50' : ''}`}
+                  onClick={hasAccess ? () => onFileClick?.(file) : undefined}
+                  onDoubleClick={hasAccess ? () => onFileDoubleClick?.(file) : undefined}
+                >
+                  <CardContent className="p-4 relative">
+                    {/* Selection checkbox */}
+                    <div className="absolute top-2 left-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedFiles.has(item.id)}
+                        onChange={() => handleSelectionChange(item.id, !selectedFiles.has(item.id))}
+                        onClick={e => e.stopPropagation()}
+                        className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                        disabled={!hasAccess}
+                      />
+                    </div>
+
+                    {/* Overflow menu */}
+                    <div className="absolute top-2 right-2">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            className="p-1 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                            onClick={e => e.stopPropagation()}
+                            disabled={!hasAccess}
+                          >
+                            <Icon Icon={RiMoreFill} size={IconSizes.small} color={IconColors.muted} className="w-4 h-4" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => onFileClick?.(file)}>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onToggleFavorite?.(file.id)}>
+                            <Star className="w-4 h-4 mr-2" />
+                            {file.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onFileUpdate?.(file.id, { tags: [...(file.tags || []), 'new-tag'] })}>
+                            <Tag className="w-4 h-4 mr-2" />
+                            Add Tag
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onFileMove?.(file.id, null, null)}>
+                            <Move className="w-4 h-4 mr-2" />
+                            Move
+                          </DropdownMenuItem>
+                          {userRole === 'admin' && (
+                            <DropdownMenuItem 
+                              onClick={() => onFileDelete?.(file.id)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Edit3 className="w-4 h-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+
+                    {/* File thumbnail/icon */}
+                    <div className="flex items-center justify-center h-32 mb-4">
+                      {getFileIcon(file.type)}
+                    </div>
+
+                    {/* File info */}
+                    <div className="space-y-2">
+                      <h3 className="font-medium text-sm text-foreground truncate" title={file.name}>
+                        {file.name}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {file.size}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(file.modifiedDate).toLocaleDateString()}
+                      </p>
+                      
+                      {/* Tags */}
+                      {file.tags && file.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {file.tags.slice(0, 2).map((tag) => (
+                            <span
+                              key={tag}
+                              className="px-2 py-1 text-xs bg-primary/10 text-primary rounded-full"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                          {file.tags.length > 2 && (
+                            <span className="px-2 py-1 text-xs bg-muted text-muted-foreground rounded-full">
+                              +{file.tags.length - 2}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            }
+          })}
+        </div>
       </div>
     );
   };
@@ -790,102 +895,79 @@ const FileGrid: React.FC<FileGridProps> = ({
   };
 
   return (
-    <div className={className}>
-      {/* Filter Bar - Fixed at top of content area */}
-      {showFilters && onViewModeChange && onSortByChange && onSortDirectionChange && onFilterTypeChange && (
-        <div className="sticky top-0 z-10 bg-dark-surface">
-           <FilterBar
-             viewMode={viewMode}
-             onViewModeChange={onViewModeChange}
-             sortBy={sortBy}
-             onSortByChange={onSortByChange}
-             sortDirection={sortDirection}
-             onSortDirectionChange={onSortDirectionChange}
-             filterType={filterType}
-             onFilterTypeChange={onFilterTypeChange}
-             totalCount={totalCount}
-             filteredCount={filteredFiles.length}
-             onServerSortChange={onServerSortChange}
-             selectedCount={selectedFiles.size}
-             onSelectAll={handleSelectAll}
-           />
+    <div className={`h-full bg-background ${className}`}>
+      {/* Files Display */}
+      <div className="h-full overflow-auto bg-background">
+        {filteredFiles.length === 0 ? (
+          <div className="flex-1 flex items-center justify-center min-h-[60vh]">
+            <div className="text-center space-y-6 max-w-md p-8">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
+                <span className="text-muted-foreground text-2xl">📁</span>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold text-foreground">No files found</h3>
+                <p className="text-sm text-muted-foreground">
+                  {filterType !== 'all' 
+                    ? `No files match the current filter: ${filterType}`
+                    : activeView && activeView !== 'dashboard'
+                    ? `No files found in ${getViewDisplayName(activeView)}`
+                    : 'Start by uploading your first file or creating a folder.'
+                  }
+                </p>
+              </div>
+              {filterType !== 'all' && onFilterTypeChange && (
+                <div className="flex items-center justify-center">
+                  <button 
+                    onClick={() => onFilterTypeChange('all')}
+                    className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium transition-colors duration-200"
+                  >
+                    Show All Files
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          renderFilesList()
+        )}
+      </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex-shrink-0 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t border-border bg-background">
+          {/* Page Info */}
+          <div className="text-sm text-muted-foreground">
+            Showing {((currentPage - 1) * 50) + 1} to {Math.min(currentPage * 50, totalCount)} of {totalCount} files
+            {activeView && activeView !== 'dashboard' && ` in ${getViewDisplayName(activeView)}`}
+          </div>
+
+          {/* Navigation */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onPrevPage}
+              disabled={!hasPrevPage}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent disabled:text-muted-foreground/50 disabled:hover:bg-transparent disabled:cursor-not-allowed rounded-md transition-colors duration-200"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>Previous</span>
+            </button>
+
+            <div className="flex items-center gap-1">
+              {renderPageNumbers()}
+            </div>
+
+            <button
+              onClick={onNextPage}
+              disabled={!hasNextPage}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent disabled:text-muted-foreground/50 disabled:hover:bg-transparent disabled:cursor-not-allowed rounded-md transition-colors duration-200"
+            >
+              <span>Next</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       )}
 
-      <div className="p-6">
-
-        {/* Files Display */}
-        <div className="mb-8">
-          {renderFilesList()}
-        </div>
-
-        {/* Pagination Controls - Enhanced for better navigation */}
-        {totalPages > 1 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
-            {/* Page Info */}
-            <div className="text-sm text-slate-400">
-              Showing {((currentPage - 1) * 50) + 1} to {Math.min(currentPage * 50, totalCount)} of {totalCount} files
-              {activeView && activeView !== 'dashboard' && ` in ${getViewDisplayName(activeView)}`}
-            </div>
-
-            {/* Navigation */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={onPrevPage}
-                disabled={!hasPrevPage}
-                className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 disabled:text-slate-500 disabled:hover:bg-transparent disabled:cursor-not-allowed rounded-lg transition-colors duration-200"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                <span>Previous</span>
-              </button>
-
-              <div className="flex items-center space-x-1">
-                {renderPageNumbers()}
-              </div>
-
-              <button
-                onClick={onNextPage}
-                disabled={!hasNextPage}
-                className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 disabled:text-slate-500 disabled:hover:bg-transparent disabled:cursor-not-allowed rounded-lg transition-colors duration-200"
-              >
-                <span>Next</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Empty state */}
-        {filteredFiles.length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-[#262626] rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-slate-400 text-2xl">📁</span>
-            </div>
-            <h3 className="text-lg font-medium text-white mb-2">No files found</h3>
-            <p className="text-slate-400 mb-6">
-              {filterType !== 'all' 
-                ? `No files match the current filter: ${filterType}`
-                : activeView && activeView !== 'dashboard'
-                ? `No files found in ${getViewDisplayName(activeView)}`
-                : 'Start by uploading your first file or creating a folder.'
-              }
-            </p>
-            {filterType !== 'all' && onFilterTypeChange && (
-              <button 
-                onClick={() => onFilterTypeChange('all')}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200 mr-4"
-              >
-                Show All Files
-              </button>
-            )}
-            {(activeView === 'dashboard' || activeView === 'all-files') && (
-              <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200">
-                Upload Files
-              </button>
-            )}
-          </div>
-        )}
-      </div>
 
       {/* Batch Action Bar */}
       <BatchActionBar
@@ -924,6 +1006,6 @@ const FileGrid: React.FC<FileGridProps> = ({
       )}
     </div>
   );
-};
+});
 
 export default FileGrid;

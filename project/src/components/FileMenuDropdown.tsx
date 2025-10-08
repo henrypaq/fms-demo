@@ -17,7 +17,7 @@ import {
   AlertTriangle,
   Loader
 } from 'lucide-react';
-import { FileItem } from './FileCard';
+import { FileItem } from './features/FileCard';
 import { useProject } from '../contexts/ProjectContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import TagInput from './TagInput';
@@ -179,7 +179,6 @@ const FileMenuDropdown: React.FC<FileMenuDropdownProps> = ({
 
   const handleMoveFile = (projectId: string | null, folderId: string | null) => {
     if (onMove && canMove) {
-      console.log('Moving file:', file.id, 'to project:', projectId, 'folder:', folderId);
       onMove(file.id, projectId, folderId);
     }
     setShowMoveModal(false);

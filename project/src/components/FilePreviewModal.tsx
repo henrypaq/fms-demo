@@ -9,9 +9,7 @@ import {
   HardDrive, 
   Tag, 
   User,
-  FileText,
   Image,
-  Video,
   Music,
   Archive,
   File,
@@ -23,7 +21,9 @@ import {
   MessageSquare,
   Info
 } from 'lucide-react';
-import { FileItem } from './FileCard';
+import { RiFile3Line, RiVideoLine } from '@remixicon/react';
+import { Icon, IconSizes, IconColors } from './ui/Icon';
+import { FileItem } from './features/FileCard';
 import { supabase } from '../lib/supabase';
 import AutoTaggingButton from './AutoTaggingButton';
 import TagInput from './TagInput';
@@ -96,17 +96,17 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
     const iconClass = "w-12 h-12";
     switch (type) {
       case 'document':
-        return <FileText className={`${iconClass} text-blue-400`} />;
+        return <Icon Icon={RiFile3Line} size={48} color="#60a5fa" className={iconClass} />;
       case 'image':
-        return <Image className={`${iconClass} text-green-400`} />;
+        return <Icon Icon={Image} size={48} color="#4ade80" className={iconClass} />;
       case 'video':
-        return <Video className={`${iconClass} text-purple-400`} />;
+        return <Icon Icon={RiVideoLine} size={48} color="#a855f7" className={iconClass} />;
       case 'audio':
-        return <Music className={`${iconClass} text-orange-400`} />;
+        return <Icon Icon={Music} size={48} color="#fb923c" className={iconClass} />;
       case 'archive':
-        return <Archive className={`${iconClass} text-yellow-400`} />;
+        return <Icon Icon={Archive} size={48} color="#eab308" className={iconClass} />;
       default:
-        return <File className={`${iconClass} text-slate-400`} />;
+        return <Icon Icon={File} size={48} color="#94a3b8" className={iconClass} />;
     }
   };
 
@@ -390,8 +390,6 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                         className="flex-1 min-w-0 bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && commentText.trim()) {
-                            // TODO: Handle comment submission
-                            console.log('Comment:', commentText, file.type === 'video' ? `at ${formatTime(videoCurrentTime)}` : '');
                             setCommentText('');
                           }
                         }}
@@ -415,8 +413,6 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                       <button
                         onClick={() => {
                           if (commentText.trim()) {
-                            // TODO: Handle comment submission
-                            console.log('Comment:', commentText, file.type === 'video' ? `at ${formatTime(videoCurrentTime)}` : '');
                             setCommentText('');
                           }
                         }}

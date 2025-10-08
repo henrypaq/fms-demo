@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { FileItem } from '../components/FileCard';
-import { ViewMode, SortOption, SortDirection, FilterType } from '../components/FilterBar';
+import { FileItem } from '../components/features/FileCard';
+import { ViewMode, SortOption, SortDirection, FilterType } from '../types/ui';
 
 interface UseFileFiltersProps {
   files: FileItem[];

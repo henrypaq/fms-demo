@@ -1,53 +1,510 @@
+/* Import Space Grotesk font */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /* Performance optimizations */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  
+  body {
+    text-rendering: optimizeLegibility;
+    -webkit-text-size-adjust: 100%;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.6;
+  }
+
   :root {
-    --background: 0 0% 4%; /* #0A0A0A */
-    --foreground: 0 0% 90%; /* #E5E5E5 */
-    --card: 0 0% 9%; /* #171717 */
-    --card-foreground: 0 0% 90%;
-    --popover: 0 0% 9%; /* #171717 */
-    --popover-foreground: 0 0% 90%; /* #E5E5E5 */
-    --primary: 0 0% 9%; /* #171717 */
-    --primary-foreground: 0 0% 4%; /* #0A0A0A */
-    --secondary: 0 0% 90%; /* #E5E5E5 */
-    --secondary-foreground: 0 0% 4%; /* #0A0A0A */
-    --muted: 0 0% 15%; /* #262626 */
-    --muted-foreground: 0 0% 65%; /* #A3A3A3 */
-    --accent: 0 0% 15%; /* #262626 */
-    --accent-foreground: 0 0% 90%; /* #E5E5E5 */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 15%; /* #262626 */
-    --input: 0 0% 15%; /* #262626 */
-    --ring: 0 0% 90%; /* #E5E5E5 */
-    --radius: 0.5rem;
+    /* New Cinematic Theme Color System */
+    --background: 240 30% 4%; /* #080A15 - Darker navy-black with violet hint */
+    --foreground: 240 10% 82%; /* #CFCFF6 - Soft lavender for headers and key labels */
+    --card: 240 30% 8%; /* #0C0E1F - Darker navy for panels */
+    --card-foreground: 240 10% 82%; /* #CFCFF6 - Card text */
+    --popover: 240 30% 8%; /* #0C0E1F - Popover background */
+    --popover-foreground: 240 10% 82%; /* #CFCFF6 - Popover text */
+    --primary: 220 85% 45%; /* #1E40AF - Royal blue accent */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF - White for primary text */
+    --secondary: 240 30% 8%; /* #0C0E1F - Secondary background */
+    --secondary-foreground: 240 10% 82%; /* #CFCFF6 - Secondary text */
+    --muted: 240 30% 8%; /* #0C0E1F - Muted background */
+    --muted-foreground: 0 0% 54%; /* #8A8C8E - Soft gray for inactive text and icons */
+    --accent: 240 30% 8%; /* #0C0E1F - Accent background */
+    --accent-foreground: 240 10% 82%; /* #CFCFF6 - Accent text */
+    --destructive: 0 84% 60%; /* #EF4444 - Error/destructive */
+    --destructive-foreground: 0 0% 100%; /* #FFFFFF - Destructive text */
+    --border: 240 25% 15%; /* #1F2138 - Slight separation borders */
+    --input: 240 30% 8%; /* #0C0E1F - Input background */
+    --ring: 220 85% 45%; /* #1E40AF - Focus ring using royal blue */
+    --radius: 0.5rem; /* Border radius for rounded corners */
+    
+    /* Additional tokens for highlights and secondary text */
+    --highlight: 0 0% 100%; /* #FFFFFF - Crisp white for clarity and hierarchy */
+    --active-foreground: 0 0% 100%; /* #FFFFFF - White for active/selected items */
+    --surface: 240 30% 8%; /* #0C0E1F - Content areas (top bar + main workspace panels) */
+    --card-light: 240 30% 10%; /* #12142A - Lighter navy for cards and interactive elements */
+    
+    /* Sidebar Navy Colors */
+    --sidebar-background: 240 30% 4%; /* #080A15 - Darker navy-black sidebar */
+    --sidebar-foreground: 240 10% 90%; /* #E4E5F1 - Soft off-white text */
+    --sidebar-primary: 220 85% 45%; /* #1E40AF - Royal blue primary */
+    --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - White text on primary */
+    --sidebar-accent: 240 30% 8%; /* #0C0E1F - Accent background */
+    --sidebar-accent-foreground: 240 10% 90%; /* #E4E5F1 - Accent text */
+    --sidebar-border: 240 25% 15%; /* #1F2138 - Border color */
+    --sidebar-ring: 220 85% 45%; /* #1E40AF - Focus ring */
+    
+    /* Sidebar Width Variables */
+    --sidebar-width: 16rem; /* 256px - Expanded width */
+    --sidebar-width-icon: 5rem; /* 80px - Collapsed width */
+  }
+  .dark {
+    --sidebar-background: 240 30% 4%; /* #080A15 - Darker navy-black sidebar */
+    --sidebar-foreground: 240 10% 90%; /* #E4E5F1 - Soft off-white text */
+    --sidebar-primary: 220 85% 45%; /* #1E40AF - Royal blue primary */
+    --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - White text on primary */
+    --sidebar-accent: 240 30% 8%; /* #0C0E1F - Accent background */
+    --sidebar-accent-foreground: 240 10% 90%; /* #E4E5F1 - Accent text */
+    --sidebar-border: 240 25% 15%; /* #1F2138 - Border color */
+    --sidebar-ring: 220 85% 45%; /* #1E40AF - Focus ring */
   }
 }
 
-/* Custom base styles with new color palette */
+/* Custom base styles for SaaS dashboard */
 @layer base {
-  body {
-    @apply bg-dark-bg text-light-text;
+  * {
+    @apply border-border;
   }
   
-  /* Override default scrollbar colors */
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Improved scrollbar styling */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
+    height: 6px;
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-dark-surface;
+    @apply bg-muted/20;
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-dark-surface;
-    border-radius: 4px;
+    @apply bg-muted-foreground/30 rounded-full;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-light-text/20;
+    @apply bg-muted-foreground/50;
   }
+  
+  /* Focus styles */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
+  }
+  
+  /* Selection styles */
+  ::selection {
+    @apply bg-primary/20 text-primary-foreground;
+  }
+
+  /* Unified Animation System - GPU Accelerated */
+  [data-state="open"],
+  [data-state="closed"],
+  .animate-in,
+  .animate-out {
+    will-change: transform, opacity;
+  }
+
+  /* Remove will-change after animation completes */
+  [data-state="open"]:not([data-state="opening"]),
+  [data-state="closed"]:not([data-state="closing"]) {
+    will-change: auto;
+  }
+}
+
+/* Component layer for DaVinci Resolve styling */
+@layer components {
+  /* Visual Hierarchy - Icon and Text Colors */
+  /* Default: All icons and secondary text use muted gray */
+  svg, .icon {
+    @apply text-muted-foreground transition-colors duration-200;
+  }
+
+  /* Interactive elements - icons and buttons */
+  button:not(.btn-primary):not([data-active="true"]) svg,
+  a:not([data-active="true"]) svg {
+    @apply text-muted-foreground hover:text-foreground transition-all duration-200 ease-in-out;
+  }
+
+  /* Active/Selected state - white icons */
+  [data-active="true"] svg,
+  [data-active="true"],
+  .active svg,
+  .active {
+    @apply text-active-foreground;
+  }
+
+  /* Sidebar Menu Button States */
+  [data-sidebar="menu-button"]:not([data-active="true"]) {
+    @apply text-muted-foreground;
+  }
+
+  [data-sidebar="menu-button"]:not([data-active="true"]):hover {
+    @apply text-foreground;
+  }
+
+  [data-sidebar="menu-button"][data-active="true"] {
+    @apply text-white bg-sidebar-accent;
+  }
+
+  /* Sidebar icons inherit button color */
+  [data-sidebar="menu-button"] svg {
+    color: inherit;
+  }
+
+  /* Typography Utilities - Space Grotesk System */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight leading-tight text-foreground;
+    font-weight: 500;
+  }
+  
+  h1 {
+    @apply text-3xl;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  
+  h2 {
+    @apply text-2xl;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  
+  h3 {
+    @apply text-xl;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  
+  h4, h5, h6 {
+    @apply text-base;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  
+  /* Body and UI text - default to muted gray */
+  p, span, div, label {
+    letter-spacing: -0.01em;
+    line-height: 1.6;
+    @apply text-muted-foreground;
+  }
+  
+  /* Label and UI text - refined thin style */
+  label, input, select, textarea {
+    font-weight: 300;
+    letter-spacing: -0.01em;
+  }
+  
+  /* Button text */
+  button {
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  
+  /* Primary text elements - use foreground color */
+  .text-primary,
+  [data-primary="true"] {
+    @apply text-foreground;
+  }
+  
+  /* Active/Selected text - use white */
+  .text-active,
+  [data-active="true"] {
+    @apply text-active-foreground;
+  }
+  
+  /* Raised panels with proper elevation and frame.io style rounding */
+  .raised-panel {
+    @apply bg-card/95 shadow-[0_2px_8px_rgba(0,0,0,0.35)] rounded-lg;
+  }
+  
+  /* Ensure perfect alignment of top bar and content area */
+  header.raised-panel,
+  .content-gutter .raised-panel {
+    @apply w-full mx-0;
+  }
+  
+  /* Content gutter spacing - thinner gutter with perfect alignment */
+  .content-gutter {
+    @apply bg-background pt-1 pb-1 mx-0 w-full;
+  }
+  
+  /* Ensure SidebarInset doesn't add margins */
+  .sidebar-inset {
+    @apply mx-0;
+  }
+  
+  /* Remove sidebar border to blend with background */
+  .group-data-\[side\=left\]\:border-r,
+  .group-data-\[side\=right\]\:border-l,
+  [data-sidebar="sidebar"],
+  [data-sidebar="sidebar"] * {
+    @apply border-0 !important;
+  }
+  
+  /* Remove sidebar rail hover effects */
+  [data-sidebar="rail"] {
+    @apply hidden !important;
+  }
+  
+  /* Make sidebar background match the main background */
+  [data-sidebar="sidebar"] {
+    @apply bg-background;
+  }
+  
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-lg hover:shadow-primary/5;
+  }
+  
+  /* Button variants */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus-ring;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 focus-ring;
+  }
+  
+  .btn-ghost {
+    @apply hover:bg-accent hover:text-accent-foreground focus-ring;
+  }
+  
+  /* Input styles */
+  .input-field {
+    @apply bg-card border border-border px-3 py-2 text-sm focus-ring;
+  }
+  
+  /* Navigation styles */
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors;
+  }
+  
+  .nav-item-active {
+    @apply bg-accent text-accent-foreground;
+  }
+  
+  .nav-item-inactive {
+    @apply text-muted-foreground hover:text-foreground hover:bg-accent;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Sidebar button sizing controlled by Tailwind variants */
+
+/* Button sizing controlled by Tailwind classes in sidebar-shadcn.tsx - no overrides needed */
+
+/* Upload Sheet positioning - ensure no gap, override built-in left-0 */
+[data-sidebar-upload-sheet] {
+  left: var(--sidebar-width) !important;
+  transition: left 0.3s ease-in-out !important;
+}
+
+[data-state="collapsed"] [data-sidebar-upload-sheet] {
+  left: var(--sidebar-width-icon) !important;
+}
+
+/* Override built-in sheet variants positioning */
+[data-sidebar-upload-sheet].left-0 {
+  left: var(--sidebar-width) !important;
+}
+
+[data-state="collapsed"] [data-sidebar-upload-sheet].left-0 {
+  left: var(--sidebar-width-icon) !important;
+}
+
+/* Upload Sheet overlay positioning - responsive to sidebar state */
+[data-sidebar-overlay-exclude] {
+  transition: left 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+/* When sidebar is collapsed, adjust overlay positioning */
+[data-state="collapsed"] [data-sidebar-overlay-exclude] {
+  left: var(--sidebar-width-icon) !important;
+  width: calc(100% - var(--sidebar-width-icon)) !important;
+}
+
+/* Sidebar color change when upload sheet is open */
+.upload-sheet-open [data-sidebar="sidebar"] {
+  background-color: hsl(var(--surface)) !important;
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Add dark gutter between sidebar and upload sheet when open */
+[data-sidebar="sidebar"] {
+  position: relative;
+}
+
+[data-sidebar="sidebar"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: hsl(var(--background));
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.upload-sheet-open [data-sidebar="sidebar"]::after {
+  opacity: 1;
+  box-shadow: 4px 0 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Performance optimizations for smooth interactions */
+@layer utilities {
+  /* Prevent layout shifts */
+  .prevent-layout-shift {
+    contain: layout style;
+  }
+  
+  /* Smooth transitions without flash */
+  .smooth-transition {
+    transition: all 0.15s ease-out;
+    will-change: transform, opacity;
+  }
+  
+  /* Fast transitions for interactive elements */
+  .fast-transition {
+    transition: all 0.12s ease-out;
+    will-change: transform, opacity;
+  }
+  
+  /* Hardware acceleration for better performance */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  /* Optimize button interactions */
+  button, [role="button"] {
+    transition: all 0.15s ease-out;
+    transform: translateZ(0);
+  }
+  
+  /* Optimize sidebar animations */
+  [data-sidebar] {
+    transition: transform 0.2s ease-out;
+  }
+  
+  /* Optimize dropdown animations */
+  [data-radix-popper-content-wrapper] {
+    transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+  }
+  
+  /* Folder-shaped project cards */
+  .folder-card {
+    aspect-ratio: 100/80;
+    width: 100%;
+    height: auto;
+  }
+  
+}
+
+/* Fast dropdown animations */
+.fast-dropdown {
+  animation-duration: 75ms !important;
+  transition-duration: 75ms !important;
+}
+
+.fast-dropdown[data-state="open"] {
+  animation: fast-fade-in 75ms ease-out !important;
+}
+
+.fast-dropdown[data-state="closed"] {
+  animation: fast-fade-out 75ms ease-out !important;
+}
+
+@keyframes fast-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fast-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* ============================================ */
+/* DROPDOWN ANIMATIONS - OUTSIDE ALL LAYERS    */
+/* Maximum specificity to override everything  */
+/* ============================================ */
+
+@keyframes dropdownFastIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dropdownFastOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+[data-radix-dropdown-menu-content][data-state="open"],
+[data-radix-context-menu-content][data-state="open"] {
+  animation: dropdownFastIn 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+[data-radix-dropdown-menu-content][data-state="closed"],
+[data-radix-context-menu-content][data-state="closed"] {
+  animation: dropdownFastOut 100ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }

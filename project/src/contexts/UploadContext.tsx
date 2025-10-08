@@ -47,7 +47,6 @@ export const UploadProvider: React.FC<UploadProviderProps> = ({ children }) => {
   const uploadRefs = useRef<Map<string, XMLHttpRequest>>(new Map());
   const { uploadFiles: realUploadFiles } = useFileUpload();
   
-  console.log('UploadProvider initialized, realUploadFiles:', typeof realUploadFiles);
 
   const formatBytes = (bytes: number) => {
     if (bytes === 0) return '0 B';
@@ -178,10 +177,8 @@ export const UploadProvider: React.FC<UploadProviderProps> = ({ children }) => {
       file,
     };
 
-    console.log('UploadContext - Adding upload:', uploadItem);
     setUploads(prev => {
       const newUploads = [...prev, uploadItem];
-      console.log('UploadContext - New uploads array:', newUploads);
       return newUploads;
     });
 
@@ -252,10 +249,8 @@ export const UploadProvider: React.FC<UploadProviderProps> = ({ children }) => {
         
         // Use the existing uploadFiles function from the hook
         // We'll need to import and use the actual upload functionality
-        console.log('Starting real upload for:', file.name);
         
         // Perform real upload with progress tracking
-        console.log('Starting real upload for:', file.name);
         
         try {
           // Check if upload function is available
@@ -264,7 +259,6 @@ export const UploadProvider: React.FC<UploadProviderProps> = ({ children }) => {
             throw new Error('Upload function not available');
           }
           
-          console.log('Upload function available, starting upload...');
           
           // Start with some progress to show it's working
           setUploads(prev => prev.map(upload => 
@@ -274,12 +268,9 @@ export const UploadProvider: React.FC<UploadProviderProps> = ({ children }) => {
           ));
           
           // Perform the actual upload
-          console.log('Calling realUploadFiles with:', { file: file.name, project });
           const uploadedFiles = await realUploadFiles([file], [], true, project, null);
-          console.log('Upload completed, files:', uploadedFiles);
           
           if (uploadedFiles && uploadedFiles.length > 0) {
-            console.log('Upload successful, updating status');
             // Update to completed status
             setUploads(prev => prev.map(upload => 
               upload.id === id 
@@ -313,7 +304,6 @@ export const UploadProvider: React.FC<UploadProviderProps> = ({ children }) => {
           });
           
           // Fallback to simulated upload for testing
-          console.log('Falling back to simulated upload for testing...');
           let progress = 10;
           const interval = setInterval(() => {
             progress += Math.random() * 15 + 5; // Random progress between 5-20%

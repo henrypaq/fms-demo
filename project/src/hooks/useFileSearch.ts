@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { FileItem } from '../components/FileCard';
+import { FileItem } from '../components/features/FileCard';
 
 export interface SearchFilters {
   query: string;

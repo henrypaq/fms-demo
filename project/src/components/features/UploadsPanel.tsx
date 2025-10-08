@@ -5,10 +5,12 @@ import {
   Play, 
   Pause, 
   CheckCircle,
-  AlertCircle,
-  Folder
+  AlertCircle
 } from 'lucide-react';
-import { useUploads, UploadItem } from '../contexts/UploadContext';
+import { RiFolder3Line } from '@remixicon/react';
+import { Icon, IconSizes, IconColors } from '../ui/Icon';
+import { useUploads, UploadItem } from '../../contexts/UploadContext';
+import { Button } from '../ui';
 
 interface UploadsPanelProps {
   isOpen: boolean;
@@ -19,8 +21,6 @@ const UploadsPanel: React.FC<UploadsPanelProps> = ({ isOpen, onClose }) => {
   const { uploads, pauseUpload, resumeUpload, cancelUpload, removeUpload, clearCompletedUploads } = useUploads();
 
   // Debug logging
-  console.log('UploadsPanel - uploads:', uploads);
-  console.log('UploadsPanel - isOpen:', isOpen);
 
   const activeUploads = uploads.filter(upload => upload.status === 'uploading' || upload.status === 'paused');
   const completedUploads = uploads.filter(upload => upload.status === 'completed');
@@ -123,15 +123,17 @@ const UploadsPanel: React.FC<UploadsPanelProps> = ({ isOpen, onClose }) => {
                 Clear All
               </button>
             )}
-            <button className="p-1.5 rounded-lg text-light-text/70 hover:text-light-text hover:bg-dark-bg transition-colors duration-200">
+            <Button variant="ghost" size="icon" className="h-8 w-8">
               <MoreHorizontal className="w-4 h-4" />
-            </button>
-            <button 
+            </Button>
+            <Button 
               onClick={onClose}
-              className="p-1.5 rounded-lg text-light-text/70 hover:text-light-text hover:bg-dark-bg transition-colors duration-200"
+              variant="ghost" 
+              size="icon"
+              className="h-8 w-8"
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -147,7 +149,7 @@ const UploadsPanel: React.FC<UploadsPanelProps> = ({ isOpen, onClose }) => {
               {allUploads.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="w-12 h-12 bg-[#262626] rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Folder className="w-6 h-6 text-light-text/70" />
+                    <Icon Icon={RiFolder3Line} size={IconSizes.medium} color="#94a3b8" className="w-6 h-6" />
                   </div>
                   <p className="text-light-text/70 text-sm">No uploads yet</p>
                   <p className="text-light-text/50 text-xs mt-1">Upload files to see them here</p>
@@ -192,15 +194,15 @@ const UploadsPanel: React.FC<UploadsPanelProps> = ({ isOpen, onClose }) => {
                                 </button>
                               </>
                             ) : null}
-                            <button className="p-1 rounded-lg text-light-text/70 hover:text-light-text hover:bg-dark-surface transition-colors duration-200">
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
                               <MoreHorizontal className="w-3 h-3" />
-                            </button>
+                            </Button>
                           </div>
                         </div>
                         
                         <div className="flex items-center space-x-2 mt-1">
                           <span className="text-light-text/70 text-xs">{upload.project}</span>
-                          <Folder className="w-3 h-3 text-light-text/70" />
+                          <Icon Icon={RiFolder3Line} size={12} color="#94a3b8" className="w-3 h-3" />
                           <span className="text-light-text/70 text-xs">root</span>
                         </div>
                         

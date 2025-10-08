@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, LogIn, AlertCircle, Loader } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import logoImage from '../assets/images.png';
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, Label } from './ui';
+import { Alert, AlertDescription } from './ui/alert';
 
 interface LoginPageProps {
   onLoginSuccess: () => void;
@@ -17,147 +19,129 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
-      setError('Please enter both email and password');
-      return;
-    }
-
+    // Demo mode: Just show loading and proceed
     setIsLoading(true);
     setError(null);
 
-    try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password
-      });
-
-      if (authError) {
-        throw authError;
-      }
-
-      if (data.user) {
-        // Check if user profile exists
-        const { data: profile, error: profileError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
-
-        if (profileError && profileError.code !== 'PGRST116') {
-          console.error('Error loading user profile:', profileError);
-        }
-
-        onLoginSuccess();
-      }
-    } catch (error: any) {
-      console.error('Login error:', error);
-      
-      if (error.message?.includes('Invalid login credentials')) {
-        setError('Invalid email or password');
-      } else if (error.message?.includes('Email not confirmed')) {
-        setError('Please confirm your email first');
-      } else {
-        setError(error.message || 'Login failed');
-      }
-    } finally {
+    // Simulate login delay for demo purposes
+    setTimeout(() => {
       setIsLoading(false);
-    }
+      onLoginSuccess();
+    }, 1000);
   };
 
   return (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md space-y-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 overflow-hidden">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto overflow-hidden bg-card border border-border shadow-sm">
             <img 
               src={logoImage} 
               alt="Njordgear" 
               className="w-full h-full object-contain"
             />
           </div>
-          <h1 className="text-3xl font-bold text-white">Njordgear FMS</h1>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-foreground">Njordgear FMS</h1>
+            <p className="text-sm text-muted-foreground">
+              File Management System
+            </p>
+          </div>
         </div>
 
         {/* Login Form */}
-        <div className="bg-dark-surface border border-dark-surface rounded-xl p-8">
-          <form onSubmit={handleLogin} className="space-y-6">
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-light-text/70 mb-2">
-                Email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-light-text/70" />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter email"
-                  className="w-full pl-10 pr-4 py-3 bg-dark-bg border border-dark-surface rounded-lg text-light-text placeholder-light-text/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
-                  disabled={isLoading}
-                  autoComplete="email"
-                />
+        <Card className="shadow-lg">
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle className="text-2xl font-semibold">Welcome back</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Demo Mode - Click "Sign In" to continue
+            </p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              {/* Email Field */}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="pl-10"
+                    disabled={isLoading}
+                    autoComplete="email"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-light-text/70 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-light-text/70" />
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
-                  className="w-full pl-10 pr-12 py-3 bg-dark-bg border border-dark-surface rounded-lg text-light-text placeholder-light-text/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
-                  disabled={isLoading}
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-light-text/70 hover:text-light-text transition-colors duration-200"
-                  disabled={isLoading}
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
+              {/* Password Field */}
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className="pl-10 pr-10"
+                    disabled={isLoading}
+                    autoComplete="current-password"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    disabled={isLoading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                    <span className="sr-only">
+                      {showPassword ? 'Hide password' : 'Show password'}
+                    </span>
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="flex items-center space-x-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                <span className="text-red-400 text-sm">{error}</span>
-              </div>
-            )}
-
-            {/* Login Button */}
-            <button
-              type="submit"
-              disabled={isLoading || !email || !password}
-              className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-light-text hover:bg-light-text/90 disabled:bg-dark-surface disabled:cursor-not-allowed text-dark-bg rounded-lg font-medium transition-colors duration-200"
-            >
-              {isLoading ? (
-                <>
-                  <Loader className="w-5 h-5 animate-spin" />
-                  <span>Signing in...</span>
-                </>
-              ) : (
-                <>
-                  <LogIn className="w-5 h-5" />
-                  <span>Sign In</span>
-                </>
+              {/* Error Message */}
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
-            </button>
-          </form>
-        </div>
+
+              {/* Login Button */}
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full gap-2"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    <span>Signing in...</span>
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4" />
+                    <span>Sign In</span>
+                  </>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

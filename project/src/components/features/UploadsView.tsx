@@ -4,11 +4,13 @@ import {
   Pause, 
   MoreHorizontal, 
   X, 
-  Folder,
   Clock,
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
+import { RiFolder3Line } from '@remixicon/react';
+import { Icon, IconSizes, IconColors } from '../ui/Icon';
+import { Button } from '../ui';
 
 interface UploadItem {
   id: string;
@@ -95,12 +97,12 @@ const UploadsView: React.FC = () => {
       <div className="flex items-center justify-between p-6 border-b border-dark-surface">
         <h1 className="text-2xl font-bold text-light-text">Uploads</h1>
         <div className="flex items-center space-x-4">
-          <button className="p-2 rounded-lg text-light-text/70 hover:text-light-text hover:bg-dark-surface transition-colors duration-200">
+          <Button variant="ghost" size="icon" className="h-10 w-10">
             <MoreHorizontal className="w-5 h-5" />
-          </button>
-          <button className="p-2 rounded-lg text-light-text/70 hover:text-light-text hover:bg-dark-surface transition-colors duration-200">
+          </Button>
+          <Button variant="ghost" size="icon" className="h-10 w-10">
             <X className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -123,14 +125,14 @@ const UploadsView: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <h3 className="text-light-text font-medium truncate">{upload.name}</h3>
-                    <button className="p-1 rounded-lg text-light-text/70 hover:text-light-text hover:bg-dark-bg transition-colors duration-200">
+                    <Button variant="ghost" size="icon" className="h-6 w-6">
                       <MoreHorizontal className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </div>
                   
                   <div className="flex items-center space-x-2 mt-1">
                     <span className="text-light-text/70 text-sm">{upload.project}</span>
-                    <Folder className="w-3 h-3 text-light-text/70" />
+                    <Icon Icon={RiFolder3Line} size={12} color="#94a3b8" className="w-3 h-3" />
                     <span className="text-light-text/70 text-sm">root</span>
                   </div>
                   
@@ -174,14 +176,14 @@ const UploadsView: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <h3 className="text-light-text font-medium truncate">{upload.name}</h3>
-                    <button className="p-1 rounded-lg text-light-text/70 hover:text-light-text hover:bg-dark-bg transition-colors duration-200">
+                    <Button variant="ghost" size="icon" className="h-6 w-6">
                       <MoreHorizontal className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </div>
                   
                   <div className="flex items-center space-x-2 mt-1">
                     <span className="text-light-text/70 text-sm">{upload.project}</span>
-                    <Folder className="w-3 h-3 text-light-text/70" />
+                    <Icon Icon={RiFolder3Line} size={12} color="#94a3b8" className="w-3 h-3" />
                     <span className="text-light-text/70 text-sm">root</span>
                   </div>
                   

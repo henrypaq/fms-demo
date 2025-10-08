@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { useWorkspace } from '../contexts/WorkspaceContext';
-import { FileItem } from '../components/FileCard';
+import { FileItem } from '../components/features/FileCard';
 
 interface GlobalSearchResult {
   files: FileItem[];
@@ -115,11 +115,6 @@ export const useGlobalSearch = (query: string, selectedTags: string[] = [], acti
     setError(null);
 
     try {
-      console.log('=== Smart Global Search ===');
-      console.log('Query:', searchQuery);
-      console.log('Tags:', tags);
-      console.log('View:', view || 'all');
-      console.log('Workspace:', currentWorkspace.id);
 
       // Build smart search patterns
       const searchInfo = buildSmartSearchQuery(searchQuery);
@@ -187,7 +182,6 @@ export const useGlobalSearch = (query: string, selectedTags: string[] = [], acti
         throw searchError;
       }
 
-      console.log('Search results:', data?.length || 0);
 
       let searchResults = (data || []).map(convertFileRecord);
       

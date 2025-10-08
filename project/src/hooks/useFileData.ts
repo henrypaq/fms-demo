@@ -103,14 +103,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
       const currentView = view || activeView;
       setActiveView(currentView);
 
-      console.log('=== Loading Files with Server-Side Sorting ===');
-      console.log('Workspace:', currentWorkspace.name, currentWorkspace.id);
-      console.log('Project Context:', projectContext);
-      console.log('Current Project:', currentProject?.name || 'None');
-      console.log('Current Folder:', currentFolder?.name || 'None');
-      console.log('Page:', page);
-      console.log('Sort:', sortField || sortBy, sortDir || sortDirection);
-      console.log('View:', currentView);
 
       // Build workspace-scoped query - show ALL files in workspace regardless of user role
       let query = supabase
@@ -127,11 +119,9 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
 
       // Apply view-specific filters
       if (currentView === 'favorites') {
-        console.log('Filtering by favorites');
         query = query.eq('is_favorite', true);
         countQuery = countQuery.eq('is_favorite', true);
       } else if (currentView === 'recent') {
-        console.log('Filtering by recent (last 7 days)');
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
         const sevenDaysAgoStr = sevenDaysAgo.toISOString();
@@ -143,21 +133,17 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
       // Apply project/folder filtering when in project context
       if (projectContext) {
         if (currentProject) {
-          console.log('Filtering by project:', currentProject.id);
           query = query.eq('project_id', currentProject.id);
           countQuery = countQuery.eq('project_id', currentProject.id);
           
           if (currentFolder) {
-            console.log('Filtering by folder:', currentFolder.id);
             query = query.eq('folder_id', currentFolder.id);
             countQuery = countQuery.eq('folder_id', currentFolder.id);
           } else {
-            console.log('Showing project root files (no folder)');
             query = query.is('folder_id', null);
             countQuery = countQuery.is('folder_id', null);
           }
         } else {
-          console.log('No project selected in project context - showing empty');
           setFiles([]);
           setTotalCount(0);
           setLoading(false);
@@ -165,7 +151,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
           return;
         }
       } else {
-        console.log('Main view - showing all workspace files');
       }
 
       // Get total count
@@ -178,7 +163,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
 
       const totalFiles = count || 0;
       setTotalCount(totalFiles);
-      console.log('Total files found:', totalFiles);
 
       // Apply server-side sorting
       const currentSortBy = sortField || sortBy;
@@ -207,7 +191,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
           break;
       }
 
-      console.log('Applying server-side sort:', orderColumn, ascending ? 'ASC' : 'DESC');
 
       // Calculate pagination
       const from = (page - 1) * ITEMS_PER_PAGE;
@@ -223,7 +206,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
         throw fetchError;
       }
 
-      console.log('Files fetched:', data?.length || 0);
       const convertedFiles = (data || []).map(convertFileRecord);
       
       if (append) {
@@ -248,7 +230,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
 
   // Load files when workspace or context changes
   useEffect(() => {
-    console.log('=== Context Changed - Reloading Files ===');
     if (currentWorkspace?.id) {
       setCurrentPage(1);
       loadFiles(1);
@@ -264,14 +245,12 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
 
     // Always clean up previous channel before creating a new one
     if (channelRef.current) {
-      console.log('[useFileData] Cleaning up previous channel', channelRef.current.topic);
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
     }
 
     // Always create a new channel instance with a unique name
     const channelName = `files_changes_${currentWorkspace.id}_${channelInstanceId.current}`;
-    console.log('[useFileData] Creating new channel:', channelName);
     const newChannel = supabase
       .channel(channelName)
       .on('postgres_changes', 
@@ -282,7 +261,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
           filter: `workspace_id=eq.${currentWorkspace.id}`
         }, 
         (payload) => {
-          console.log('Real-time update received:', payload);
           if (!loadingRef.current) {
             setTimeout(() => {
               loadFiles(currentPageRef.current);
@@ -297,7 +275,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
 
     return () => {
       if (channelRef.current) {
-        console.log('[useFileData] Cleanup on unmount', channelRef.current.topic);
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
       }
@@ -308,7 +285,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
   const handleSortChange = useCallback((newSortBy: 'name' | 'date' | 'size' | 'type', newSortDirection?: 'asc' | 'desc') => {
     const direction = newSortDirection || (newSortBy === sortBy && sortDirection === 'asc' ? 'desc' : 'asc');
     
-    console.log('Changing sort:', newSortBy, direction);
     setSortBy(newSortBy);
     setSortDirection(direction);
     
@@ -339,7 +315,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
   const addFiles = useCallback((newFiles: FileRecord[]) => {
     if (!currentWorkspace?.id) return;
 
-    console.log('Adding files to state:', newFiles.length);
     // Only add files that belong to current workspace and are not deleted
     let filteredFiles = newFiles.filter(f => f.workspace_id === currentWorkspace.id && !f.deleted_at);
     
@@ -378,7 +353,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
       if (updates.folderId !== undefined) dbUpdates.folder_id = updates.folderId || undefined;
       if (updates.fileUrl !== undefined) dbUpdates.file_url = updates.fileUrl || undefined;
 
-      console.log('Updating file:', fileId, 'with changes:', dbUpdates);
 
       const { error } = await supabase
         .from('files')
@@ -396,7 +370,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
 
       // If we moved the file to a different project/folder, refresh to update the view
       if (updates.projectId !== undefined || updates.folderId !== undefined) {
-        console.log('File moved, refreshing view');
         setTimeout(() => {
           loadFiles(currentPage, false, undefined, undefined, activeView);
         }, 100);
@@ -410,7 +383,6 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
 
   const deleteFile = useCallback(async (fileId: string) => {
     try {
-      console.log('DELETING FILE:', fileId);
       
       // Soft delete by setting deleted_at timestamp
       const { error } = await supabase
@@ -426,23 +398,19 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
         throw error;
       }
 
-      console.log('File soft deleted successfully in database');
 
       // Remove from local state immediately
       setFiles(prev => {
         const newFiles = prev.filter(file => file.id !== fileId);
-        console.log('Removed file from local state. Files before:', prev.length, 'Files after:', newFiles.length);
         return newFiles;
       });
       
       setTotalCount(prev => {
         const newCount = Math.max(0, prev - 1);
-        console.log('Updated total count from', prev, 'to', newCount);
         return newCount;
       });
 
       markFilesAsUpdated();
-      console.log('File deletion completed successfully');
 
     } catch (err) {
       console.error('Error deleting file:', err);
@@ -458,14 +426,12 @@ export const useFileData = (projectContext: boolean = false, showTrash: boolean 
   }, [files, updateFile]);
 
   const refreshFiles = useCallback((view?: string) => {
-    console.log('Refreshing files...', view ? `View: ${view}` : '');
     if (!loadingRef.current) {
       loadFiles(currentPage, false, undefined, undefined, view);
     }
   }, [loadFiles, currentPage]);
 
   const changeView = useCallback((view: string) => {
-    console.log('Changing view to:', view);
     setActiveView(view);
     setCurrentPage(1);
     loadFiles(1, false, undefined, undefined, view);

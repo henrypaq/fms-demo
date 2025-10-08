@@ -30,7 +30,6 @@ let lastUpdateTimestamp = 0;
 export const markFilesAsUpdated = () => {
   filesUpdatedFlag = true;
   lastUpdateTimestamp = Date.now();
-  console.log('Files marked as updated at:', lastUpdateTimestamp);
 };
 
 // Function to check if files need refresh
@@ -41,7 +40,6 @@ export const shouldRefreshFiles = () => {
 // Function to clear the update flag
 export const clearFilesUpdateFlag = () => {
   filesUpdatedFlag = false;
-  console.log('Files update flag cleared');
 };
 
 // Fallback component for when workspace is not available
@@ -129,7 +127,6 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
             setWorkspaces([defaultWorkspace]);
             setCurrentWorkspace(defaultWorkspace);
             localStorage.setItem('currentWorkspaceId', defaultWorkspace.id);
-            console.log('Created default workspace as fallback.');
           } catch (err) {
             console.error('Failed to create default workspace as fallback:', err);
           }
@@ -172,13 +169,11 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
 
   const loadWorkspaces = useCallback(async () => {
     try {
-      console.log('Loading workspaces...');
       
       // Get current user to check permissions
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('No user found, loading all workspaces');
         const { data, error: fetchError } = await supabase
           .from('workspaces')
           .select('*')
@@ -190,7 +185,6 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
         }
 
         if (!data || data.length === 0) {
-          console.log('No workspaces found, creating default workspace...');
           
           try {
             const defaultWorkspace = await createWorkspaceInternal({
@@ -200,14 +194,12 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
             });
             
             setWorkspaces([defaultWorkspace]);
-            console.log('Default workspace created successfully');
           } catch (createError) {
             console.error('Failed to create default workspace:', createError);
             setWorkspaces([]);
           }
         } else {
           setWorkspaces(data);
-          console.log(`Loaded ${data.length} workspaces`);
         }
         return;
       }
@@ -219,10 +211,8 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
         .eq('id', user.id)
         .single();
 
-      console.log('User profile loaded:', profile);
 
       if (!profile) {
-        console.log('No user profile found, loading all workspaces');
         const { data, error: fetchError } = await supabase
           .from('workspaces')
           .select('*')
@@ -244,12 +234,8 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
         .order('name');
 
       if (profile.role === 'admin') {
-        console.log('Admin user, loading all workspaces');
         // Admins see all workspaces - no filtering needed
       } else {
-        console.log('Employee user, loading accessible workspaces only');
-        console.log('Profile workspace_id:', profile.workspace_id);
-        console.log('Profile project_access:', profile.project_access);
         
         // For employees, build a query that only fetches accessible workspaces
         const accessibleWorkspaceIds = new Set<string>();
@@ -257,7 +243,6 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
         // Add primary workspace
         if (profile.workspace_id) {
           accessibleWorkspaceIds.add(profile.workspace_id);
-          console.log('Added primary workspace:', profile.workspace_id);
         }
         
         // Add workspaces from project access
@@ -271,13 +256,11 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
             projects.forEach(project => {
               if (project.workspace_id) {
                 accessibleWorkspaceIds.add(project.workspace_id);
-                console.log('Added workspace from project:', project.workspace_id);
               }
             });
           }
         }
         
-        console.log('Total accessible workspace IDs:', Array.from(accessibleWorkspaceIds));
         
         if (accessibleWorkspaceIds.size > 0) {
           // Filter the query to only include accessible workspaces
@@ -285,7 +268,6 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
         } else {
           // No accessible workspaces - return empty array
           setWorkspaces([]);
-          console.log('No accessible workspaces found for employee');
           return;
         }
       }
@@ -299,7 +281,6 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
       }
 
       setWorkspaces(data || []);
-      console.log(`Loaded ${data?.length || 0} workspaces:`, data);
     } catch (err) {
       console.error('Error in loadWorkspaces:', err);
       throw err;
@@ -310,7 +291,6 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
     try {
       const workspace = workspaces.find(w => w.id === workspaceId);
       if (workspace) {
-        console.log('Switching to workspace:', workspace.name);
         setCurrentWorkspace(workspace);
         localStorage.setItem('currentWorkspaceId', workspaceId);
       } else if (workspaces.length > 0) {
@@ -331,7 +311,6 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
             setWorkspaces([defaultWorkspace]);
             setCurrentWorkspace(defaultWorkspace);
             localStorage.setItem('currentWorkspaceId', defaultWorkspace.id);
-            console.log('Created default workspace as fallback (switch).');
           } catch (err) {
             console.error('Failed to create default workspace as fallback (switch):', err);
           }
@@ -449,7 +428,6 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
         throw new Error(`Failed to duplicate files: ${insertError.message}`);
       }
 
-      console.log(`Successfully duplicated ${fileIds.length} files to workspace ${targetWorkspaceId}`);
     } catch (err) {
       console.error('Error duplicating files:', err);
       throw err;
@@ -468,7 +446,6 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
         throw new Error(`Failed to move files: ${error.message}`);
       }
 
-      console.log(`Successfully moved ${fileIds.length} files to workspace ${targetWorkspaceId}`);
     } catch (err) {
       console.error('Error moving files:', err);
       throw err;

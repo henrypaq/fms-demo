@@ -64,7 +64,6 @@ export default function WorkspaceDemo() {
 
 	const handleWorkspaceChange = (workspace: MyWorkspace) => {
 		setActiveWorkspaceId(workspace.id);
-		console.log('Selected workspace:', workspace);
 	};
 
 	// Custom workspace renderer with additional info

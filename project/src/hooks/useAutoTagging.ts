@@ -62,12 +62,6 @@ export const useAutoTagging = () => {
         }
       };
 
-      console.log('Sending manual auto-tagging request:', {
-        fileId: webhookPayload.fileId,
-        fileName: webhookPayload.fileName,
-        fileUrl: webhookPayload.fileUrl,
-        thumbnailUrl: webhookPayload.thumbnailUrl
-      });
 
       // Send to n8n webhook
       const response = await fetch(N8N_WEBHOOK_URL, {
@@ -83,11 +77,9 @@ export const useAutoTagging = () => {
       }
 
       const result = await response.json();
-      console.log('Auto-tagging triggered successfully:', result);
 
       // Check if n8n returned tags immediately
       if (result.tags && Array.isArray(result.tags) && result.tags.length > 0) {
-        console.log('Received immediate tags from n8n:', result.tags);
         
         // Update file tags in database
         const { error: updateError } = await supabase
@@ -129,7 +121,6 @@ export const useAutoTagging = () => {
 
       if (error) throw error;
 
-      console.log(`Updated tags for file ${fileId}:`, newTags);
       return true;
 
     } catch (error) {

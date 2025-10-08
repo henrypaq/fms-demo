@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Download, 
-  FileText, 
   Image, 
-  Video, 
   Music, 
   Archive, 
   File,
@@ -16,8 +14,10 @@ import {
   Share2,
   AlertTriangle
 } from 'lucide-react';
+import { RiFile3Line, RiVideoLine } from '@remixicon/react';
+import { Icon, IconSizes, IconColors } from './ui/Icon';
 import { supabase } from '../lib/supabase';
-import { FileItem } from './FileCard';
+import { FileItem } from './features/FileCard';
 import logoImage from '../assets/images.png';
 
 interface SharePageProps {
@@ -119,17 +119,17 @@ const SharePage: React.FC<SharePageProps> = ({ fileId }) => {
     const iconClass = "w-16 h-16";
     switch (type) {
       case 'document':
-        return <FileText className={`${iconClass} text-blue-400`} />;
+        return <Icon Icon={RiFile3Line} size={64} color="#60a5fa" className={iconClass} />;
       case 'image':
-        return <Image className={`${iconClass} text-green-400`} />;
+        return <Icon Icon={Image} size={64} color="#4ade80" className={iconClass} />;
       case 'video':
-        return <Video className={`${iconClass} text-purple-400`} />;
+        return <Icon Icon={RiVideoLine} size={64} color="#a855f7" className={iconClass} />;
       case 'audio':
-        return <Music className={`${iconClass} text-orange-400`} />;
+        return <Icon Icon={Music} size={64} color="#fb923c" className={iconClass} />;
       case 'archive':
-        return <Archive className={`${iconClass} text-yellow-400`} />;
+        return <Icon Icon={Archive} size={64} color="#eab308" className={iconClass} />;
       default:
-        return <File className={`${iconClass} text-slate-400`} />;
+        return <Icon Icon={File} size={64} color="#94a3b8" className={iconClass} />;
     }
   };
 

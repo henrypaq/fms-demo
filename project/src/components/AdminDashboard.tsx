@@ -144,9 +144,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
           email: user.email,
           workspaces: workspaceData as string[],
           workspaceIds: workspaceIds as string[],
-          status: 'active' as const, // TODO: Determine from auth status
           createdAt: new Date(user.created_at).toLocaleDateString(),
-          lastLogin: undefined, // TODO: Get from auth.users
           project_access: (user.project_access || []) as string[],
           role: user.role
         } satisfies Employee;
@@ -197,13 +195,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
     setErrorMessage('');
 
     try {
-      console.log('Creating employee with data:', {
-        email: newEmployee.email,
-        name: newEmployee.name,
-        workspaceId: newEmployee.workspaceIds[0],
-        workspaceIds: newEmployee.workspaceIds,
-        isAdmin: newEmployee.isAdmin
-      });
       
       // Store current admin session
       const { data: { session } } = await supabase.auth.getSession();
@@ -229,7 +220,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
         throw new Error('No user data returned');
       }
 
-      console.log('Auth user created:', authData.user.id);
 
       // Create user profile - use the first selected workspace as primary
       const primaryWorkspaceId = newEmployee.workspaceIds[0];
@@ -263,7 +253,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
         throw new Error(`Failed to create profile: ${profileError.message}`);
       }
 
-      console.log('User profile created successfully');
 
       // Update the user profile with the correct workspace and project access
       // This ensures the workspace assignment is correct even if the trigger overrides it
@@ -335,13 +324,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
     setErrorMessage('');
 
     try {
-      console.log('Updating employee with data:', {
-        id: selectedEmployee.id,
-        email: editEmployee.email,
-        name: editEmployee.name,
-        workspaceId: editEmployee.workspaceIds[0],
-        workspaceIds: editEmployee.workspaceIds
-      });
 
       // Get project IDs for all selected workspaces
       const { data: projectsData, error: projectsError } = await supabase
@@ -356,7 +338,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
       
       // Extract project IDs
       const projectAccess = projectsData ? projectsData.map(p => p.id) : [];
-      console.log('Setting project access:', projectAccess);
 
       // Update user profile - use the first selected workspace as primary
       const primaryWorkspaceId = editEmployee.workspaceIds[0];
@@ -377,7 +358,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
         throw new Error(`Failed to update profile: ${profileError.message}`);
       }
 
-      console.log('User profile updated successfully');
 
       setSubmitStatus('success');
       setShowEditEmployee(false);

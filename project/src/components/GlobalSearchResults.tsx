@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search, X, FileText, Loader } from 'lucide-react';
-import { FileItem } from './FileCard';
-import FileCard from './FileCard';
+import { FileItem } from './features/FileCard';
+import FileCard from './features/FileCard';
 
 interface GlobalSearchResultsProps {
   query: string;
@@ -60,16 +60,16 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
   };
 
   return (
-    <div className="p-6">
+    <div>
       {/* Search Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <Search className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <Search className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Search Results</h2>
-            <div className="flex items-center space-x-2 text-sm text-slate-400">
+            <h2 className="text-xl font-semibold text-foreground">Search Results</h2>
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               {query.trim() && (
                 <span>"{query.trim()}"</span>
               )}
@@ -133,7 +133,7 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
           {files.length > 0 ? (
             <>
               {/* Results Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible">
                 {files.map((file) => (
                   <FileCard
                     key={file.id}

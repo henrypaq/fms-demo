@@ -41,17 +41,17 @@ const WorkspaceManager: React.FC<WorkspaceManagerProps> = ({ isOpen, onClose }) 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    color: '#3B82F6'
+    color: '#1E40AF'
   });
 
   const colors = [
-    '#3B82F6', '#10B981', '#F59E0B', '#EF4444', 
+    '#1E40AF', '#10B981', '#F59E0B', '#EF4444', 
     '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16',
     '#F97316', '#6366F1', '#14B8A6', '#F43F5E'
   ];
 
   const resetForm = useCallback(() => {
-    setFormData({ name: '', description: '', color: '#3B82F6' });
+    setFormData({ name: '', description: '', color: '#1E40AF' });
     setEditingWorkspace(null);
     setError(null);
     setSuccess(null);

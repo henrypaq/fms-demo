@@ -146,7 +146,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
     }
 
     try {
-      console.log('Loading projects for workspace:', currentWorkspace.id);
 
       const { data, error: fetchError } = await supabase
         .from('projects')
@@ -160,7 +159,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
       }
 
       const projectsData = data || [];
-      console.log('Projects loaded:', projectsData.length);
       setProjects(projectsData);
 
       // Set current project from localStorage or first project
@@ -191,7 +189,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
     }
 
     try {
-      console.log('Loading folders for project:', currentProject.id);
 
       const { data, error: fetchError } = await supabase
         .from('folders')
@@ -205,7 +202,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
       }
 
       const foldersData = data || [];
-      console.log('Folders loaded:', foldersData.length);
 
       // Add file counts to folders
       try {
@@ -283,7 +279,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
     try {
       const project = projects.find(p => p.id === projectId);
       if (project && currentWorkspace?.id) {
-        console.log('Switching to project:', project.name);
         setCurrentProject(project);
         setCurrentFolder(null); // Reset folder when switching projects
         localStorage.setItem(`currentProjectId_${currentWorkspace.id}`, projectId);
@@ -297,18 +292,15 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
 
   const switchFolder = (folderId: string | null) => {
     try {
-      console.log('Switching to folder:', folderId);
       if (folderId) {
         const folder = folders.find(f => f.id === folderId);
         if (folder) {
-          console.log('Found folder:', folder.name);
           setCurrentFolder(folder);
         } else {
           console.warn('Folder not found:', folderId);
           setCurrentFolder(null);
         }
       } else {
-        console.log('Switching to project root');
         setCurrentFolder(null);
       }
     } catch (err) {
@@ -319,7 +311,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
 
   const createProject = async (projectData: Omit<Project, 'id' | 'created_at' | 'updated_at'>): Promise<Project> => {
     try {
-      console.log('Creating project:', projectData.name, 'in workspace:', projectData.workspace_id);
 
       const { data, error } = await supabase
         .from('projects')
@@ -338,7 +329,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
 
       const newProject = data as Project;
       setProjects(prev => [...prev, newProject]);
-      console.log('Project created successfully:', newProject.id);
       return newProject;
     } catch (err) {
       console.error('Error creating project:', err);
@@ -397,7 +387,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
 
   const createFolder = async (folderData: Omit<Folder, 'id' | 'created_at' | 'updated_at' | 'path'>): Promise<Folder> => {
     try {
-      console.log('Creating folder:', folderData.name, 'in project:', folderData.project_id);
 
       const { data, error } = await supabase
         .from('folders')
@@ -416,7 +405,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
 
       const newFolder = data as Folder;
       await loadFolders(); // Reload to get updated paths and counts
-      console.log('Folder created successfully:', newFolder.id);
       return newFolder;
     } catch (err) {
       console.error('Error creating folder:', err);
@@ -468,7 +456,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
 
   const moveFolder = async (folderId: string, newParentId: string | null) => {
     try {
-      console.log('Moving folder:', folderId, 'to parent:', newParentId);
 
       // Prevent moving folder into itself or its children
       if (folderId === newParentId) {
@@ -502,7 +489,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
       }
 
       await loadFolders(); // Reload to get updated tree structure
-      console.log('Folder moved successfully');
     } catch (err) {
       console.error('Error moving folder:', err);
       throw err;

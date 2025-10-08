@@ -1,0 +1,30 @@
+# Ignore typical build/system junk
+node_modules/
+.next/
+dist/
+out/
+build/
+coverage/
+.vscode/
+.idea/
+
+# Ignore lockfiles and logs
+*.log
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Cursor’s default ignores that we’ll allow overrides for:
+# DO NOT ignore .env files anymore
+!*.env
+!*.env.local
+!*.env.development
+!*.env.production
+
+# Optional: if you want to allow Cursor to read your config files too
+!tailwind.config.ts
+!tailwind.config.js
+!postcss.config.js
+!next.config.js
+!vite.config.ts
+!vite.config.js

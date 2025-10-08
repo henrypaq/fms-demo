@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X, Tag } from 'lucide-react';
-import { FileItem } from './FileCard';
+import { FileItem } from './features/FileCard';
 import { getAllTags } from '../hooks/useFileSearch';
 
 interface EnhancedSearchBarProps {

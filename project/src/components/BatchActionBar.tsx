@@ -16,7 +16,7 @@ import {
   Share2,
   Trash2
 } from 'lucide-react';
-import { FileItem } from './FileCard';
+import { FileItem } from './features/FileCard';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { supabase } from '../lib/supabase';
 
