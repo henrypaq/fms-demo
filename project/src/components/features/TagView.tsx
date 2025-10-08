@@ -484,7 +484,8 @@ const TagView: React.FC<TagViewProps> = ({
   };
 
   return (
-    <div className="flex gap-1 h-full overflow-hidden">
+    <>
+    <div className="flex gap-1 h-full overflow-hidden flex-1">
       {/* Tag Sidebar */}
       <TagSidebar
         tagStats={tagStats}
@@ -505,7 +506,7 @@ const TagView: React.FC<TagViewProps> = ({
       />
 
       {/* Main Content Area */}
-      <div className="h-full raised-panel w-full flex-1 mx-0 overflow-y-auto overflow-x-visible">
+      <div className="h-full raised-panel flex-1 mx-0 overflow-y-auto overflow-x-visible">
         {/* Top Bar - Filter Bar and Controls */}
         <div className="flex items-center justify-between py-2 border-b border-border mx-0 px-6 mb-4">
           {/* Left Side - Page Title */}
@@ -641,6 +642,7 @@ const TagView: React.FC<TagViewProps> = ({
           )}
         </div>
       </div>
+    </div>
 
       {/* Add Tag Modal */}
       <Dialog open={showAddTagModal} onOpenChange={setShowAddTagModal}>
@@ -755,7 +757,7 @@ const TagView: React.FC<TagViewProps> = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 };
 
