@@ -315,7 +315,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
         />
       )}
       
-      <div className={`relative flex flex-col ${className} ${showExpandedTags ? 'z-[210]' : ''}`}>
+      <div className={`relative flex flex-col ${className} ${showExpandedTags ? 'z-[210]' : 'z-[1]'}`}>
       
       <Card 
         className={`
@@ -332,7 +332,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           transition-all duration-150 ease-out
           cursor-pointer group
           flex flex-col
-          relative z-[210]
+          relative ${showExpandedTags ? 'z-[210]' : 'z-[1]'}
           ${currentSelected && !showExpandedTags
             ? 'ring-2 ring-[#6049E3] shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(96,73,227,0.4)]' 
             : !showExpandedTags ? 'hover:scale-[1.02] hover:shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(0,0,0,0.5)]' : ''
@@ -513,7 +513,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
       {/* Tags floating underneath the card - ALWAYS max 2 rows */}
       {tagsVisible && displayTags.length > 0 && (
         <div 
-          className={`flex flex-wrap gap-1.5 mt-2 px-1 cursor-pointer relative z-[210] ${showExpandedTags ? 'max-w-none' : ''}`}
+          className={`flex flex-wrap gap-1.5 mt-2 px-1 cursor-pointer relative ${showExpandedTags ? 'z-[210] max-w-none' : 'z-[1]'}`}
           onClick={(e) => {
             if (!showExpandedTags) {
               e.stopPropagation();
@@ -552,7 +552,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
       {/* Close hint when expanded */}
       {showExpandedTags && (
         <div className="mt-2 text-center relative z-[210]">
-          <span className="text-xs text-[#8A8C8E]">
+          <span className="text-xs text-[#CFCFF6]/80">
             Click anywhere to close
           </span>
         </div>
