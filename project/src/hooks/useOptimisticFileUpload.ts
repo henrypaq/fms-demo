@@ -216,17 +216,10 @@ export const useOptimisticFileUpload = () => {
       return { fileName: file.name };
     },
     onSuccess: (data, variables, context) => {
-      console.log('✅ Upload success, removing optimistic file:', context.fileName);
-      
       // Remove optimistic file by matching the file name
-      setOptimisticFiles(prev => {
-        const filtered = prev.filter(f => f.name !== context.fileName);
-        console.log('🗑️ Removed optimistic file, remaining:', filtered.length);
-        return filtered;
-      });
+      setOptimisticFiles(prev => prev.filter(f => f.name !== context.fileName));
       
       // Invalidate and refetch files - force immediate refetch
-      console.log('🔄 Triggering file refresh...');
       queryClient.invalidateQueries({ queryKey: ['files'] });
       queryClient.refetchQueries({ queryKey: ['files'] });
       
@@ -258,22 +251,10 @@ export const useOptimisticFileUpload = () => {
     const uploadId = `optimistic-${Date.now()}-${Math.random().toString(36).substring(2)}`;
     const optimisticFile = createOptimisticFile(params.file, uploadId);
     
-    console.log('🎨 Creating optimistic file:', { 
-      name: params.file.name, 
-      uploadId,
-      isOptimistic: optimisticFile.isOptimistic,
-      uploadProgress: optimisticFile.uploadProgress 
-    });
-    
-    setOptimisticFiles(prev => {
-      const newFiles = [optimisticFile, ...prev];
-      console.log('📝 Updated optimistic files:', { count: newFiles.length });
-      return newFiles;
-    });
+    setOptimisticFiles(prev => [optimisticFile, ...prev]);
 
     // Update progress immediately
     const updateProgress = (progress: number, status: OptimisticFileItem['uploadStatus']) => {
-      console.log(`⏫ Progress update: ${progress}% - ${status}`);
       setOptimisticFiles(prev => prev.map(f => 
         f.id === uploadId 
           ? { ...f, uploadProgress: progress, uploadStatus: status }

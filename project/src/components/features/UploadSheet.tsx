@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Upload, File, CheckCircle, AlertCircle, Loader, Clock } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useFileUpload } from '../../hooks/useFileUpload';
+import { useOptimisticFileUpload } from '../../hooks/useOptimisticFileUpload';
 import { FileRecord } from '../../lib/supabase';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useUploads } from '../../contexts/UploadContext';
@@ -96,7 +96,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploads, isUploading, uploadFiles } = useFileUpload();
-  const { queryClient } = useQueryClient();
+  const { uploadMultipleFiles } = useOptimisticFileUpload();
 
   // Add/remove class to body to trigger sidebar color change
   useEffect(() => {
@@ -154,34 +154,26 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
       let targetProjectId = projectId;
       let targetFolderId = folderId;
       
-      // DON'T close the sheet - keep it open to show progress
-      // Clear selected files immediately so user can add more
+      // Clear selected files immediately so user can add more while uploading
       const filesToUpload = [...selectedFiles];
       setSelectedFiles([]);
       
-      // Upload files using the standard upload system
-      console.log('🚀 Starting upload for', filesToUpload.length, 'files');
+      // DON'T close the sheet - keep it open to show progress
+      // Use optimistic upload system
       try {
-        // uploadFiles signature: (files, manualTags, autoTaggingEnabled, projectId, folderId)
-        await uploadFiles(
-          filesToUpload, 
-          [], // manualTags
-          autoTaggingEnabled, 
-          targetProjectId, 
-          targetFolderId
+        const success = await uploadMultipleFiles(
+          filesToUpload,
+          targetProjectId,
+          targetFolderId,
+          autoTaggingEnabled
         );
         
-        // Force immediate refresh of file list
-        console.log('✅ Upload complete - refreshing file list');
-        queryClient.invalidateQueries({ queryKey: ['files'] });
-        await queryClient.refetchQueries({ queryKey: ['files'] });
-        
-        // Also trigger a browser event for any listeners
-        if (window.dispatchEvent) {
-          window.dispatchEvent(new CustomEvent('filesUpdated'));
+        // Optimistic upload system automatically handles file list updates
+        if (success) {
+          console.log('✅ Upload complete - optimistic system will update UI automatically');
         }
       } catch (error) {
-        console.error('❌ Upload failed:', error);
+        console.error('Upload failed:', error);
         setErrorMessage(error instanceof Error ? error.message : 'Upload failed. Please try again.');
       }
       
@@ -271,8 +263,9 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
             <SheetTitle className="text-white text-xl font-bold flex items-center justify-between">
               <span>Upload Files</span>
               {contextUploads.filter(u => u.status === 'uploading').length > 0 && (
-                <span className="text-xs font-normal text-[#6049E3] bg-[#6049E3]/10 px-2 py-1 rounded-md border border-[#6049E3]/30">
-                  {contextUploads.filter(u => u.status === 'uploading').length} active
+                <span className="text-xs font-normal text-[#6049E3] bg-[#6049E3]/10 px-2 py-1 rounded-md border border-[#6049E3]/30 flex items-center space-x-1">
+                  <Loader className="w-3 h-3 animate-spin" />
+                  <span>{contextUploads.filter(u => u.status === 'uploading').length} active</span>
                 </span>
               )}
             </SheetTitle>
@@ -584,7 +577,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                   variant="outline"
                   className="border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white hover:border-[#6049E3] transition-all flex items-center space-x-2"
                 >
-                  {isUploading && <Loader className="w-4 h-4 animate-spin" />}
+                  {isUploading && <Loader className="w-3 h-3 animate-spin" />}
                   <span>
                     {isUploading 
                       ? 'Starting...' 

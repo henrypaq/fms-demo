@@ -1,13 +1,16 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FileItem } from './FileCard';
 import FileCard from './FileCard';
 import { ChevronLeft, ChevronRight, ChevronDown, Eye, Star } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui';
 import { Button } from '../ui';
+import { OptimisticFileItem } from '../../hooks/useOptimisticFileUpload';
 import BatchActionBar from '../BatchActionBar';
 
 interface FileGridSimpleProps {
   files: FileItem[];
+  optimisticFiles?: OptimisticFileItem[];
   onFileClick?: (file: FileItem) => void;
   onFileDoubleClick?: (file: FileItem) => void;
   onToggleFavorite?: (fileId: string) => void;
@@ -45,6 +48,7 @@ interface FileGridSimpleProps {
 
 const FileGridSimple: React.FC<FileGridSimpleProps> = ({ 
   files, 
+  optimisticFiles = [],
   onFileClick, 
   onFileDoubleClick,
   onToggleFavorite,
@@ -288,12 +292,62 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
         ) : (
           /* Grid View */
           <div className={`grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 ${tagsVisible ? 'gap-y-16' : 'gap-y-6'} items-start pb-12`}>
+          <AnimatePresence>
+            {/* Render optimistic files first */}
+            {optimisticFiles.map((file) => {
+              const isSelected = selectedFiles.has(file.id);
+              
+              return (
+                <motion.div
+                  key={file.id}
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="relative group"
+                >
+                  <FileCard
+                    file={file}
+                    onClick={onFileClick}
+                    onDoubleClick={onFileDoubleClick}
+                    onDelete={onFileDelete}
+                    onToggleFavorite={onToggleFavorite}
+                    onUpdate={onFileUpdate}
+                    onMove={onFileMove}
+                    isSelected={isSelected}
+                    onSelectionChange={(fileId, selected) => {
+                      const newSelection = new Set(selectedFiles);
+                        if (selected) {
+                          newSelection.add(fileId);
+                        } else {
+                          newSelection.delete(fileId);
+                        }
+                      if (onSelectionChange) {
+                        onSelectionChange(newSelection);
+                      } else {
+                        setInternalSelectedFiles(newSelection);
+                      }
+                    }}
+                    selectionMode={selectedFiles.size > 0}
+                    userRole={userRole}
+                    userProjectAccess={userProjectAccess}
+                    tagsVisible={tagsVisible}
+                  />
+                </motion.div>
+              );
+            })}
+
+            {/* Render regular files */}
             {files.map((file) => {
             const isSelected = selectedFiles.has(file.id);
             
             return (
-              <div 
-                key={file.id}
+              <motion.div 
+                key={file.id} 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
                 className="relative group"
               >
                   <FileCard
@@ -323,9 +377,10 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
                     userProjectAccess={userProjectAccess}
                     tagsVisible={tagsVisible}
                 />
-              </div>
+              </motion.div>
             );
           })}
+          </AnimatePresence>
         
         {files.length === 0 && (
           <div className="flex items-center justify-center min-h-[60vh]">
@@ -336,9 +391,9 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
               <h3 className="text-lg font-semibold text-foreground">No files found</h3>
               <p className="text-sm text-muted-foreground">Start by uploading your first file.</p>
             </div>
-            </div>
-          )}
           </div>
+        )}
+      </div>
         )}
       </div>
 
