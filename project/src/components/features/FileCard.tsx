@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Image, 
   Music, 
@@ -315,7 +316,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
         />
       )}
       
-      <div className={`relative flex flex-col ${className} ${showExpandedTags ? 'z-[210]' : 'z-[1]'}`}>
+      <div className={`relative flex flex-col ${className} ${showExpandedTags ? 'z-[210]' : 'z-0'}`}>
       
       <Card 
         className={`
@@ -332,7 +333,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           transition-all duration-150 ease-out
           cursor-pointer group
           flex flex-col
-          relative ${showExpandedTags ? 'z-[210]' : 'z-[1]'}
+          relative ${showExpandedTags ? 'z-[210]' : 'z-0'}
           ${currentSelected && !showExpandedTags
             ? 'ring-2 ring-[#6049E3] shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(96,73,227,0.4)]' 
             : !showExpandedTags ? 'hover:scale-[1.02] hover:shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(0,0,0,0.5)]' : ''
@@ -513,7 +514,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
       {/* Tags floating underneath the card - ALWAYS max 2 rows */}
       {tagsVisible && displayTags.length > 0 && (
         <div 
-          className={`flex flex-wrap gap-1.5 mt-2 px-1 cursor-pointer relative ${showExpandedTags ? 'z-[210] max-w-none' : 'z-[1]'}`}
+          className={`flex flex-wrap gap-1.5 mt-2 px-1 cursor-pointer relative ${showExpandedTags ? 'z-[210] max-w-none' : 'z-0'}`}
           onClick={(e) => {
             if (!showExpandedTags) {
               e.stopPropagation();
@@ -559,7 +560,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
       )}
 
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
+      {showDeleteConfirm && createPortal(
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" onClick={() => setShowDeleteConfirm(false)}>
           <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
@@ -601,11 +602,12 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Rename Modal */}
-      {showRename && (
+      {showRename && createPortal(
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" onClick={() => setShowRename(false)}>
           <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
@@ -638,11 +640,12 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Tags Edit Modal */}
-      {showTagsEdit && (
+      {showTagsEdit && createPortal(
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" onClick={() => setShowTagsEdit(false)}>
           <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
@@ -691,14 +694,16 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Share Success Toast */}
-      {showShareSuccess && (
+      {showShareSuccess && createPortal(
         <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-[9999]">
           Share link copied to clipboard!
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* File Preview Modal */}
