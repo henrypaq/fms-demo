@@ -469,39 +469,44 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-          <div className="bg-card border border-border rounded-xl w-full max-w-md">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+          <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md">
             <div className="p-6">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center">
-                  <File className="w-6 h-6 text-red-500" />
+                <div className="w-12 h-12 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center">
+                  <Trash2 className="w-6 h-6 text-red-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-foreground">Delete File</h3>
-                  <p className="text-muted-foreground text-sm">This action cannot be undone</p>
+                  <h3 className="text-lg font-bold text-[#CFCFF6]">Delete File</h3>
+                  <p className="text-[#CFCFF6]/60 text-sm">Can be recovered for 30 days</p>
                 </div>
               </div>
               
-              <p className="text-muted-foreground mb-6">
-                Are you sure you want to delete <span className="font-medium text-foreground">"{file.name}"</span>?
+              <p className="text-[#CFCFF6]/80 mb-4">
+                Are you sure you want to delete <span className="font-medium text-[#CFCFF6]">"{file.name}"</span>?
               </p>
 
+              <div className="mb-6 p-3 bg-[#6049E3]/10 border border-[#6049E3]/30 rounded-lg">
+                <p className="text-xs text-[#CFCFF6]/70">
+                  💡 Deleted items can be recovered for 30 days before being permanently deleted.
+                </p>
+              </div>
+
               <div className="flex space-x-3">
-                <Button
+                <button
                   onClick={handleDeleteConfirm}
                   disabled={isDeleting || userRole !== 'admin'}
-                  variant="destructive"
-                  className="flex-1"
+                  className="flex-1 px-4 py-2 border-2 border-red-500 bg-red-500/20 hover:bg-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
                 >
                   {isDeleting ? "Deleting..." : "Delete File"}
-                </Button>
-                <Button
+                </button>
+                <button
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={isDeleting}
-                  variant="outline"
+                  className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] disabled:opacity-50 text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
                 >
                   Cancel
-                </Button>
+                </button>
               </div>
             </div>
           </div>
