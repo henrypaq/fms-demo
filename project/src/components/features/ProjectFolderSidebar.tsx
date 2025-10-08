@@ -69,10 +69,10 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
           }}
           className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer transition-all duration-200 group ${
             isSelected
-              ? 'bg-[hsl(240,30%,12%)] text-[#CFCFF6] border border-[#6049E3]/40'
+              ? 'bg-[#1A1C3A]/60 text-[#CFCFF6] border border-[#6049E3]/40'
               : isDragOver
               ? 'bg-green-600 text-white'
-              : 'text-[#CFCFF6] hover:bg-[hsl(240,30%,8%)]/50 hover:text-white'
+              : 'text-[#CFCFF6] hover:bg-[#1A1C3A]/30 hover:text-white'
           }`}
           style={{ paddingLeft: `${level * 16 + 12}px` }}
           onClick={() => onSelectFolder(folder)}
