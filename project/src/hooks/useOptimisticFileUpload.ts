@@ -178,7 +178,7 @@ export const useOptimisticFileUpload = () => {
       const { thumbnailPath, thumbnailUrl } = await generateThumbnail(file);
 
       // Create file record in database
-      const fileRecord = {
+      const fileRecord: any = {
         name: file.name,
         original_name: file.name,
         file_size: file.size,
@@ -190,13 +190,28 @@ export const useOptimisticFileUpload = () => {
                       file.type.includes('zip') || file.type.includes('archive') ? 'archive' : 'other',
         file_path: filePath,
         file_url: fileUrl,
-        thumbnail_url: thumbnailUrl,
         workspace_id: currentWorkspace.id,
         project_id: projectId || null,
         folder_id: folderId || null,
-        tags: autoTagging ? [] : [], // Auto-tagging would be implemented here
         is_favorite: false,
       };
+
+      // Add thumbnail_url only if it exists (avoid null issues)
+      if (thumbnailUrl) {
+        fileRecord.thumbnail_url = thumbnailUrl;
+      }
+
+      // Add tags as empty array or null (let database use default)
+      // Don't include tags field at all to use database default
+      // tags: [] might be causing issues with PostgreSQL array handling
+
+      console.log('📝 Inserting file record:', {
+        name: fileRecord.name,
+        project_id: fileRecord.project_id,
+        folder_id: fileRecord.folder_id,
+        workspace_id: fileRecord.workspace_id,
+        file_category: fileRecord.file_category
+      });
 
       const { data: dbData, error: dbError } = await supabase
         .from('files')
@@ -205,9 +220,17 @@ export const useOptimisticFileUpload = () => {
         .single();
 
       if (dbError) {
+        console.error('❌ Database insert error:', {
+          message: dbError.message,
+          code: dbError.code,
+          details: dbError.details,
+          hint: dbError.hint,
+          fileRecord: fileRecord
+        });
         throw new Error(`Database error: ${dbError.message}`);
       }
 
+      console.log('✅ File record inserted successfully:', dbData.id);
       return dbData;
     },
     onMutate: async ({ file }) => {
