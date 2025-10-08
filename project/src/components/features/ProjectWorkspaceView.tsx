@@ -242,6 +242,8 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   
   // Enhanced drag and drop state for both files and folders
+  // Use ref to persist drag state across re-renders
+  const draggedItemRef = useRef<{id: string, type: 'file' | 'folder'} | null>(null);
   const [draggedItem, setDraggedItem] = useState<{id: string, type: 'file' | 'folder'} | null>(null);
   const [dragOverFolder, setDragOverFolder] = useState<string | null>(null);
   
@@ -383,8 +385,13 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
   const moveFolder = async (folderId: string, newParentId: string | null) => {
     try {
+      console.log('🚀 Starting moveFolder:', { folderId, newParentId });
+      
       // Prevent moving folder into itself or its children
-      if (folderId === newParentId) return;
+      if (folderId === newParentId) {
+        console.warn('⚠️ Cannot move folder into itself');
+        return;
+      }
       
       // Check if target is a child of the folder being moved
       const isChildOfMovedFolder = (targetId: string | null, movedFolderId: string): boolean => {
@@ -399,19 +406,54 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
       };
 
       if (newParentId && isChildOfMovedFolder(newParentId, folderId)) {
+        console.warn('⚠️ Cannot move folder into its own child');
         return;
       }
 
+      // Get the folder being moved
+      const folderToMove = folders.find(f => f.id === folderId);
+      if (!folderToMove) {
+        console.error('❌ Folder not found:', folderId);
+        return;
+      }
+
+      // Calculate new path
+      let newPath = folderToMove.name;
+      if (newParentId) {
+        const parentFolder = folders.find(f => f.id === newParentId);
+        if (parentFolder) {
+          newPath = `${parentFolder.path}/${folderToMove.name}`;
+        }
+      }
+
+      console.log('📝 Updating folder:', {
+        id: folderId,
+        oldPath: folderToMove.path,
+        newPath,
+        oldParent: folderToMove.parent_id,
+        newParent: newParentId
+      });
+
+      // Update the folder
       const { error } = await supabase
         .from('folders')
-        .update({ parent_id: newParentId })
+        .update({ 
+          parent_id: newParentId,
+          path: newPath
+        })
         .eq('id', folderId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Supabase error moving folder:', error);
+        throw error;
+      }
 
+      console.log('✅ Folder updated in database, reloading folders...');
       await loadFolders(); // Reload to get updated tree structure
+      console.log('✅ Folders reloaded');
     } catch (err) {
-      console.error('Error moving folder:', err);
+      console.error('❌ Error moving folder:', err);
+      throw err;
     }
   };
 
@@ -667,8 +709,13 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
   // Enhanced drag and drop handlers for both files and folders
   const handleDragStart = (e: React.DragEvent, itemId: string, itemType: 'file' | 'folder') => {
     e.stopPropagation();
-    console.log('🎬 Drag started:', itemType, itemId, e.target);
-    setDraggedItem({ id: itemId, type: itemType });
+    const dragData = { id: itemId, type: itemType };
+    console.log('🎬 Drag started:', itemType, itemId);
+    
+    // Store in both ref (persists) and state (for UI updates)
+    draggedItemRef.current = dragData;
+    setDraggedItem(dragData);
+    
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', `${itemType}:${itemId}`);
   };
@@ -676,6 +723,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
   const handleDragEnd = (e: React.DragEvent) => {
     console.log('🏁 Drag ended');
     // Reset drag state when drag operation ends (whether successful or cancelled)
+    draggedItemRef.current = null;
     setDraggedItem(null);
     setDragOverFolder(null);
   };
@@ -695,41 +743,53 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
   const handleDrop = async (e: React.DragEvent, targetFolderId: string | null) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Use ref as source of truth (more reliable than state during drag)
+    const dragData = draggedItemRef.current;
+    
     console.log('📦 Drop event:', {
-      draggedItem,
-      targetFolder: targetFolderId || 'Project Root',
-      target: e.currentTarget
+      draggedItemFromRef: dragData,
+      draggedItemFromState: draggedItem,
+      targetFolder: targetFolderId || 'Project Root'
     });
     
-    if (!draggedItem) {
-      console.warn('⚠️ No dragged item');
+    if (!dragData) {
+      console.warn('⚠️ No dragged item in ref');
       return;
     }
     
-    const { id: draggedId, type: draggedType } = draggedItem;
+    const { id: draggedId, type: draggedType } = dragData;
     
     // Prevent dropping into itself
     if (draggedType === 'folder' && draggedId === targetFolderId) {
       console.warn('⚠️ Cannot drop folder into itself');
+      draggedItemRef.current = null;
       setDraggedItem(null);
       setDragOverFolder(null);
       return;
     }
     
-    // Handle folder drops
-    if (draggedType === 'folder' && draggedId !== targetFolderId) {
-      console.log('📁 Moving folder:', draggedId, 'to', targetFolderId || 'root');
-      await moveFolder(draggedId, targetFolderId);
+    try {
+      // Handle folder drops
+      if (draggedType === 'folder' && draggedId !== targetFolderId) {
+        console.log('📁 Moving folder:', draggedId, 'to', targetFolderId || 'root');
+        await moveFolder(draggedId, targetFolderId);
+        console.log('✅ Folder moved successfully');
+      }
+      
+      // Handle file drops
+      if (draggedType === 'file') {
+        console.log('📄 Moving file:', draggedId, 'to folder', targetFolderId || 'root');
+        await moveFile(draggedId, targetFolderId);
+        console.log('✅ File moved successfully');
+      }
+    } catch (error) {
+      console.error('❌ Move failed:', error);
+    } finally {
+      draggedItemRef.current = null;
+      setDraggedItem(null);
+      setDragOverFolder(null);
     }
-    
-    // Handle file drops
-    if (draggedType === 'file') {
-      console.log('📄 Moving file:', draggedId, 'to folder', targetFolderId || 'root');
-      await moveFile(draggedId, targetFolderId);
-    }
-    
-    setDraggedItem(null);
-    setDragOverFolder(null);
   };
 
   // Batch selection handlers
