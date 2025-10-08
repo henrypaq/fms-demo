@@ -479,8 +479,16 @@ function AppContentWithWorkspace({
 
   // Dynamic CTA configuration based on current view
   const getCtaConfig = () => {
-    // Only show "New Project" when explicitly in Projects view AND no project selected
-    if (activeView === 'project-v3' && showProjectV3View && !selectedProject) {
+    // Only show "New Project" when explicitly in Projects list view
+    // Must be: in project view, view is active, showing projects list, no project selected, not showing other views
+    if (
+      activeView === 'project-v3' && 
+      showProjectV3View && 
+      !selectedProject &&
+      !showAdminDashboard &&
+      !showTagsView &&
+      !showFilesView
+    ) {
       return {
         label: 'New Project',
         icon: (
@@ -488,7 +496,10 @@ function AppContentWithWorkspace({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
         ),
-        action: () => setTriggerCreateProject(prev => prev + 1)
+        action: () => {
+          console.log('New Project button clicked');
+          setTriggerCreateProject(prev => prev + 1);
+        }
       };
     }
     if (showTagsView) {
@@ -613,9 +624,14 @@ function AppContentWithWorkspace({
                   const ctaConfig = getCtaConfig();
                   return (
                     <Button 
-                      onClick={ctaConfig.action}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        ctaConfig.action();
+                      }}
                       variant="outline"
                       size="sm"
+                      type="button"
                       className="gap-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white hover:border-[#6049E3] transition-all"
                     >
                       {ctaConfig.icon}
