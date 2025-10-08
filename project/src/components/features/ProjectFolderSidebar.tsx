@@ -67,14 +67,13 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
               console.warn('⚠️ onFolderContextMenu not provided!');
             }
           }}
-          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer transition-all duration-200 group ${
-            isSelected
-              ? 'bg-[#1A1C3A]/60 text-[#CFCFF6] border border-[#6049E3]/40'
-              : isDragOver
-              ? 'bg-green-600 text-white'
-              : 'text-[#CFCFF6] hover:bg-[#1A1C3A]/30 hover:text-white'
-          }`}
-          style={{ paddingLeft: `${level * 16 + 12}px` }}
+          style={{ 
+            paddingLeft: `${level * 16 + 12}px`,
+            backgroundColor: isSelected ? '#1A1C3A99' : isDragOver ? '#059669' : 'transparent',
+            color: (isSelected || isDragOver) ? 'white' : '#CFCFF6',
+            border: isSelected ? '1px solid rgba(96, 73, 227, 0.4)' : '1px solid transparent',
+          }}
+          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer transition-all duration-200 group hover:bg-[#1A1C3A]/30 hover:text-white`}
           onClick={() => onSelectFolder(folder)}
         >
           {hasChildren && (
@@ -130,13 +129,13 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
 
         {/* Project Root */}
         <div
-          className={`flex items-center space-x-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 mb-1 ${
-            !currentFolder
-              ? 'border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] font-medium'
-              : dragOverFolder === null
-              ? 'bg-green-600 text-white'
-              : 'border-2 border-transparent text-[#CFCFF6] hover:bg-[#6049E3]/10 hover:border-[#6049E3]/30 hover:text-white'
-          }`}
+          style={{
+            backgroundColor: !currentFolder ? 'rgba(96, 73, 227, 0.2)' : dragOverFolder === null ? '#059669' : 'transparent',
+            border: !currentFolder ? '2px solid #6049E3' : '2px solid transparent',
+            color: '#CFCFF6',
+            fontWeight: !currentFolder ? '500' : '400',
+          }}
+          className="flex items-center space-x-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 mb-1 hover:bg-[#6049E3]/10 hover:border-[#6049E3]/30 hover:text-white"
           onClick={() => onSelectFolder(null)}
           onDragOver={(e) => onDragOver(e, null)}
           onDragLeave={onDragLeave}
