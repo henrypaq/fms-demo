@@ -85,16 +85,16 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
   // Selection state management - use external state if provided, otherwise internal
   const [internalSelectedFiles, setInternalSelectedFiles] = useState<Set<string>>(new Set());
   const selectedFiles = selectedFileIds ?? internalSelectedFiles;
-  
+
   // Handle file selection
   const handleFileSelect = (fileId: string, event: React.MouseEvent) => {
     event.stopPropagation();
     const newSelection = new Set(selectedFiles);
-    if (newSelection.has(fileId)) {
-      newSelection.delete(fileId);
-    } else {
-      newSelection.add(fileId);
-    }
+      if (newSelection.has(fileId)) {
+        newSelection.delete(fileId);
+      } else {
+        newSelection.add(fileId);
+      }
     
     if (onSelectionChange) {
       onSelectionChange(newSelection);
@@ -316,11 +316,11 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
                     isSelected={isSelected}
                     onSelectionChange={(fileId, selected) => {
                       const newSelection = new Set(selectedFiles);
-                      if (selected) {
-                        newSelection.add(fileId);
-                      } else {
-                        newSelection.delete(fileId);
-                      }
+                        if (selected) {
+                          newSelection.add(fileId);
+                        } else {
+                          newSelection.delete(fileId);
+                        }
                       if (onSelectionChange) {
                         onSelectionChange(newSelection);
                       } else {
@@ -360,11 +360,11 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
                     isSelected={isSelected}
                     onSelectionChange={(fileId, selected) => {
                       const newSelection = new Set(selectedFiles);
-                      if (selected) {
-                        newSelection.add(fileId);
-                      } else {
-                        newSelection.delete(fileId);
-                      }
+                        if (selected) {
+                          newSelection.add(fileId);
+                        } else {
+                          newSelection.delete(fileId);
+                        }
                       if (onSelectionChange) {
                         onSelectionChange(newSelection);
                       } else {
@@ -380,19 +380,19 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
             );
           })}
           </AnimatePresence>
-          
-          {files.length === 0 && (
-            <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
-                  <span className="text-muted-foreground text-2xl">📁</span>
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">No files found</h3>
-                <p className="text-sm text-muted-foreground">Start by uploading your first file.</p>
+        
+        {files.length === 0 && (
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
+                <span className="text-muted-foreground text-2xl">📁</span>
               </div>
+              <h3 className="text-lg font-semibold text-foreground">No files found</h3>
+              <p className="text-sm text-muted-foreground">Start by uploading your first file.</p>
+            </div>
             </div>
           )}
-        </div>
+          </div>
         )}
       </div>
     </div>

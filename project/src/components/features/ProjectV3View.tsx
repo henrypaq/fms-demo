@@ -14,9 +14,15 @@ const ProjectV3View: React.FC<ProjectV3ViewProps> = ({ onBack, onProjectChange, 
   const [selectedProject, setSelectedProject] = useState<any>(null);
 
   const handleProjectSelect = (project: any) => {
-    console.log('Project selected:', project?.name);
+    console.log('🎯 ProjectV3View: Project selected:', project?.name);
+    console.log('🎯 Setting local state and notifying parent...');
     setSelectedProject(project);
-    onProjectChange?.(project);
+    if (onProjectChange) {
+      onProjectChange(project);
+      console.log('✅ Parent notified of project selection');
+    } else {
+      console.warn('⚠️ onProjectChange callback not provided!');
+    }
   };
 
   const handleBackToProjects = () => {

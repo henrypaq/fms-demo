@@ -459,8 +459,10 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Project clicked:', project.name);
+                console.log('🖱️ Project card clicked:', project.name);
+                console.log('🖱️ Calling onProjectSelect callback...');
                 onProjectSelect(project);
+                console.log('✅ onProjectSelect callback called');
               }}
             >
               {/* Large Image Area - covers most of the folder */}
