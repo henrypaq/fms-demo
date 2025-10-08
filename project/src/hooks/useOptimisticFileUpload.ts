@@ -357,6 +357,23 @@ export const useOptimisticFileUpload = () => {
         throw new Error('No workspace selected');
       }
 
+      // Check file size (Supabase free tier limit is 50MB, but we'll set a safer limit)
+      const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
+      const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB for videos (if you have pro plan)
+      
+      const sizeLimit = file.type.startsWith('video/') ? MAX_VIDEO_SIZE : MAX_FILE_SIZE;
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      const limitMB = (sizeLimit / (1024 * 1024)).toFixed(0);
+      
+      if (file.size > sizeLimit) {
+        throw new Error(
+          `File too large: ${sizeMB}MB exceeds the ${limitMB}MB limit. ` +
+          `Please compress the file or use a smaller version.`
+        );
+      }
+
+      console.log(`📊 File size check: ${sizeMB}MB (limit: ${limitMB}MB) ✅`);
+
       // Generate unique file path
       const fileExt = file.name.split('.').pop() || 'bin';
       const timestamp = Date.now();
@@ -489,6 +506,23 @@ export const useOptimisticFileUpload = () => {
   });
 
   const uploadFile = useCallback((params: UploadFileParams) => {
+    // Validate file size before upload
+    const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+    const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB for videos
+    
+    const sizeLimit = params.file.type.startsWith('video/') ? MAX_VIDEO_SIZE : MAX_FILE_SIZE;
+    const sizeMB = (params.file.size / (1024 * 1024)).toFixed(2);
+    const limitMB = (sizeLimit / (1024 * 1024)).toFixed(0);
+    
+    if (params.file.size > sizeLimit) {
+      addToast({
+        type: 'error',
+        title: 'File Too Large',
+        description: `${params.file.name} (${sizeMB}MB) exceeds the ${limitMB}MB limit. Please compress or use a smaller file.`,
+      });
+      return;
+    }
+    
     // Create optimistic file immediately when upload is called
     const uploadId = `optimistic-${Date.now()}-${Math.random().toString(36).substring(2)}`;
     const optimisticFile = createOptimisticFile(params.file, uploadId);
@@ -510,7 +544,7 @@ export const useOptimisticFileUpload = () => {
     setTimeout(() => updateProgress(75, 'processing'), 1000);
 
     return uploadMutation.mutateAsync(params);
-  }, [uploadMutation, createOptimisticFile]);
+  }, [uploadMutation, createOptimisticFile, addToast]);
 
   const uploadMultipleFiles = useCallback(async (files: File[], projectId?: string, folderId?: string, autoTagging = true) => {
     // Create all optimistic files immediately
