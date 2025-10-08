@@ -20,7 +20,8 @@ import {
   Pause,
   MessageSquare,
   Info,
-  Loader
+  Loader,
+  Smile
 } from 'lucide-react';
 import { RiFile3Line, RiVideoLine } from '@remixicon/react';
 import { Icon, IconSizes, IconColors } from './ui/Icon';
@@ -29,6 +30,18 @@ import { supabase } from '../lib/supabase';
 import AutoTaggingButton from './AutoTaggingButton';
 import TagInput from './TagInput';
 import VideoPlayer from './VideoPlayer';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from './ui/popover';
+
+interface CommentReaction {
+  emoji: string;
+  count: number;
+  users: string[]; // user emails or IDs
+  hasReacted: boolean; // has current user reacted
+}
 
 interface FileComment {
   id: string;
@@ -42,6 +55,7 @@ interface FileComment {
   created_at: string;
   updated_at: string;
   replies?: FileComment[];
+  reactions?: CommentReaction[];
 }
 
 interface FilePreviewModalProps {
@@ -107,8 +121,49 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
 
       if (error) throw error;
       
-      // Structure comments with replies
-      const allComments = data || [];
+      // Get current user for reaction tracking
+      const { data: { user } } = await supabase.auth.getUser();
+      const currentUserEmail = user?.email || 'demo@example.com';
+      
+      // Fetch all reactions for these comments
+      const commentIds = (data || []).map(c => c.id);
+      const { data: reactionsData } = await supabase
+        .from('comment_reactions')
+        .select('*')
+        .in('comment_id', commentIds);
+      
+      // Group reactions by comment and emoji
+      const reactionsByComment = new Map<string, CommentReaction[]>();
+      (reactionsData || []).forEach(reaction => {
+        if (!reactionsByComment.has(reaction.comment_id)) {
+          reactionsByComment.set(reaction.comment_id, []);
+        }
+        
+        const commentReactions = reactionsByComment.get(reaction.comment_id)!;
+        const existingReaction = commentReactions.find(r => r.emoji === reaction.emoji);
+        
+        if (existingReaction) {
+          existingReaction.count++;
+          existingReaction.users.push(reaction.user_email);
+          if (reaction.user_email === currentUserEmail) {
+            existingReaction.hasReacted = true;
+          }
+        } else {
+          commentReactions.push({
+            emoji: reaction.emoji,
+            count: 1,
+            users: [reaction.user_email],
+            hasReacted: reaction.user_email === currentUserEmail
+          });
+        }
+      });
+      
+      // Structure comments with replies and reactions
+      const allComments = (data || []).map(comment => ({
+        ...comment,
+        reactions: reactionsByComment.get(comment.id) || []
+      }));
+      
       const topLevelComments = allComments.filter(c => !c.parent_comment_id);
       const structuredComments = topLevelComments.map(comment => ({
         ...comment,
@@ -202,6 +257,58 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
       alert('Failed to save reply. Please try again.');
     } finally {
       setSavingComment(false);
+    }
+  };
+
+  const toggleReaction = async (commentId: string, emoji: string) => {
+    if (!file) return;
+
+    try {
+      // Get current user or use demo user
+      const { data: { user } } = await supabase.auth.getUser();
+      const currentUserEmail = user?.email || 'demo@example.com';
+      const currentUserName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Demo User';
+
+      // Check if user already reacted with this emoji
+      const { data: existingReaction } = await supabase
+        .from('comment_reactions')
+        .select('*')
+        .eq('comment_id', commentId)
+        .eq('user_email', currentUserEmail)
+        .eq('emoji', emoji)
+        .single();
+
+      if (existingReaction) {
+        // Remove reaction
+        const { error } = await supabase
+          .from('comment_reactions')
+          .delete()
+          .eq('comment_id', commentId)
+          .eq('user_email', currentUserEmail)
+          .eq('emoji', emoji);
+
+        if (error) throw error;
+      } else {
+        // Add reaction
+        const reactionData = {
+          comment_id: commentId,
+          user_id: user?.id || null,
+          user_name: currentUserName,
+          user_email: currentUserEmail,
+          emoji: emoji
+        };
+
+        const { error } = await supabase
+          .from('comment_reactions')
+          .insert([reactionData]);
+
+        if (error) throw error;
+      }
+
+      // Reload comments to update reactions
+      await loadComments();
+    } catch (error) {
+      console.error('Error toggling reaction:', error);
     }
   };
 
@@ -533,13 +640,63 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                               )}
                               <p className="text-sm text-[#CFCFF6]/80 break-words">{comment.comment_text}</p>
                               
-                              {/* Reply Button */}
-                              <button
-                                onClick={() => setReplyingTo(comment.id)}
-                                className="mt-2 text-xs text-[#6049E3] hover:text-[#7D66FF] transition-colors font-medium"
-                              >
-                                Reply
-                              </button>
+                              {/* Reactions Display */}
+                              {comment.reactions && comment.reactions.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                  {comment.reactions.map((reaction) => (
+                                    <button
+                                      key={reaction.emoji}
+                                      onClick={() => toggleReaction(comment.id, reaction.emoji)}
+                                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-all duration-150 ${
+                                        reaction.hasReacted
+                                          ? 'bg-[#6049E3]/20 border border-[#6049E3]/50 text-[#CFCFF6]'
+                                          : 'bg-[#1A1C3A]/60 border border-[#2A2C45]/40 text-[#CFCFF6]/70 hover:bg-[#1A1C3A]/80 hover:border-[#2A2C45]/60'
+                                      }`}
+                                      title={reaction.users.join(', ')}
+                                    >
+                                      <span className="text-sm">{reaction.emoji}</span>
+                                      <span className="font-medium">{reaction.count}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                              
+                              {/* Action Buttons */}
+                              <div className="flex items-center gap-3 mt-2">
+                                <button
+                                  onClick={() => setReplyingTo(comment.id)}
+                                  className="text-xs text-[#6049E3] hover:text-[#7D66FF] transition-colors font-medium"
+                                >
+                                  Reply
+                                </button>
+                                
+                                {/* Emoji Picker */}
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <button className="text-[#CFCFF6] hover:text-emerald-400 transition-colors">
+                                      <Smile className="w-4 h-4" />
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent 
+                                    className="w-auto p-2 bg-[#111111] border border-[#2A2A2A] shadow-lg"
+                                    sideOffset={5}
+                                  >
+                                    <div className="flex gap-1">
+                                      {['👍', '❤️', '😂', '😮', '👏'].map((emoji) => (
+                                        <button
+                                          key={emoji}
+                                          onClick={() => {
+                                            toggleReaction(comment.id, emoji);
+                                          }}
+                                          className="text-xl p-2 rounded-md hover:bg-[#2A2A2A] transition-all duration-150"
+                                        >
+                                          {emoji}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -612,6 +769,56 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                                       </p>
                                     </div>
                                     <p className="text-xs text-[#CFCFF6]/80 break-words">{reply.comment_text}</p>
+                                    
+                                    {/* Reactions Display for Replies */}
+                                    {reply.reactions && reply.reactions.length > 0 && (
+                                      <div className="flex flex-wrap gap-1 mt-2">
+                                        {reply.reactions.map((reaction) => (
+                                          <button
+                                            key={reaction.emoji}
+                                            onClick={() => toggleReaction(reply.id, reaction.emoji)}
+                                            className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs transition-all duration-150 ${
+                                              reaction.hasReacted
+                                                ? 'bg-[#6049E3]/20 border border-[#6049E3]/50 text-[#CFCFF6]'
+                                                : 'bg-[#1A1C3A]/60 border border-[#2A2C45]/40 text-[#CFCFF6]/70 hover:bg-[#1A1C3A]/80 hover:border-[#2A2C45]/60'
+                                            }`}
+                                            title={reaction.users.join(', ')}
+                                          >
+                                            <span className="text-xs">{reaction.emoji}</span>
+                                            <span className="font-medium text-xs">{reaction.count}</span>
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+                                    
+                                    {/* Emoji Picker for Replies */}
+                                    <div className="mt-2">
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <button className="text-[#CFCFF6]/60 hover:text-emerald-400 transition-colors">
+                                            <Smile className="w-3 h-3" />
+                                          </button>
+                                        </PopoverTrigger>
+                                        <PopoverContent 
+                                          className="w-auto p-2 bg-[#111111] border border-[#2A2A2A] shadow-lg"
+                                          sideOffset={5}
+                                        >
+                                          <div className="flex gap-1">
+                                            {['👍', '❤️', '😂', '😮', '👏'].map((emoji) => (
+                                              <button
+                                                key={emoji}
+                                                onClick={() => {
+                                                  toggleReaction(reply.id, emoji);
+                                                }}
+                                                className="text-lg p-1.5 rounded-md hover:bg-[#2A2A2A] transition-all duration-150"
+                                              >
+                                                {emoji}
+                                              </button>
+                                            ))}
+                                          </div>
+                                        </PopoverContent>
+                                      </Popover>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
