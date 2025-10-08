@@ -302,6 +302,14 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
     try {
       setLoading(true);
       if (!currentWorkspace) throw new Error('No workspace selected');
+      
+      console.log('📂 Loading files with query parameters:', {
+        workspace_id: currentWorkspace.id,
+        project_id: project.id,
+        folder_id: currentFolder?.id || null,
+        folder_name: currentFolder?.name || 'Root'
+      });
+      
       let query = supabase
         .from('files')
         .select('*')
@@ -311,8 +319,10 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
       // Filter by folder
       if (currentFolder) {
+        console.log('🔍 Filtering by folder_id:', currentFolder.id);
         query = query.eq('folder_id', currentFolder.id);
       } else {
+        console.log('🔍 Filtering for root files (folder_id is null)');
         query = query.is('folder_id', null);
       }
 
@@ -321,12 +331,22 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
       if (filesError) throw filesError;
 
+      console.log(`📊 Query returned ${filesData?.length || 0} files`);
+      if (filesData && filesData.length > 0) {
+        console.log('📄 First few files:', filesData.slice(0, 3).map(f => ({
+          name: f.name,
+          id: f.id,
+          folder_id: f.folder_id,
+          created_at: f.created_at
+        })));
+      }
+
       const convertedFiles = (filesData || []).map(convertFileRecord);
       setFiles(convertedFiles);
       setError(null);
 
     } catch (err) {
-      console.error('Error loading files:', err);
+      console.error('❌ Error loading files:', err);
       setError('Failed to load files. Please try again.');
     } finally {
       setLoading(false);
@@ -960,8 +980,21 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
     );
   };
 
-  const handleUploadComplete = () => {
-    loadFiles();
+  const handleUploadComplete = async () => {
+    console.log('🔄 Upload complete callback triggered - refreshing files...');
+    console.log('📍 Current context:', {
+      projectId: project.id,
+      projectName: project.name,
+      currentFolder: currentFolder?.name || 'Root',
+      folderId: currentFolder?.id || null
+    });
+    
+    // Add small delay to ensure database transaction is committed
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    console.log('📥 Loading files after upload...');
+    await loadFiles();
+    console.log('✅ Files reloaded after upload');
   };
 
   // Get file type icon with color
