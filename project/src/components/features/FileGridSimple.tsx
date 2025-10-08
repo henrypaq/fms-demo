@@ -300,10 +300,15 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
               return (
                 <motion.div
                   key={file.id}
+                  layout
                   initial={{ opacity: 0, scale: 0.8, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.8, y: -20 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  transition={{ 
+                    layout: { duration: 0.3, ease: "easeOut" },
+                    opacity: { duration: 0.2 },
+                    scale: { duration: 0.2 }
+                  }}
                   className="relative group"
                 >
                   <FileCard
@@ -343,11 +348,16 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
             
             return (
               <motion.div 
-                key={file.id} 
+                key={file.id}
+                layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.15, ease: "easeOut" }}
+                transition={{ 
+                  layout: { duration: 0.3, ease: "easeOut" },
+                  opacity: { duration: 0.15 },
+                  scale: { duration: 0.15 }
+                }}
                 className="relative group"
               >
                   <FileCard
