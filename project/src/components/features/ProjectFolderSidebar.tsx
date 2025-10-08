@@ -144,19 +144,19 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
         {/* Project Root */}
         <div
           style={{
-            backgroundColor: !currentFolder ? 'rgba(96, 73, 227, 0.2)' : dragOverFolder === null ? '#059669' : 'transparent',
-            border: !currentFolder ? '2px solid #6049E3' : dragOverFolder === null ? '2px solid #059669' : '2px solid transparent',
+            backgroundColor: !currentFolder ? 'rgba(96, 73, 227, 0.2)' : (dragOverFolder === null && draggedItem) ? '#059669' : 'transparent',
+            border: !currentFolder ? '2px solid #6049E3' : (dragOverFolder === null && draggedItem) ? '2px solid #059669' : '2px solid transparent',
             color: '#CFCFF6',
             fontWeight: !currentFolder ? '500' : '400',
           }}
           onMouseEnter={(e) => {
-            if (currentFolder && dragOverFolder !== null) {
+            if (currentFolder && (!draggedItem || dragOverFolder !== null)) {
               e.currentTarget.style.backgroundColor = 'rgba(96, 73, 227, 0.1)';
               e.currentTarget.style.borderColor = 'rgba(96, 73, 227, 0.3)';
             }
           }}
           onMouseLeave={(e) => {
-            if (currentFolder && dragOverFolder !== null) {
+            if (currentFolder && (!draggedItem || dragOverFolder !== null)) {
               e.currentTarget.style.backgroundColor = 'transparent';
               e.currentTarget.style.borderColor = 'transparent';
             }
