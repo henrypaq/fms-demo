@@ -1275,15 +1275,18 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
             {childFolders.map(folder => (
               <div
                 key={folder.id}
-                className={`group bg-[#262626] border rounded-xl p-4 flex flex-col items-center justify-center cursor-move hover:bg-[#262626]/80 transition-all duration-200 ${
+                className={`group bg-[#262626] border rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] hover:shadow-lg transition-all duration-200 ${
                   dragOverFolder === folder.id
                     ? 'border-[#6049E3] ring-2 ring-[#6049E3]/50 bg-[#6049E3]/10'
-                    : 'border-slate-600'
+                    : 'border-slate-600 hover:border-slate-500'
                 } ${
                   draggedItem?.type === 'folder' && draggedItem?.id === folder.id
-                    ? 'opacity-50 scale-95'
+                    ? 'opacity-50 scale-95 cursor-grabbing'
                     : ''
                 }`}
+                style={{
+                  cursor: draggedItem?.type === 'folder' && draggedItem?.id === folder.id ? 'grabbing' : 'pointer'
+                }}
                 onClick={(e) => {
                   // Only navigate if it's a simple click (not after dragging)
                   if (!draggedItem || draggedItem.id !== folder.id) {
@@ -1300,17 +1303,24 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                 draggable={true}
                 onDragStart={(e) => {
                   console.log('🎬 Grid folder drag started:', folder.name);
+                  e.currentTarget.style.cursor = 'grabbing';
                   handleDragStart(e, folder.id, 'folder');
                 }}
                 onDragEnd={(e) => {
                   console.log('🏁 Grid folder drag ended:', folder.name);
+                  e.currentTarget.style.cursor = 'pointer';
                   handleDragEnd(e);
                 }}
                 onDragOver={(e) => handleDragOver(e, folder.id)}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, folder.id)}
               >
-                <Icon Icon={RiFolder3Line} size={IconSizes.card} color="#60a5fa" className="mb-2" />
+                <Icon 
+                  Icon={RiFolder3Line} 
+                  size={IconSizes.card} 
+                  color="#60a5fa" 
+                  className="mb-2 transition-transform duration-200 group-hover:scale-110" 
+                />
                 <span className="text-white font-medium text-sm truncate w-full text-center">{folder.name}</span>
                 {dragOverFolder === folder.id && draggedItem && (
                   <span className="text-[#6049E3] text-xs mt-1 font-medium">
