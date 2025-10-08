@@ -1177,11 +1177,15 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                 className="group bg-[#262626] border border-slate-600 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-[#262626]/80 transition-colors"
                 onClick={() => selectFolder(folder)}
                 onContextMenu={(e) => {
+                  console.log('📌 Grid folder right-clicked:', folder.name);
                   e.preventDefault();
                   e.stopPropagation();
+                  console.log('📍 Setting grid folder menu at:', e.clientX, e.clientY);
                   setFolderMenu({ folder, x: e.clientX, y: e.clientY });
                 }}
-                draggable={false}
+                draggable={true}
+                onDragStart={(e) => handleDragStart(e, folder.id, 'folder')}
+                onDragEnd={handleDragEnd}
               >
                 <Icon Icon={RiFolder3Line} size={IconSizes.card} color="#60a5fa" className="mb-2" />
                 <span className="text-white font-medium text-sm truncate w-full text-center">{folder.name}</span>
