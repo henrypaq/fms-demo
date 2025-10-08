@@ -10,6 +10,7 @@ import {
   ChevronRight,
   ChevronDown,
   FolderPlus,
+  Folder,
   SortAsc,
   SortDesc,
   Grid3X3,
@@ -665,13 +666,15 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
   // Enhanced drag and drop handlers for both files and folders
   const handleDragStart = (e: React.DragEvent, itemId: string, itemType: 'file' | 'folder') => {
-    console.log('🎬 Drag started:', itemType, itemId);
+    e.stopPropagation();
+    console.log('🎬 Drag started:', itemType, itemId, e.target);
     setDraggedItem({ id: itemId, type: itemType });
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', `${itemType}:${itemId}`);
   };
 
   const handleDragEnd = (e: React.DragEvent) => {
+    console.log('🏁 Drag ended');
     // Reset drag state when drag operation ends (whether successful or cancelled)
     setDraggedItem(null);
     setDragOverFolder(null);
@@ -679,19 +682,23 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
   const handleDragOver = (e: React.DragEvent, targetFolderId: string | null) => {
     e.preventDefault();
+    e.stopPropagation();
     e.dataTransfer.dropEffect = 'move';
     setDragOverFolder(targetFolderId);
   };
 
-  const handleDragLeave = () => {
+  const handleDragLeave = (e?: React.DragEvent) => {
+    if (e) e.stopPropagation();
     setDragOverFolder(null);
   };
 
   const handleDrop = async (e: React.DragEvent, targetFolderId: string | null) => {
     e.preventDefault();
+    e.stopPropagation();
     console.log('📦 Drop event:', {
       draggedItem,
-      targetFolder: targetFolderId || 'Project Root'
+      targetFolder: targetFolderId || 'Project Root',
+      target: e.currentTarget
     });
     
     if (!draggedItem) {
@@ -700,6 +707,14 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
     }
     
     const { id: draggedId, type: draggedType } = draggedItem;
+    
+    // Prevent dropping into itself
+    if (draggedType === 'folder' && draggedId === targetFolderId) {
+      console.warn('⚠️ Cannot drop folder into itself');
+      setDraggedItem(null);
+      setDragOverFolder(null);
+      return;
+    }
     
     // Handle folder drops
     if (draggedType === 'folder' && draggedId !== targetFolderId) {
@@ -1199,7 +1214,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
             {childFolders.map(folder => (
               <div
                 key={folder.id}
-                className={`group bg-[#262626] border rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-[#262626]/80 transition-all duration-200 ${
+                className={`group bg-[#262626] border rounded-xl p-4 flex flex-col items-center justify-center cursor-move hover:bg-[#262626]/80 transition-all duration-200 ${
                   dragOverFolder === folder.id
                     ? 'border-[#6049E3] ring-2 ring-[#6049E3]/50 bg-[#6049E3]/10'
                     : 'border-slate-600'
@@ -1208,7 +1223,12 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                     ? 'opacity-50 scale-95'
                     : ''
                 }`}
-                onClick={() => selectFolder(folder)}
+                onClick={(e) => {
+                  // Only navigate if it's a simple click (not after dragging)
+                  if (!draggedItem || draggedItem.id !== folder.id) {
+                    selectFolder(folder);
+                  }
+                }}
                 onContextMenu={(e) => {
                   console.log('📌 Grid folder right-clicked:', folder.name);
                   e.preventDefault();
@@ -1221,7 +1241,10 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                   console.log('🎬 Grid folder drag started:', folder.name);
                   handleDragStart(e, folder.id, 'folder');
                 }}
-                onDragEnd={handleDragEnd}
+                onDragEnd={(e) => {
+                  console.log('🏁 Grid folder drag ended:', folder.name);
+                  handleDragEnd(e);
+                }}
                 onDragOver={(e) => handleDragOver(e, folder.id)}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, folder.id)}
