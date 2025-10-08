@@ -101,6 +101,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
   const [newName, setNewName] = useState(file.name);
   const [showTagsEdit, setShowTagsEdit] = useState(false);
   const [editedTags, setEditedTags] = useState<string[]>(file.tags || []);
+  const [showExpandedTags, setShowExpandedTags] = useState(false);
   
   // Ref to store click timeout for double-click detection
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -494,12 +495,94 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
         </div>
       </Card>
 
-      {/* Tags floating underneath the card */}
+      {/* Tags floating underneath the card - max 2 rows */}
       {tagsVisible && displayTags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-2 px-1">
-          {displayTags.map((tag, index) => (
+        <div 
+          className="flex flex-wrap gap-1.5 mt-2 px-1 cursor-pointer"
+          onClick={() => setShowExpandedTags(true)}
+        >
+          {displayTags.slice(0, 6).map((tag, index) => (
             <TagBadge key={index} tag={tag} variant="default" />
           ))}
+          {displayTags.length > 6 && (
+            <span className="text-xs text-[#8A8C8E] hover:text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[hsl(240,30%,10%)] border border-[hsl(240,25%,15%)] transition-colors flex items-center gap-1">
+              +{displayTags.length - 6} more
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Expanded Tags Modal */}
+      {showExpandedTags && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[110] p-4"
+          onClick={() => setShowExpandedTags(false)}
+        >
+          <div 
+            className="relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* File Card (highlighted) */}
+            <Card 
+              className={`
+                w-[240px] h-[260px] rounded-xl transition-all cursor-default
+                bg-[hsl(240,30%,12%)] border-2 border-[#6049E3] shadow-[0_8px_32px_rgba(96,73,227,0.3)]
+                flex flex-col justify-between p-0
+              `}
+            >
+              {/* Thumbnail / Image Area */}
+              <div className="flex-1 relative rounded-t-lg overflow-hidden group">
+                {file.thumbnail || file.fileUrl ? (
+                  <img 
+                    src={file.thumbnail || file.fileUrl} 
+                    alt={file.name}
+                    className="w-full h-full object-cover transition-all duration-200"
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                    decoding="async"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[hsl(240,25%,15%)] to-[hsl(240,30%,10%)] flex items-center justify-center">
+                    <File className="w-8 h-8 text-[#6049E3] opacity-80" />
+                  </div>
+                )}
+                
+                {/* Favorite Star */}
+                {file.isFavorite && (
+                  <div className="absolute top-2 left-2 bg-[hsl(240,30%,12%)]/70 backdrop-blur-sm rounded-md p-1">
+                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                  </div>
+                )}
+
+                {/* File title overlay */}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent px-2 py-1.5 pt-8">
+                  <h3 className="text-sm font-medium text-white truncate leading-tight">
+                    {file.name}
+                  </h3>
+                </div>
+              </div>
+
+              {/* Bottom metadata bar */}
+              <div className="h-8 px-1.5 flex items-center justify-between gap-1 bg-[hsl(240,30%,12%)] border-t border-[hsl(240,30%,12%)]/30">
+                <span className="text-xs text-[#8A8C8E] flex items-center gap-1">
+                  {file.size}
+                </span>
+              </div>
+            </Card>
+
+            {/* All Tags - Expanded View */}
+            <div className="flex flex-wrap gap-1.5 mt-4 max-w-[600px] justify-center">
+              {displayTags.map((tag, index) => (
+                <TagBadge key={index} tag={tag} variant="default" />
+              ))}
+            </div>
+
+            {/* Close hint */}
+            <div className="mt-4 text-center">
+              <span className="text-xs text-[#8A8C8E]">
+                Click anywhere to close
+              </span>
+            </div>
+          </div>
         </div>
       )}
 
