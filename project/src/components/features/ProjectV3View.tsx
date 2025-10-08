@@ -14,17 +14,20 @@ const ProjectV3View: React.FC<ProjectV3ViewProps> = ({ onBack, onProjectChange, 
   const [selectedProject, setSelectedProject] = useState<any>(null);
 
   const handleProjectSelect = (project: any) => {
+    console.log('Project selected:', project?.name);
     setSelectedProject(project);
     onProjectChange?.(project);
   };
 
   const handleBackToProjects = () => {
+    console.log('Back to projects from ProjectWorkspaceView');
     setSelectedProject(null);
     onProjectChange?.(null);
     onProjectBackClick?.();
   };
 
   const handleBackToMain = () => {
+    console.log('Back to main dashboard');
     setSelectedProject(null);
     onProjectChange?.(null);
     onBack();

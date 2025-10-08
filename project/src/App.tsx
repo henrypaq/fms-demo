@@ -446,9 +446,10 @@ function AppContentWithWorkspace({
   }, [changeView]);
 
   const handleBackToProjectsList = useCallback(() => {
+    console.log('Back to projects list clicked');
     setSelectedProject(null);
     setSidebarData(null);
-    // Stay on project view but go back to projects list
+    // Force a clean reset by staying on project view
   }, []);
 
   const handleBackFromAdminDashboard = useCallback(() => {
@@ -612,6 +613,7 @@ function AppContentWithWorkspace({
             {/* Project Sidebar - Only show when inside a project */}
             {showProjectV3View && selectedProject && sidebarData && (
               <ProjectFolderSidebar
+                key={selectedProject?.id} // Force remount when project changes
                 folderTree={sidebarData.folderTree}
                 currentFolder={sidebarData.currentFolder}
                 expandedFolders={sidebarData.expandedFolders}
@@ -765,6 +767,7 @@ function AppContentWithWorkspace({
             {/* Projects View - no wrapper padding as it manages its own */}
             {showProjectV3View && (
               <ProjectV3View 
+                key={selectedProject?.id || 'projects-list'} // Force remount on project change
                 onBack={handleBackFromProjectV3}
                 onProjectChange={setSelectedProject}
                 onSidebarDataChange={setSidebarData}
