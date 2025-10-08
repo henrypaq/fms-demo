@@ -436,7 +436,7 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
           {projects.map((project) => (
             <div
               key={project.id}
-              className="group transition-all duration-200 cursor-pointer relative folder-card hover:scale-[1.02]"
+              className="group transition-all duration-200 ease-out cursor-pointer relative folder-card hover:scale-[1.02] hover:brightness-110"
               style={{
                 background: '#111235',
                 maskImage: 'url(/folder-shape.svg)',
@@ -447,15 +447,21 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
                 WebkitMaskSize: 'cover',
                 WebkitMaskRepeat: 'no-repeat',
                 WebkitMaskPosition: 'center',
-                filter: 'drop-shadow(0 0 0 1px hsl(240, 25%, 15%)) drop-shadow(0 2px 8px rgba(0,0,0,0.35))'
+                filter: 'drop-shadow(0 0 0 1px hsl(240, 25%, 15%)) drop-shadow(0 2px 8px rgba(0,0,0,0.35))',
+                transition: 'filter 0.2s ease-out, transform 0.2s ease-out'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.filter = 'drop-shadow(0 0 0 2px #6049E3) drop-shadow(0 4px 12px rgba(96, 73, 227, 0.4))';
+                e.currentTarget.style.filter = 'drop-shadow(0 0 0 2px #6049E3) drop-shadow(0 6px 16px rgba(96, 73, 227, 0.5))';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.filter = 'drop-shadow(0 0 0 1px hsl(240, 25%, 15%)) drop-shadow(0 2px 8px rgba(0,0,0,0.35))';
               }}
-              onClick={() => onProjectSelect(project)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Project clicked:', project.name);
+                onProjectSelect(project);
+              }}
             >
               {/* Large Image Area - covers most of the folder */}
               <div className="relative w-full h-full flex flex-col">
