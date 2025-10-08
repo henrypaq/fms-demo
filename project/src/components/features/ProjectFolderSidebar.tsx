@@ -57,10 +57,14 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
           onDragLeave={onDragLeave}
           onDrop={(e) => onDrop(e, folder.id)}
           onContextMenu={(e) => {
+            console.log('📌 Folder right-clicked:', folder.name);
+            e.preventDefault();
+            e.stopPropagation();
             if (onFolderContextMenu) {
-              e.preventDefault();
-              e.stopPropagation();
+              console.log('✅ Calling onFolderContextMenu');
               onFolderContextMenu(e, folder);
+            } else {
+              console.warn('⚠️ onFolderContextMenu not provided!');
             }
           }}
           className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer transition-all duration-200 group ${

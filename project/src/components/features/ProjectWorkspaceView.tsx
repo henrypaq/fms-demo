@@ -663,6 +663,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
   // Enhanced drag and drop handlers for both files and folders
   const handleDragStart = (e: React.DragEvent, itemId: string, itemType: 'file' | 'folder') => {
+    console.log('🎬 Drag started:', itemType, itemId);
     setDraggedItem({ id: itemId, type: itemType });
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', `${itemType}:${itemId}`);
@@ -686,18 +687,27 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
   const handleDrop = async (e: React.DragEvent, targetFolderId: string | null) => {
     e.preventDefault();
+    console.log('📦 Drop event:', {
+      draggedItem,
+      targetFolder: targetFolderId || 'Project Root'
+    });
     
-    if (!draggedItem) return;
+    if (!draggedItem) {
+      console.warn('⚠️ No dragged item');
+      return;
+    }
     
     const { id: draggedId, type: draggedType } = draggedItem;
     
     // Handle folder drops
     if (draggedType === 'folder' && draggedId !== targetFolderId) {
+      console.log('📁 Moving folder:', draggedId, 'to', targetFolderId || 'root');
       await moveFolder(draggedId, targetFolderId);
     }
     
     // Handle file drops
     if (draggedType === 'file') {
+      console.log('📄 Moving file:', draggedId, 'to folder', targetFolderId || 'root');
       await moveFile(draggedId, targetFolderId);
     }
     
@@ -1291,8 +1301,10 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
           setDraggedItem({ id: folder.id, type: 'folder' });
         },
         onFolderContextMenu: (e: React.MouseEvent, folder: any) => {
+          console.log('🎯 onFolderContextMenu called for:', folder.name);
           e.preventDefault();
           e.stopPropagation();
+          console.log('📍 Setting folder menu at position:', e.clientX, e.clientY);
           setFolderMenu({ folder, x: e.clientX, y: e.clientY });
         },
       });
