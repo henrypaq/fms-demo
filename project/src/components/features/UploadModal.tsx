@@ -3,6 +3,7 @@ import { X, Upload, File, Loader } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWorkspace } from '@/contexts/WorkspaceContext';
 import { useFileUpload } from '@/hooks/useFileUpload';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -73,19 +74,29 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div 
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      style={{
-        left: 'var(--sidebar-width, 5rem)'
-      }}
-    >
-      <div className="bg-dark-surface border border-dark-surface rounded-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="p-6 border-b border-dark-surface">
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          style={{
+            left: 'var(--sidebar-width, 5rem)'
+          }}
+        >
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.98, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: 10 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+          >
+        <div className="p-6 border-b border-[#2A2C45]/40">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold text-white">Upload Files</h3>
+            <h3 className="text-xl font-bold text-[#CFCFF6]">Upload Files</h3>
             <Button 
               onClick={handleClose} 
               variant="ghost" 
@@ -116,12 +127,12 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose }) => {
             onClick={() => !isUploading && fileInputRef.current?.click()}
           >
             <Upload className={`w-12 h-12 mx-auto mb-4 ${
-              dragActive ? 'text-[#6049E3]' : 'text-slate-400'
+              dragActive ? 'text-[#6049E3]' : 'text-[#CFCFF6]/60'
             }`} />
-            <p className="text-white font-medium mb-2">
+            <p className="text-[#CFCFF6] font-medium mb-2">
               {dragActive ? 'Drop files here' : 'Drop files here or click to browse'}
             </p>
-            <p className="text-[#CFCFF6]/60 text-xs">
+            <p className="text-[#CFCFF6]/50 text-xs">
               Support for multiple files up to 10GB each
             </p>
             <input
@@ -137,22 +148,22 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose }) => {
           {/* Selected Files List */}
           {selectedFiles.length > 0 && (
             <div className="mt-6">
-              <h4 className="text-sm font-medium text-light-text/70 mb-3">
+              <h4 className="text-sm font-medium text-[#CFCFF6]/70 mb-3">
                 Selected Files ({selectedFiles.length})
               </h4>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {selectedFiles.map((file, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg border border-slate-600/50"
+                    className="flex items-center justify-between p-3 bg-[#1A1C3A]/40 rounded-lg border border-[#2A2C45]/40"
                   >
                     <div className="flex items-center space-x-3 flex-1 min-w-0">
                       <File className="w-5 h-5 text-[#6049E3] flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
+                        <p className="text-sm font-medium text-[#CFCFF6] truncate">
                           {file.name}
                         </p>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-[#CFCFF6]/60">
                           {formatFileSize(file.size)}
                         </p>
                       </div>
@@ -176,8 +187,8 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-dark-surface flex justify-between items-center">
-          <p className="text-sm text-slate-400">
+        <div className="p-6 border-t border-[#2A2C45]/40 flex justify-between items-center">
+          <p className="text-sm text-[#CFCFF6]/60">
             {selectedFiles.length > 0 
               ? `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} selected`
               : 'No files selected'
@@ -188,7 +199,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose }) => {
               type="button"
               onClick={handleClose}
               disabled={isUploading}
-              className="px-4 py-2 bg-dark-surface hover:bg-dark-bg text-light-text rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
@@ -210,8 +221,10 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose }) => {
             )}
           </div>
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

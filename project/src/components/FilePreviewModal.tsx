@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, 
   Download, 
@@ -89,8 +89,6 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
     e.preventDefault();
     e.stopPropagation();
   };
-
-  if (!isOpen || !file) return null;
 
   const getFileIcon = (type: FileItem['type']) => {
     const iconClass = "w-12 h-12";
@@ -230,23 +228,33 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
   const handleVideoPause = () => setIsPlaying(false);
 
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
-    >
-      <div 
-        className="bg-dark-surface rounded-2xl border border-dark-surface/50 w-full max-w-[calc(100vw-4rem)] max-h-[calc(100vh-4rem)] overflow-hidden shadow-2xl relative"
-        draggable={false}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        onClick={(e) => e.stopPropagation()}
-      >
+    <AnimatePresence>
+      {isOpen && file && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={onClose}
+        >
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.98, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: 10 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="bg-[#1A1C3A]/90 backdrop-blur-md rounded-2xl border border-[#2A2C45]/60 w-full max-w-[calc(100vw-4rem)] max-h-[calc(100vh-4rem)] overflow-hidden shadow-2xl relative"
+            draggable={false}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            onClick={(e) => e.stopPropagation()}
+          >
         {/* Top Header with Path, Filename, and Share */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+        <div className="flex items-center justify-between p-6 border-b border-[#2A2C45]/40">
           {/* Left: Path and Filename */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center space-x-2 text-sm text-slate-400 mb-1">
+            <div className="flex items-center space-x-2 text-sm text-[#CFCFF6]/60 mb-1">
               <span>Projects</span>
               <span>/</span>
               <span>Current Project</span>
@@ -254,7 +262,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
               <span>Media</span>
             </div>
           <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold text-white truncate">{file.name}</h1>
+              <h1 className="text-2xl font-bold text-[#CFCFF6] truncate">{file.name}</h1>
             {file.isFavorite && (
                 <Star className="w-6 h-6 text-yellow-400 fill-current flex-shrink-0" />
             )}
@@ -276,7 +284,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
               </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors duration-200"
+              className="p-2 rounded-lg text-[#CFCFF6]/60 hover:text-white hover:bg-[#1A1C3A]/60 transition-colors duration-200"
             >
               <X className="w-5 h-5" />
             </button>
@@ -285,7 +293,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
 
         <div className="flex h-[calc(100vh-200px)]">
           {/* Main Preview Area - Much Larger */}
-          <div className="flex-1 flex items-center justify-center bg-slate-900/30 p-6 pb-8">
+          <div className="flex-1 flex items-center justify-center bg-[#0C0E1F]/30 p-6 pb-8">
             <div className="w-full h-full flex items-center justify-center">
               {file.type === 'image' ? (
                 <img
@@ -326,15 +334,15 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
           </div>
 
           {/* Right Sidebar - Two Sections with Tab Buttons */}
-          <div className="w-80 border-l border-slate-700/50 flex flex-col">
+          <div className="w-80 border-l border-[#2A2C45]/40 flex flex-col">
             {/* Tab Buttons - Like in the image */}
-            <div className="flex border-b border-slate-700/50 p-2">
+            <div className="flex border-b border-[#2A2C45]/40 p-2">
               <button
                 onClick={() => setActiveTab('comments')}
                 className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-2 ${
                   activeTab === 'comments'
-                    ? 'bg-[#262626] text-light-text' // Active style from image
-                    : 'text-light-text/70 hover:bg-[#171717]' // Inactive style from image
+                    ? 'bg-[#1A1C3A]/80 text-[#CFCFF6]'
+                    : 'text-[#CFCFF6]/70 hover:bg-[#1A1C3A]/40'
                 }`}
               >
                 <MessageSquare className="w-4 h-4" />
@@ -344,8 +352,8 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                 onClick={() => setActiveTab('fields')}
                 className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-2 ${
                   activeTab === 'fields'
-                    ? 'bg-[#262626] text-light-text' // Active style from image
-                    : 'text-light-text/70 hover:bg-[#171717]' // Inactive style from image
+                    ? 'bg-[#1A1C3A]/80 text-[#CFCFF6]'
+                    : 'text-[#CFCFF6]/70 hover:bg-[#1A1C3A]/40'
                 }`}
               >
                 <Info className="w-4 h-4" />
@@ -357,7 +365,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
             {activeTab === 'comments' ? (
               <div className="flex-1 p-6 overflow-y-auto flex flex-col">
                 <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-white">Comments</h3>
+                  <h3 className="text-lg font-semibold text-[#CFCFF6]">Comments</h3>
                 </div>
                 <div className="space-y-4 flex-1">
                   {/* Placeholder for comments - not functional yet */}
@@ -429,7 +437,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
               </div>
             ) : (
               <div className="flex-1 p-6 overflow-y-auto">
-                <h3 className="text-lg font-semibold text-white mb-4">File Details</h3>
+                <h3 className="text-lg font-semibold text-[#CFCFF6] mb-4">File Details</h3>
                 <div className="space-y-4">
               {/* File Name */}
               <div>
@@ -580,8 +588,10 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
         </div>
         </div>
 
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 });
 
