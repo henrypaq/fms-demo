@@ -806,7 +806,6 @@ function AppContentWithWorkspace({
             {/* Projects View - no wrapper padding as it manages its own */}
             {showProjectV3View ? (
               <ProjectV3View 
-                key={selectedProject?.id || 'projects-list'} // Force remount on project change
                 onBack={handleBackFromProjectV3}
                 onProjectChange={setSelectedProject}
                 onSidebarDataChange={setSidebarData}
