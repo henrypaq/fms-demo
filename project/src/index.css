@@ -273,6 +273,7 @@
   /* Sidebar uses its own background color defined in --sidebar-background */
   [data-sidebar="sidebar"] {
     background-color: hsl(var(--sidebar-background)) !important;
+    border-radius: 0.5rem !important;
   }
   
   /* Card hover effects */
@@ -360,7 +361,6 @@
 /* Sidebar color change when upload sheet is open - matches upload sheet */
 .upload-sheet-open [data-sidebar="sidebar"] {
   background-color: #1A1C3A !important;
-  transition: background-color 0.3s ease-in-out;
 }
 
 /* Add dark gutter between sidebar and upload sheet when open */
