@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, Upload, File, CheckCircle, AlertCircle, Loader, Clock } from 'lucide-react';
 import { useFileUpload } from '../../hooks/useFileUpload';
 import { useOptimisticFileUpload } from '../../hooks/useOptimisticFileUpload';
@@ -16,9 +16,10 @@ import {
   SheetPortal,
 } from '../ui/sheet';
 import * as SheetPrimitive from "@radix-ui/react-dialog";
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from "../../lib/utils";
 
-// Custom SheetContent that slides from right, flush with sidebar
+// Custom SheetContent that slides from right, flush with sidebar with Framer Motion
 const CustomSheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> & { sidebarState?: string }
@@ -30,22 +31,36 @@ const CustomSheetContent = React.forwardRef<
 
   return (
     <SheetPrimitive.Content
+      asChild
       ref={ref}
       data-sidebar-upload-sheet
-      className={cn(
-        "fixed top-0 bottom-0 right-0 z-[60] h-full w-[420px] bg-[#1A1C3A]/90 backdrop-blur-md text-[#CFCFF6] border-l border-[#2A2C45]/60 shadow-xl rounded-lg transition-all duration-300 ease-in-out",
-        className
-      )}
-      style={{
-        left: leftPosition
-      }}
       {...props}
     >
-      {children}
-      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </SheetPrimitive.Close>
+      <motion.div
+        initial={{ x: '100%', opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: '100%', opacity: 0 }}
+        transition={{ 
+          type: "spring", 
+          stiffness: 400, 
+          damping: 40,
+          duration: 0.3
+        }}
+        className={cn(
+          "fixed top-0 bottom-0 right-0 z-[60] h-full w-[420px] bg-[#1A1C3A] backdrop-blur-md text-[#CFCFF6] border-l border-[#2A2C45]/60 shadow-xl rounded-lg",
+          className
+        )}
+        style={{
+          left: leftPosition,
+          transition: 'left 0.3s ease-in-out' // Smooth transition when sidebar state changes
+        }}
+      >
+        {children}
+        <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </SheetPrimitive.Close>
+      </motion.div>
     </SheetPrimitive.Content>
   );
 });
@@ -84,6 +99,18 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploads, isUploading, uploadFiles } = useFileUpload();
   const { uploadMultipleFiles } = useOptimisticFileUpload();
+
+  // Add/remove class to body to trigger sidebar color change
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('upload-sheet-open');
+    } else {
+      document.body.classList.remove('upload-sheet-open');
+    }
+    return () => {
+      document.body.classList.remove('upload-sheet-open');
+    };
+  }, [isOpen]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -206,24 +233,32 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      {/* Custom overlay that only covers content area (not sidebar) */}
-      {isOpen && (
-        <SheetPortal>
-          <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300 ease-in-out"
-            style={{
-              left: overlayLeft
-            }}
-            onClick={() => onOpenChange(false)}
-            data-sidebar-overlay-exclude
-          />
-        </SheetPortal>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <SheetPortal>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+              style={{
+                left: overlayLeft,
+                transition: 'left 0.3s ease-in-out'
+              }}
+              onClick={() => onOpenChange(false)}
+              data-sidebar-overlay-exclude
+            />
+          </SheetPortal>
+        )}
+      </AnimatePresence>
       
-      <CustomSheetContent 
-        className="p-0 overflow-y-auto"
-        sidebarState={sidebarState}
-      >
+      <AnimatePresence>
+        {isOpen && (
+          <CustomSheetContent 
+            className="p-0 overflow-y-auto"
+            sidebarState={sidebarState}
+          >
         <div className="flex flex-col h-full">
           {/* Header */}
           <SheetHeader className="p-6 pb-4 border-b border-[#1A1C3A] space-y-1">
@@ -467,6 +502,8 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
           </SheetFooter>
         </div>
       </CustomSheetContent>
+        )}
+      </AnimatePresence>
     </Sheet>
   );
 };
