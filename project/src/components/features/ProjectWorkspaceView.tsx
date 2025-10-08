@@ -1488,7 +1488,10 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
       />
 
       {/* Folder Context Menu */}
-      {folderMenu && (
+      {folderMenu && (() => {
+        console.log('🎨 Rendering context menu for:', folderMenu.folder?.name, 'at', folderMenu.x, folderMenu.y);
+        return true;
+      })() && (
         <div
           ref={folderMenuRef}
           className="fixed z-[100] bg-[#1A1C3A]/95 backdrop-blur-md border border-[#6049E3]/40 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.6)] py-2 px-1 min-w-[160px]"

@@ -109,7 +109,13 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
   };
 
   return (
-    <div className="w-[280px] bg-card/95 rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.3)] flex flex-col flex-shrink-0 overflow-hidden h-full">
+    <div 
+      className="w-[280px] bg-card/95 rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.3)] flex flex-col flex-shrink-0 overflow-hidden h-full" 
+      style={{ pointerEvents: 'auto' }}
+      onContextMenu={(e) => {
+        console.log('🔍 Sidebar root context menu (should be prevented by child)');
+      }}
+    >
       <div className="p-4 border-b border-[#1A1C3A]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-[#CFCFF6]">Folders</h3>
