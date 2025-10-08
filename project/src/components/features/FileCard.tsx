@@ -326,7 +326,9 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           bg-[hsl(240,30%,12%)]
           ${showExpandedTags 
             ? 'border-2 border-[#6049E3] shadow-[0_8px_32px_rgba(96,73,227,0.5)]' 
-            : 'border border-[hsl(240,30%,12%)]'
+            : currentSelected 
+              ? 'border-2 border-[#6049E3]'
+              : 'border border-[hsl(240,30%,12%)]'
           }
           shadow-[0_4px_10px_rgba(0,0,0,0.3)]
           overflow-hidden
@@ -335,7 +337,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           flex flex-col
           relative ${showExpandedTags ? 'z-[210]' : 'z-0'}
           ${currentSelected && !showExpandedTags
-            ? 'ring-2 ring-[#6049E3] shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(96,73,227,0.4)]' 
+            ? 'shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(96,73,227,0.4)]' 
             : !showExpandedTags ? 'hover:scale-[1.02] hover:shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(0,0,0,0.5)]' : ''
           }
         `}
@@ -707,14 +709,17 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
       )}
 
       {/* File Preview Modal */}
-      <FilePreviewModal
-        file={showPreview ? file : null}
-        isOpen={showPreview}
-        onClose={() => setShowPreview(false)}
-        onUpdate={onUpdate}
-        onToggleFavorite={onToggleFavorite}
-        userRole={userRole}
-      />
+      {createPortal(
+        <FilePreviewModal
+          file={showPreview ? file : null}
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+          onUpdate={onUpdate}
+          onToggleFavorite={onToggleFavorite}
+          userRole={userRole}
+        />,
+        document.body
+      )}
     </div>
     </>
   );
