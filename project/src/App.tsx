@@ -849,12 +849,21 @@ function AppContentWithWorkspace({
                     selectedTags={searchFilters.tags}
                     files={globalSearchResults.files}
                     loading={globalSearchResults.loading}
+                    error={globalSearchResults.error || null}
+                    totalResults={globalSearchResults.files.length}
+                    onFileClick={(file) => setSelectedFile(file)}
+                    onFileDoubleClick={handleFileDoubleClick}
+                    onToggleFavorite={toggleFavorite}
+                    onFileUpdate={handleFileUpdate}
+                    onFileMove={handleFileMove}
+                    onFileDelete={handleFileDelete}
                   />
                 ) : (
                   <FileGridSimple
                     files={filteredFiles}
                     onFileClick={(file) => setSelectedFile(file)}
                     onFileDoubleClick={handleFileDoubleClick}
+                    onToggleFavorite={toggleFavorite}
                     onFileUpdate={handleFileUpdate}
                     onFileDelete={handleFileDelete}
                     onFileMove={handleFileMove}

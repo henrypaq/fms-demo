@@ -15,6 +15,7 @@ interface GlobalSearchResultsProps {
   onToggleFavorite?: (fileId: string) => void;
   onFileUpdate?: (fileId: string, updates: Partial<FileItem>) => void;
   onFileMove?: (fileId: string, projectId: string | null, folderId: string | null) => void;
+  onFileDelete?: (fileId: string) => Promise<void>;
   onClearSearch?: () => void;
   userRole?: 'admin' | 'employee';
   userProjectAccess?: string[];
@@ -33,6 +34,7 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
   onToggleFavorite,
   onFileUpdate,
   onFileMove,
+  onFileDelete,
   onClearSearch,
   userRole = 'admin',
   userProjectAccess = [],
@@ -143,6 +145,7 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
                     onToggleFavorite={onToggleFavorite}
                     onUpdate={onFileUpdate}
                     onMove={onFileMove}
+                    onDelete={onFileDelete}
                     userRole={userRole}
                     userProjectAccess={userProjectAccess}
                   />
