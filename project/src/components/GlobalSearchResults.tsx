@@ -95,7 +95,7 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
         {onClearSearch && (
           <button
             onClick={onClearSearch}
-            className="flex items-center space-x-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors duration-200"
+            className="flex items-center space-x-2 px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
           >
             <X className="w-4 h-4" />
             <span>Clear Search</span>
@@ -108,8 +108,8 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
       {loading && (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
-            <Loader className="w-8 h-8 text-light-text animate-spin mx-auto mb-4" />
-            <p className="text-slate-400">Searching...</p>
+            <Loader className="w-8 h-8 text-[#6049E3] animate-spin mx-auto mb-4" />
+            <p className="text-[#CFCFF6]/60">Searching...</p>
           </div>
         </div>
       )}
@@ -118,11 +118,11 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
       {error && !loading && (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
-            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-red-400 text-2xl">⚠️</span>
             </div>
-            <h3 className="text-lg font-medium text-white mb-2">Search Error</h3>
-            <p className="text-slate-400">{error}</p>
+            <h3 className="text-lg font-medium text-[#CFCFF6] mb-2">Search Error</h3>
+            <p className="text-[#CFCFF6]/60">{error}</p>
           </div>
         </div>
       )}
@@ -152,15 +152,15 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
             </>
           ) : (
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileText className="w-8 h-8 text-slate-400" />
+              <div className="w-16 h-16 bg-[#1A1C3A]/60 border border-[#2A2C45] rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-8 h-8 text-[#8A8C8E]" />
               </div>
-              <h3 className="text-lg font-medium text-white mb-2">No files found</h3>
-              <p className="text-slate-400 mb-4">
+              <h3 className="text-lg font-medium text-[#CFCFF6] mb-2">No files found</h3>
+              <p className="text-[#CFCFF6]/60 mb-4">
                 No files match your search criteria
                 {activeView && activeView !== 'dashboard' && ` in ${getViewDisplayName(activeView)}`}.
               </p>
-              <div className="text-sm text-slate-500 max-w-md mx-auto">
+              <div className="text-sm text-[#CFCFF6]/50 max-w-md mx-auto">
                 <p>Try different search terms or check your spelling.</p>
               </div>
             </div>
@@ -168,10 +168,10 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
 
           {/* Show if results are limited */}
           {files.length === 150 && totalResults > 150 && (
-            <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+            <div className="mt-6 p-4 bg-[#6049E3]/10 border border-[#6049E3]/30 rounded-lg">
               <div className="flex items-center space-x-2">
-                <Search className="w-5 h-5 text-blue-400" />
-                <p className="text-blue-400 text-sm">
+                <Search className="w-5 h-5 text-[#6049E3]" />
+                <p className="text-[#6049E3] text-sm">
                   Showing top 150 results of {totalResults}. Results are ranked by relevance.
                 </p>
               </div>
