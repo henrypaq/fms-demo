@@ -479,24 +479,24 @@ const TagView: React.FC<TagViewProps> = ({
 
       {/* Add Tag Modal */}
       <Dialog open={showAddTagModal} onOpenChange={setShowAddTagModal}>
-        <DialogContent className="bg-[#111235] border-[#1A1C3A]">
+        <DialogContent className="bg-[#1A1C3A]/90 backdrop-blur-md border-[#2A2C45]/60">
           <DialogHeader>
             <DialogTitle className="text-[#CFCFF6]">Add New Tag</DialogTitle>
-            <DialogDescription className="text-[#8A8C8E]">
+            <DialogDescription className="text-[#CFCFF6]/60">
               Create a new tag to organize your files.
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="tag-name" className="text-[#CFCFF6]">Tag Name</Label>
+              <Label htmlFor="tag-name" className="text-[#CFCFF6]/70">Tag Name</Label>
               <Input
                 id="tag-name"
                 type="text"
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
                 placeholder="Enter tag name..."
-                className="bg-[#0B0C20] border-[#1A1C3A] text-[#CFCFF6] placeholder-[#8A8C8E]"
+                className="bg-[#1A1C3A]/40 border-[#2A2C45]/40 text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && newTagName.trim()) {
@@ -515,7 +515,7 @@ const TagView: React.FC<TagViewProps> = ({
                 setNewTagName('');
               }}
               disabled={isProcessing}
-              className="text-[#8A8C8E] hover:text-[#CFCFF6]"
+              className="bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white"
             >
               Cancel
             </Button>
@@ -543,7 +543,7 @@ const TagView: React.FC<TagViewProps> = ({
 
       {/* Delete Tag Confirmation Modal */}
       <Dialog open={!!showDeleteConfirm} onOpenChange={(open) => !open && setShowDeleteConfirm(null)}>
-        <DialogContent className="bg-[#111235] border-[#1A1C3A]">
+        <DialogContent className="bg-[#1A1C3A]/90 backdrop-blur-md border-[#2A2C45]/60">
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
               <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center">
@@ -551,7 +551,7 @@ const TagView: React.FC<TagViewProps> = ({
               </div>
               <div>
                 <DialogTitle className="text-[#CFCFF6]">Delete Tag</DialogTitle>
-                <DialogDescription className="text-[#8A8C8E]">This action cannot be undone</DialogDescription>
+                <DialogDescription className="text-[#CFCFF6]/60">This action cannot be undone</DialogDescription>
               </div>
             </div>
           </DialogHeader>
@@ -566,14 +566,14 @@ const TagView: React.FC<TagViewProps> = ({
               variant="ghost"
               onClick={() => setShowDeleteConfirm(null)}
               disabled={isProcessing}
-              className="text-[#8A8C8E] hover:text-[#CFCFF6]"
+              className="bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white"
             >
               Cancel
             </Button>
             <Button
               onClick={() => showDeleteConfirm && handleDeleteTag(showDeleteConfirm)}
               disabled={isProcessing}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="border-2 border-red-500 bg-red-500/20 text-[#CFCFF6] hover:bg-red-500/30 hover:text-white hover:border-red-500"
             >
               {isProcessing ? (
                 <>
