@@ -123,6 +123,8 @@ export const useOptimisticFileUpload = () => {
       if (result.tags && Array.isArray(result.tags) && result.tags.length > 0) {
         console.log('🏷️ n8n returned tags immediately:', result.tags);
         console.log('📝 Updating file with tags:', result.tags);
+        console.log('📊 Number of tags:', result.tags.length);
+        console.log('🔍 Tag details:', result.tags.map((tag: string, idx: number) => `${idx + 1}. "${tag}"`).join(', '));
         
         const { error: updateError } = await supabase
           .from('files')

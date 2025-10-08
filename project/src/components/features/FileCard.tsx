@@ -292,19 +292,9 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
     }
   };
 
-  // Only show actual tags, no placeholder tags
-  // Add test tags for demonstration - different amounts for different files
-  const displayTags = file.tags && file.tags.length > 0 
-    ? file.tags 
-    : (file.id.endsWith('1') || file.id.endsWith('a') 
-        ? ['Marketing', 'Q4 Campaign', 'Social Media', 'High Priority', 'Review Needed']
-        : file.id.endsWith('2') || file.id.endsWith('b')
-        ? ['Design', 'Brand Assets', 'Approved']
-        : file.id.endsWith('3') || file.id.endsWith('c')
-        ? ['Development', 'Testing', 'Bug Fix', 'Production', 'Deploy']
-        : file.id.endsWith('4') || file.id.endsWith('d')
-        ? ['Finance', 'Q1 Report']
-        : []);
+  // Only show actual tags from n8n auto-tagging (no placeholder/test tags)
+  // If n8n doesn't return tags, the file should have no tags (empty array)
+  const displayTags = file.tags && file.tags.length > 0 ? file.tags : [];
   const currentSelected = isSelected || internalSelected;
 
   return (

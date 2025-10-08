@@ -272,9 +272,13 @@ export const useFileUpload = () => {
       }
 
       const result = await response.json();
+      console.log('✅ [useFileUpload] n8n webhook response:', result);
 
       // Check if n8n returned tags immediately
       if (result.tags && Array.isArray(result.tags) && result.tags.length > 0) {
+        console.log('🏷️ [useFileUpload] n8n returned tags immediately:', result.tags);
+        console.log('📊 [useFileUpload] Number of tags:', result.tags.length);
+        console.log('🔍 [useFileUpload] Tag details:', result.tags.map((tag: string, idx: number) => `${idx + 1}. "${tag}"`).join(', '));
         
         // Update file tags in database
         const { error: updateError } = await supabase
@@ -283,10 +287,12 @@ export const useFileUpload = () => {
           .eq('id', fileData.id);
 
         if (updateError) {
-          console.error('Failed to update file tags:', updateError);
+          console.error('❌ [useFileUpload] Failed to update file tags:', updateError);
         } else {
+          console.log('✅ [useFileUpload] File tags updated successfully');
         }
       } else {
+        console.log('⏭️ [useFileUpload] No tags returned from n8n - file will have no tags');
       }
 
     } catch (error) {
