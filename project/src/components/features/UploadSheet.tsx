@@ -5,6 +5,7 @@ import { useOptimisticFileUpload } from '../../hooks/useOptimisticFileUpload';
 import { FileRecord } from '../../lib/supabase';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useUploads } from '../../contexts/UploadContext';
+import { useSidebar } from '../ui/sidebar-shadcn';
 import { Button } from '../ui/button';
 import {
   Sheet,
@@ -20,18 +21,23 @@ import { cn } from "../../lib/utils";
 // Custom SheetContent that slides from right, flush with sidebar
 const CustomSheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>
->(({ className, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> & { sidebarState?: string }
+>(({ className, children, sidebarState, ...props }, ref) => {
+  // Calculate left position based on sidebar state
+  const leftPosition = sidebarState === 'collapsed' 
+    ? 'calc(var(--sidebar-width-icon) + 4px)'  // 80px + 4px = 84px
+    : 'calc(var(--sidebar-width) + 4px)';      // 256px + 4px = 260px
+
   return (
     <SheetPrimitive.Content
       ref={ref}
       data-sidebar-upload-sheet
       className={cn(
-        "fixed top-0 bottom-0 right-0 z-[60] h-full w-[420px] bg-[#1A1C3A]/90 backdrop-blur-md text-[#CFCFF6] border-l border-[#2A2C45]/60 shadow-xl rounded-lg",
+        "fixed top-0 bottom-0 right-0 z-[60] h-full w-[420px] bg-[#1A1C3A]/90 backdrop-blur-md text-[#CFCFF6] border-l border-[#2A2C45]/60 shadow-xl rounded-lg transition-all duration-300 ease-in-out",
         className
       )}
       style={{
-        left: 'calc(var(--sidebar-width, 5rem) + 4px)'
+        left: leftPosition
       }}
       {...props}
     >
@@ -73,6 +79,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
   const { currentWorkspace } = useWorkspace();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { addUpload } = useUploads();
+  const { state: sidebarState } = useSidebar();
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploads, isUploading, uploadFiles } = useFileUpload();
@@ -192,15 +199,20 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
     }
   };
 
+  // Calculate overlay left position based on sidebar state
+  const overlayLeft = sidebarState === 'collapsed'
+    ? 'calc(var(--sidebar-width-icon) + 4px)'
+    : 'calc(var(--sidebar-width) + 4px)';
+
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       {/* Custom overlay that only covers content area (not sidebar) */}
       {isOpen && (
         <SheetPortal>
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300 ease-in-out"
             style={{
-              left: 'var(--sidebar-width, 5rem)'
+              left: overlayLeft
             }}
             onClick={() => onOpenChange(false)}
             data-sidebar-overlay-exclude
@@ -210,6 +222,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
       
       <CustomSheetContent 
         className="p-0 overflow-y-auto"
+        sidebarState={sidebarState}
       >
         <div className="flex flex-col h-full">
           {/* Header */}

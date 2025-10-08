@@ -332,7 +332,10 @@
   transition: left 0.3s ease-in-out !important;
 }
 
-[data-state="collapsed"] [data-sidebar-upload-sheet] {
+/* When sidebar is collapsed - use group state from parent */
+[data-state="collapsed"] [data-sidebar-upload-sheet],
+.group[data-state="collapsed"] [data-sidebar-upload-sheet],
+:has([data-state="collapsed"]) [data-sidebar-upload-sheet] {
   left: calc(var(--sidebar-width-icon) + 4px) !important;
 }
 
@@ -341,7 +344,9 @@
   left: calc(var(--sidebar-width) + 4px) !important;
 }
 
-[data-state="collapsed"] [data-sidebar-upload-sheet].left-0 {
+[data-state="collapsed"] [data-sidebar-upload-sheet].left-0,
+.group[data-state="collapsed"] [data-sidebar-upload-sheet].left-0,
+:has([data-state="collapsed"]) [data-sidebar-upload-sheet].left-0 {
   left: calc(var(--sidebar-width-icon) + 4px) !important;
 }
 
@@ -353,7 +358,9 @@
 }
 
 /* When sidebar is collapsed, adjust overlay positioning */
-[data-state="collapsed"] [data-sidebar-overlay-exclude] {
+[data-state="collapsed"] [data-sidebar-overlay-exclude],
+.group[data-state="collapsed"] [data-sidebar-overlay-exclude],
+:has([data-state="collapsed"]) [data-sidebar-overlay-exclude] {
   left: calc(var(--sidebar-width-icon) + 4px) !important;
   width: calc(100% - var(--sidebar-width-icon) - 4px) !important;
 }
