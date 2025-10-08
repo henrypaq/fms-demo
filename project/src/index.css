@@ -445,75 +445,39 @@
   
 }
 
-/* Fast dropdown animations */
-.fast-dropdown {
-  animation-duration: 75ms !important;
-  transition-duration: 75ms !important;
-}
-
-.fast-dropdown[data-state="open"] {
-  animation: fast-fade-in 75ms ease-out !important;
-}
-
-.fast-dropdown[data-state="closed"] {
-  animation: fast-fade-out 75ms ease-out !important;
-}
-
-@keyframes fast-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fast-fade-out {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-}
-
 /* ============================================ */
-/* DROPDOWN ANIMATIONS - OUTSIDE ALL LAYERS    */
-/* Maximum specificity to override everything  */
+/* DROPDOWN ANIMATIONS - UNIFIED SYSTEM        */
+/* Smooth, modern animations for all dropdowns */
 /* ============================================ */
 
 @keyframes dropdownFastIn {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.95) translateY(-2px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 
 @keyframes dropdownFastOut {
   from {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
   to {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.95) translateY(-2px);
   }
 }
 
 [data-radix-dropdown-menu-content][data-state="open"],
 [data-radix-context-menu-content][data-state="open"] {
-  animation: dropdownFastIn 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  animation: dropdownFastIn 150ms ease-out !important;
 }
 
 [data-radix-dropdown-menu-content][data-state="closed"],
 [data-radix-context-menu-content][data-state="closed"] {
-  animation: dropdownFastOut 100ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  animation: dropdownFastOut 150ms ease-out !important;
 }
