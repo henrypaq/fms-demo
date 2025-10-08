@@ -5,6 +5,8 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useToast } from '../components/ui/toast';
 import { FileItem } from '../components/features/FileCard';
 
+const N8N_WEBHOOK_URL = 'https://njord-gear.app.n8n.cloud/webhook/d2855857-3e7b-4465-b627-89ed188f2151';
+
 export interface OptimisticFileItem extends FileItem {
   isOptimistic?: boolean;
   uploadProgress?: number;
@@ -24,6 +26,97 @@ export const useOptimisticFileUpload = () => {
   const { currentWorkspace } = useWorkspace();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
+
+  // Send file to n8n webhook for auto-tagging
+  const sendToN8nWebhook = useCallback(async (fileData: any, autoTaggingEnabled: boolean) => {
+    if (!autoTaggingEnabled) {
+      console.log('⏭️ Auto-tagging disabled, skipping n8n webhook');
+      return;
+    }
+
+    try {
+      console.log('🏷️ Sending file to n8n webhook for auto-tagging:', fileData.name);
+
+      // Generate public URL for file
+      const { data: urlData } = supabase.storage
+        .from('files')
+        .getPublicUrl(fileData.file_path);
+      const fileUrl = urlData.publicUrl;
+
+      // Generate thumbnail URL if available
+      let thumbnailUrl = null;
+      if (fileData.thumbnail_url) {
+        thumbnailUrl = fileData.thumbnail_url;
+      } else if (fileData.file_category === 'image') {
+        thumbnailUrl = fileUrl; // Use file itself as thumbnail for images
+      }
+
+      // Prepare webhook payload
+      const webhookPayload = {
+        fileId: fileData.id,
+        fileName: fileData.name,
+        originalName: fileData.original_name,
+        fileType: fileData.file_type,
+        fileCategory: fileData.file_category,
+        fileSize: fileData.file_size,
+        fileUrl: fileUrl,
+        thumbnailUrl: thumbnailUrl,
+        filePath: fileData.file_path,
+        workspaceId: fileData.workspace_id,
+        projectId: fileData.project_id,
+        folderId: fileData.folder_id,
+        timestamp: new Date().toISOString(),
+        context: {
+          workspace: currentWorkspace?.name,
+          uploadSource: 'filevault-optimistic-upload'
+        }
+      };
+
+      console.log('📤 Sending payload to n8n:', {
+        fileId: webhookPayload.fileId,
+        fileName: webhookPayload.fileName,
+        fileCategory: webhookPayload.fileCategory
+      });
+
+      // Send to n8n webhook
+      const response = await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookPayload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook request failed: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ n8n webhook response:', result);
+
+      // If n8n returns tags immediately, update the file
+      if (result.tags && Array.isArray(result.tags) && result.tags.length > 0) {
+        console.log('🏷️ Updating file with tags:', result.tags);
+        
+        const { error: updateError } = await supabase
+          .from('files')
+          .update({ tags: result.tags })
+          .eq('id', fileData.id);
+
+        if (updateError) {
+          console.error('❌ Failed to update file tags:', updateError);
+        } else {
+          console.log('✅ File tags updated successfully');
+          // Trigger a refresh of the file list
+          queryClient.invalidateQueries({ queryKey: ['files'] });
+        }
+      }
+
+    } catch (error) {
+      console.error('❌ Failed to send file to n8n webhook:', error);
+      // Don't throw - auto-tagging failure shouldn't break the upload flow
+    }
+  }, [currentWorkspace, queryClient]);
 
   // Generate a temporary file item for optimistic updates
   const createOptimisticFile = useCallback((file: File, uploadId: string): OptimisticFileItem => {
@@ -238,9 +331,14 @@ export const useOptimisticFileUpload = () => {
       // Just return the file name for reference
       return { fileName: file.name };
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: async (data, variables, context) => {
       // Remove optimistic file by matching the file name
       setOptimisticFiles(prev => prev.filter(f => f.name !== context.fileName));
+      
+      // Send to n8n webhook for auto-tagging
+      if (variables.autoTagging !== false) {
+        await sendToN8nWebhook(data, variables.autoTagging ?? true);
+      }
       
       // Invalidate and refetch files - force immediate refetch
       queryClient.invalidateQueries({ queryKey: ['files'] });
@@ -254,7 +352,7 @@ export const useOptimisticFileUpload = () => {
       addToast({
         type: 'success',
         title: 'Upload Complete',
-        description: `${variables.file.name} has been uploaded successfully.`,
+        description: `${variables.file.name} has been uploaded ${variables.autoTagging !== false ? 'and sent for auto-tagging' : 'successfully'}.`,
       });
     },
     onError: (error, variables, context) => {

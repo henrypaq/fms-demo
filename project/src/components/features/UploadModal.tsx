@@ -52,7 +52,9 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
     if (!currentWorkspace || selectedFiles.length === 0) return;
 
     try {
-      await uploadFiles(selectedFiles, currentWorkspace.id);
+      // uploadFiles signature: (files, manualTags, autoTaggingEnabled, projectId, folderId)
+      // Always enable auto-tagging (3rd parameter = true)
+      await uploadFiles(selectedFiles, [], true);
       setSelectedFiles([]);
       
       // Call completion callback to refresh file list
