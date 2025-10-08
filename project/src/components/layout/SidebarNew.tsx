@@ -36,6 +36,7 @@ interface SidebarNewProps {
   activeView?: string;
   onViewChange?: (view: string) => void;
   onUploadClick?: () => void;
+  uploadSheetOpen?: boolean;
   userRole?: 'admin' | 'employee';
   userProjectAccess?: string[];
   currentUser?: {
@@ -51,6 +52,7 @@ const SidebarNew: React.FC<SidebarNewProps> = ({
   activeView = 'dashboard',
   onViewChange,
   onUploadClick,
+  uploadSheetOpen = false,
   userRole = 'employee',
   userProjectAccess = [],
   currentUser
@@ -134,7 +136,7 @@ const SidebarNew: React.FC<SidebarNewProps> = ({
           <SidebarGroupContent>
             <SidebarMenu className="flex flex-col gap-0">
               {filteredNavigationItems.map((item) => {
-                const isActive = activeView === item.id;
+                const isActive = item.id === 'uploads' ? uploadSheetOpen : activeView === item.id;
                 
                 return (
                   <SidebarMenuItem key={item.id}>

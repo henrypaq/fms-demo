@@ -541,6 +541,7 @@ function AppContentWithWorkspace({
           activeView={showProjectV3View ? 'project-v3' : showAdminDashboard ? 'admin-dashboard' : showUploadsView ? 'uploads' : activeView}
           onViewChange={handleViewChange}
           onUploadClick={() => setShowUploadSheet(true)}
+          uploadSheetOpen={showUploadSheet}
           userRole={currentUser?.role || 'employee'}
           userProjectAccess={currentUser?.projectAccess || []}
           currentUser={currentUser}

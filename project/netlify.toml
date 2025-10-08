@@ -1,9 +1,12 @@
 # Netlify configuration for React/Vite SPA
 [build]
+  # Base directory - where the project actually lives
+  base = "project"
+  
   # Build command
   command = "npm run build"
   
-  # Directory to publish (Vite outputs to 'dist' by default)
+  # Directory to publish (relative to base, Vite outputs to 'dist' by default)
   publish = "dist"
 
 # Redirect rules are handled by the _redirects file in public/
