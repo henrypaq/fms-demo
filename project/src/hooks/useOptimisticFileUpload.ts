@@ -5,7 +5,17 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useToast } from '../components/ui/toast';
 import { FileItem } from '../components/features/FileCard';
 
-const N8N_WEBHOOK_URL = 'https://njord-gear.app.n8n.cloud/webhook/d2855857-3e7b-4465-b627-89ed188f2151';
+/**
+ * N8N Auto-Tagging Webhook for Optimistic File Uploads
+ * 
+ * This hook uses the same webhook as useFileUpload and useAutoTagging
+ * to ensure consistent auto-tagging across all upload methods.
+ * 
+ * Webhook URL: https://callistoai.app.n8n.cloud/webhook/d2855857-3e7b-4465-b627-89ed188f2151
+ * 
+ * See useAutoTagging.ts for complete webhook documentation.
+ */
+const N8N_WEBHOOK_URL = 'https://callistoai.app.n8n.cloud/webhook/d2855857-3e7b-4465-b627-89ed188f2151';
 
 export interface OptimisticFileItem extends FileItem {
   isOptimistic?: boolean;
@@ -73,9 +83,11 @@ export const useOptimisticFileUpload = () => {
       };
 
       console.log('📤 Sending payload to n8n:', {
+        url: N8N_WEBHOOK_URL,
         fileId: webhookPayload.fileId,
         fileName: webhookPayload.fileName,
-        fileCategory: webhookPayload.fileCategory
+        fileCategory: webhookPayload.fileCategory,
+        thumbnailUrl: webhookPayload.thumbnailUrl ? 'Present' : 'Not available'
       });
 
       // Send to n8n webhook
@@ -86,6 +98,8 @@ export const useOptimisticFileUpload = () => {
         },
         body: JSON.stringify(webhookPayload)
       });
+
+      console.log('📡 n8n webhook response status:', response.status, response.statusText);
 
       if (!response.ok) {
         throw new Error(`Webhook request failed: ${response.status} ${response.statusText}`);
