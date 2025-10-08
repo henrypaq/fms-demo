@@ -69,10 +69,10 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
           }}
           className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer transition-all duration-200 group ${
             isSelected
-              ? 'bg-[#6049E3] text-white'
+              ? 'bg-[hsl(240,30%,12%)] text-[#CFCFF6] border border-[#6049E3]/40'
               : isDragOver
               ? 'bg-green-600 text-white'
-              : 'text-[#CFCFF6] hover:bg-[#1A1C3A] hover:text-white'
+              : 'text-[#CFCFF6] hover:bg-[hsl(240,30%,8%)]/50 hover:text-white'
           }`}
           style={{ paddingLeft: `${level * 16 + 12}px` }}
           onClick={() => onSelectFolder(folder)}
@@ -130,12 +130,12 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
 
         {/* Project Root */}
         <div
-          className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer transition-all duration-200 mb-1 ${
+          className={`flex items-center space-x-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 mb-1 ${
             !currentFolder
-              ? 'bg-[#6049E3] text-white'
+              ? 'border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] font-medium'
               : dragOverFolder === null
               ? 'bg-green-600 text-white'
-              : 'text-[#CFCFF6] hover:bg-[#1A1C3A] hover:text-white'
+              : 'border-2 border-transparent text-[#CFCFF6] hover:bg-[#6049E3]/10 hover:border-[#6049E3]/30 hover:text-white'
           }`}
           onClick={() => onSelectFolder(null)}
           onDragOver={(e) => onDragOver(e, null)}
