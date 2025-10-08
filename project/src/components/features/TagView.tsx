@@ -484,7 +484,7 @@ const TagView: React.FC<TagViewProps> = ({
   };
 
   return (
-    <div className="flex-1 flex gap-1 h-full overflow-hidden">
+    <div className="flex-1 flex gap-1 h-full overflow-hidden mt-1">
       {/* Tag Sidebar */}
       <TagSidebar
         tagStats={tagStats}
