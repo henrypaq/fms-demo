@@ -131,10 +131,10 @@ const SidebarNew: React.FC<SidebarNewProps> = ({
           )}
         </SidebarHeader>
 
-        <SidebarContent className="px-2 py-1">
+        <SidebarContent className="px-1 py-1">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu className="flex flex-col gap-0">
+            <SidebarMenu className="flex flex-col gap-0.5">
               {filteredNavigationItems.map((item) => {
                 const isActive = item.id === 'uploads' ? uploadSheetOpen : activeView === item.id;
                 
@@ -150,7 +150,7 @@ const SidebarNew: React.FC<SidebarNewProps> = ({
                     >
                       <item.icon 
                         className={`flex-shrink-0 transition-colors duration-150 ${
-                          isCollapsed ? 'w-[22px] h-[22px]' : 'w-4 h-4'
+                          isCollapsed ? 'w-[24px] h-[24px]' : 'w-[18px] h-[18px]'
                         } ${
                           isActive 
                             ? 'text-white' 
@@ -160,7 +160,7 @@ const SidebarNew: React.FC<SidebarNewProps> = ({
                       {!isCollapsed && (
                         <>
                           <span 
-                            className={`text-sm font-normal transition-colors duration-150 ${
+                            className={`text-[15px] font-normal transition-colors duration-150 ${
                               isActive 
                                 ? 'text-white' 
                                 : 'text-[#8A8C8E] group-hover/menu-item:text-[#CFCFF6]'
