@@ -10,6 +10,7 @@ interface AssetBarProps {
   tagsVisible?: boolean;
   onToggleTags?: () => void;
   // Selection
+  showSelectCheckbox?: boolean; // Show checkbox only on file pages
   allSelected: boolean;
   someSelected: boolean;
   onSelectAll: () => void;
@@ -24,6 +25,7 @@ export const AssetBar: React.FC<AssetBarProps> = ({
   showTagsToggle = true,
   tagsVisible = true,
   onToggleTags,
+  showSelectCheckbox = false,
   allSelected,
   someSelected,
   onSelectAll,
@@ -33,25 +35,27 @@ export const AssetBar: React.FC<AssetBarProps> = ({
   return (
     <div className="px-6 py-2">
       <div className="flex items-center gap-2">
-        {/* Select All Checkbox */}
-        <input
-          type="checkbox"
-          checked={allSelected}
-          ref={(input) => {
-            if (input) {
-              input.indeterminate = someSelected && !allSelected;
-            }
-          }}
-          onChange={onSelectAll}
-          className="w-4 h-4 rounded border-2 border-[#6049E3]/50 bg-[hsl(240,30%,5%)] checked:bg-[#6049E3] checked:border-[#6049E3] hover:border-[#6049E3] focus:ring-2 focus:ring-[#6049E3]/30 focus:ring-offset-0 cursor-pointer transition-all appearance-none flex items-center justify-center"
-          style={{
-            backgroundImage: allSelected ? 'url("data:image/svg+xml,%3csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z\'/%3e%3c/svg%3e")' : someSelected ? 'url("data:image/svg+xml,%3csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M4 8h8\'/%3e%3c/svg%3e")' : 'none',
-            backgroundSize: '100% 100%',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-          title={allSelected ? 'Deselect all' : 'Select all'}
-        />
+        {/* Select All Checkbox - Only show on file pages */}
+        {showSelectCheckbox && (
+          <input
+            type="checkbox"
+            checked={allSelected}
+            ref={(input) => {
+              if (input) {
+                input.indeterminate = someSelected && !allSelected;
+              }
+            }}
+            onChange={onSelectAll}
+            className="w-4 h-4 rounded border-2 border-[#6049E3]/50 bg-[hsl(240,30%,5%)] checked:bg-[#6049E3] checked:border-[#6049E3] hover:border-[#6049E3] focus:ring-2 focus:ring-[#6049E3]/30 focus:ring-offset-0 cursor-pointer transition-all appearance-none flex items-center justify-center"
+            style={{
+              backgroundImage: allSelected ? 'url("data:image/svg+xml,%3csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z\'/%3e%3c/svg%3e")' : someSelected ? 'url("data:image/svg+xml,%3csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M4 8h8\'/%3e%3c/svg%3e")' : 'none',
+              backgroundSize: '100% 100%',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+            title={allSelected ? 'Deselect all' : 'Select all'}
+          />
+        )}
         
         {/* Collapse/Expand Dropdown Button */}
         <button

@@ -795,6 +795,7 @@ function AppContentWithWorkspace({
                 showTagsToggle={true}
                 tagsVisible={tagsVisible}
                 onToggleTags={() => setTagsVisible(!tagsVisible)}
+                showSelectCheckbox={showFilesView && !showTagsView && !showUploadsView}
                 allSelected={allSelected}
                 someSelected={someSelected}
                 onSelectAll={handleSelectAll}

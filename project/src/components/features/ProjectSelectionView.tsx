@@ -416,6 +416,7 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
         isCollapsed={projectsCollapsed}
         onToggleCollapse={() => setProjectsCollapsed(!projectsCollapsed)}
         showTagsToggle={false}
+        showSelectCheckbox={false}
         allSelected={allSelected}
         someSelected={someSelected}
         onSelectAll={handleSelectAll}
