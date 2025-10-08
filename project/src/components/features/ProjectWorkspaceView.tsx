@@ -138,15 +138,15 @@ const CreateFolderModal: React.FC<{
   console.log('CreateFolderModal rendering, isOpen:', isOpen);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-dark-surface border border-dark-surface rounded-xl w-full max-w-md">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-white">Create Folder</h3>
+            <h3 className="text-xl font-bold text-[#CFCFF6]">Create Folder</h3>
             <button 
               onClick={onClose} 
               disabled={isSubmitting}
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors duration-200 disabled:opacity-50"
+              className="p-2 rounded-lg text-[#CFCFF6]/60 hover:text-white hover:bg-[#1A1C3A]/60 transition-colors duration-200 disabled:opacity-50"
             >
               <X className="w-5 h-5" />
             </button>
@@ -154,7 +154,7 @@ const CreateFolderModal: React.FC<{
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">
+              <label className="block text-sm font-medium text-[#CFCFF6]/70 mb-2">
                 <Icon Icon={RiFolder3Line} size={IconSizes.small} color={IconColors.muted} className="inline mr-1" />
                 Folder Name
               </label>
@@ -166,7 +166,7 @@ const CreateFolderModal: React.FC<{
                   setError(null); // Clear error when user types
                 }}
                 placeholder="Enter folder name..."
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50"
                 autoFocus
                 disabled={isSubmitting}
                 maxLength={50}
@@ -176,9 +176,9 @@ const CreateFolderModal: React.FC<{
               )}
             </div>
 
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-[#CFCFF6]/60">
               <p>Creating folder in:</p>
-              <p className="font-medium text-slate-300">
+              <p className="font-medium text-[#CFCFF6]">
                 {currentProject?.name}
                 {currentFolder && ` > ${currentFolder.path}`}
                 {!currentFolder && ' > Root'}
@@ -189,7 +189,7 @@ const CreateFolderModal: React.FC<{
               <button
                 type="submit"
                 disabled={!name.trim() || isSubmitting}
-                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors duration-200"
+                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
@@ -207,7 +207,7 @@ const CreateFolderModal: React.FC<{
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white rounded-lg font-medium transition-colors duration-200"
+                className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -332,13 +332,19 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
   const createFolder = async (folderData: any) => {
     try {
+      // Calculate the path based on parent folder
+      let path = folderData.name;
+      if (currentFolder?.path) {
+        path = `${currentFolder.path}/${folderData.name}`;
+      }
       
       const { data, error } = await supabase
         .from('folders')
         .insert([{
           name: folderData.name,
           project_id: project.id,
-          parent_id: currentFolder?.id || null
+          parent_id: currentFolder?.id || null,
+          path: path
         }])
         .select()
         .single();
