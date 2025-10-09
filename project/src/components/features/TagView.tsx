@@ -676,33 +676,33 @@ const TagView: React.FC<TagViewProps> = ({
               </div>
             </div>
           ) : (
-            <motion.div 
-              className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible"
-              initial="hidden"
-              animate="visible"
+        <motion.div 
+          className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 md:gap-5 gap-y-16 items-start overflow-visible"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            visible: {
+              transition: {
+                staggerChildren: 0.03
+              }
+            }
+          }}
+        >
+          {taggedFiles.map((file) => (
+            <motion.div
+              key={file.id}
               variants={{
-                visible: {
+                hidden: { opacity: 0, scale: 0.9 },
+                visible: { 
+                  opacity: 1, 
+                  scale: 1,
                   transition: {
-                    staggerChildren: 0.04
+                    duration: 0.15,
+                    ease: "easeOut"
                   }
                 }
               }}
             >
-              {taggedFiles.map((file) => (
-                <motion.div
-                  key={file.id}
-                  variants={{
-                    hidden: { opacity: 0, y: 8 },
-                    visible: { 
-                      opacity: 1, 
-                      y: 0,
-                      transition: {
-                        duration: 0.18,
-                        ease: [0.16, 1, 0.3, 1]
-                      }
-                    }
-                  }}
-                >
                   <FileCard
                     file={file}
                     onToggleFavorite={toggleFavorite}

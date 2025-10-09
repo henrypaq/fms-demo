@@ -1321,7 +1321,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
             variants={{
               visible: {
                 transition: {
-                  staggerChildren: 0.04
+                  staggerChildren: 0.03
                 }
               }
             }}
@@ -1330,13 +1330,13 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
               <motion.div
                 key={folder.id}
                 variants={{
-                  hidden: { opacity: 0, y: 8 },
+                  hidden: { opacity: 0, scale: 0.9 },
                   visible: { 
                     opacity: 1, 
-                    y: 0,
+                    scale: 1,
                     transition: {
-                      duration: 0.18,
-                      ease: [0.16, 1, 0.3, 1]
+                      duration: 0.15,
+                      ease: "easeOut"
                     }
                   }
                 }}
@@ -1423,7 +1423,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
           variants={{
             visible: {
               transition: {
-                staggerChildren: 0.04
+                staggerChildren: 0.03
               }
             }
           }}
@@ -1432,13 +1432,13 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
             <motion.div
               key={file.id}
               variants={{
-                hidden: { opacity: 0, y: 8 },
+                hidden: { opacity: 0, scale: 0.9 },
                 visible: { 
                   opacity: 1, 
-                  y: 0,
+                  scale: 1,
                   transition: {
-                    duration: 0.18,
-                    ease: [0.16, 1, 0.3, 1]
+                    duration: 0.15,
+                    ease: "easeOut"
                   }
                 }
               }}

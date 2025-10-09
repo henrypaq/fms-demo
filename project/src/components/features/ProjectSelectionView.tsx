@@ -440,7 +440,7 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
           variants={{
             visible: {
               transition: {
-                staggerChildren: 0.05
+                staggerChildren: 0.03
               }
             }
           }}
@@ -450,13 +450,13 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
             <motion.div
               key={project.id}
               variants={{
-                hidden: { opacity: 0, y: 8 },
+                hidden: { opacity: 0, scale: 0.9 },
                 visible: { 
                   opacity: 1, 
-                  y: 0,
+                  scale: 1,
                   transition: {
-                    duration: 0.18,
-                    ease: [0.16, 1, 0.3, 1]
+                    duration: 0.15,
+                    ease: "easeOut"
                   }
                 }
               }}
@@ -558,13 +558,13 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
           {/* Add New Project Card */}
           <motion.div
             variants={{
-              hidden: { opacity: 0, y: 8 },
+              hidden: { opacity: 0, scale: 0.9 },
               visible: { 
                 opacity: 1, 
-                y: 0,
+                scale: 1,
                 transition: {
-                  duration: 0.18,
-                  ease: [0.16, 1, 0.3, 1]
+                  duration: 0.15,
+                  ease: "easeOut"
                 }
               }
             }}
