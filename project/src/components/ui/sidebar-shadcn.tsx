@@ -1,18 +1,37 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { PanelLeft, PanelLeftClose } from "lucide-react"
 
-// Custom workspace logo component
-const WorkspaceLogo = () => (
-  <div className="w-full h-full relative overflow-hidden rounded-md bg-white">
-    <img 
-      src="/workspace-logo.png" 
-      alt="Workspace Logo" 
-      className="w-full h-full object-cover rounded-md"
-    />
-  </div>
-)
+// Custom workspace logo component with hover state
+const WorkspaceLogo = () => {
+  const [isHovered, setIsHovered] = React.useState(false);
+  
+  return (
+    <div 
+      className="w-full h-full relative overflow-hidden rounded-md transition-all duration-200"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        backgroundColor: isHovered ? 'hsl(240, 30%, 12%)' : 'white'
+      }}
+    >
+      {/* Logo - fade out on hover */}
+      <div className={`absolute inset-0 transition-opacity duration-200 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
+        <img 
+          src="/workspace-logo.png" 
+          alt="Workspace Logo" 
+          className="w-full h-full object-cover rounded-md"
+        />
+      </div>
+      
+      {/* Collapse icon - fade in on hover */}
+      <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+        <PanelLeftClose className="w-5 h-5 text-[#CFCFF6]" />
+      </div>
+    </div>
+  );
+};
 
 import { useIsMobile } from "../../hooks/use-mobile"
 import { cn } from "../../lib/utils"
@@ -285,21 +304,33 @@ const SidebarTrigger = React.forwardRef<
   const { toggleSidebar } = useSidebar()
 
   return (
-    <Button
-      ref={ref}
-      data-sidebar="trigger"
-      variant="ghost"
-      size="icon"
-      className={cn("h-10 w-10 p-0 overflow-hidden", className)}
-      onClick={(event) => {
-        onClick?.(event)
-        toggleSidebar()
-      }}
-      {...props}
-    >
-      <WorkspaceLogo />
-      <span className="sr-only">Toggle Sidebar</span>
-    </Button>
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            ref={ref}
+            data-sidebar="trigger"
+            variant="ghost"
+            size="icon"
+            className={cn("h-10 w-10 p-0 overflow-hidden", className)}
+            onClick={(event) => {
+              onClick?.(event)
+              toggleSidebar()
+            }}
+            {...props}
+          >
+            <WorkspaceLogo />
+            <span className="sr-only">Toggle Sidebar</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent 
+          side="right" 
+          className="bg-[#1A1C3A] border border-[#2A2C45] text-[#CFCFF6] text-xs px-2 py-1"
+        >
+          Toggle sidebar
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 })
 SidebarTrigger.displayName = "SidebarTrigger"
