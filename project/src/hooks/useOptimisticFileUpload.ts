@@ -357,21 +357,33 @@ export const useOptimisticFileUpload = () => {
         throw new Error('No workspace selected');
       }
 
-      // Check file size - allow up to 100MB for all files
-      const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB in bytes for all files
+      // Check file size - allow up to 10GB for all files
+      const MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024; // 10GB in bytes
+      const N8N_MAX_SIZE = 100 * 1024 * 1024; // 100MB limit for n8n auto-tagging
       
       const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-      const limitMB = (MAX_FILE_SIZE / (1024 * 1024)).toFixed(0);
+      const sizeGB = (file.size / (1024 * 1024 * 1024)).toFixed(2);
+      const displaySize = file.size > 1024 * 1024 * 1024 ? `${sizeGB}GB` : `${sizeMB}MB`;
       
       if (file.size > MAX_FILE_SIZE) {
         throw new Error(
-          `File too large: ${sizeMB}MB exceeds the ${limitMB}MB limit. ` +
-          `Please compress the file or use a smaller version. ` +
-          `If you need larger uploads, increase the Supabase storage limit.`
+          `File too large: ${displaySize} exceeds the 10GB limit. ` +
+          `Please compress the file or use a smaller version.`
         );
       }
 
-      console.log(`📊 File size check: ${sizeMB}MB (limit: ${limitMB}MB) ✅`);
+      // Check if file is too large for n8n auto-tagging
+      const skipN8N = autoTagging && file.size > N8N_MAX_SIZE;
+      if (skipN8N) {
+        console.log(`⚠️ File size (${displaySize}) exceeds n8n limit (100MB). Will upload without auto-tagging.`);
+        addToast({
+          type: 'info',
+          title: 'Large File Upload',
+          description: `${file.name} (${displaySize}) is too large for auto-tagging. Uploading without tags.`,
+        });
+      }
+
+      console.log(`📊 File size check: ${displaySize} (limit: 10GB) ✅`);
 
       // Generate unique file path
       const fileExt = file.name.split('.').pop() || 'bin';
@@ -472,8 +484,11 @@ export const useOptimisticFileUpload = () => {
       // Remove optimistic file by matching the file name
       setOptimisticFiles(prev => prev.filter(f => f.name !== context.fileName));
       
-      // Send to n8n webhook for auto-tagging
-      if (variables.autoTagging !== false) {
+      // Send to n8n webhook for auto-tagging (only if file is under 100MB)
+      const N8N_MAX_SIZE = 100 * 1024 * 1024; // 100MB limit for n8n
+      const skipN8N = variables.file.size > N8N_MAX_SIZE;
+      
+      if (variables.autoTagging !== false && !skipN8N) {
         await sendToN8nWebhook(data, variables.autoTagging ?? true);
       }
       
@@ -486,10 +501,16 @@ export const useOptimisticFileUpload = () => {
         window.dispatchEvent(new CustomEvent('filesUpdated'));
       }
       
+      const sizeDisplay = variables.file.size > 1024 * 1024 * 1024 
+        ? `${(variables.file.size / (1024 * 1024 * 1024)).toFixed(2)}GB`
+        : `${(variables.file.size / (1024 * 1024)).toFixed(2)}MB`;
+      
       addToast({
         type: 'success',
         title: 'Upload Complete',
-        description: `${variables.file.name} has been uploaded ${variables.autoTagging !== false ? 'and sent for auto-tagging' : 'successfully'}.`,
+        description: skipN8N 
+          ? `${variables.file.name} (${sizeDisplay}) uploaded successfully. Too large for auto-tagging.`
+          : `${variables.file.name} has been uploaded ${variables.autoTagging !== false ? 'and sent for auto-tagging' : 'successfully'}.`,
       });
     },
     onError: (error, variables, context) => {
@@ -505,17 +526,18 @@ export const useOptimisticFileUpload = () => {
   });
 
   const uploadFile = useCallback((params: UploadFileParams) => {
-    // Validate file size before upload - allow up to 100MB for all files
-    const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB for all files
+    // Validate file size before upload - allow up to 10GB for all files
+    const MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024; // 10GB for all files
     
     const sizeMB = (params.file.size / (1024 * 1024)).toFixed(2);
-    const limitMB = (MAX_FILE_SIZE / (1024 * 1024)).toFixed(0);
+    const sizeGB = (params.file.size / (1024 * 1024 * 1024)).toFixed(2);
+    const displaySize = params.file.size > 1024 * 1024 * 1024 ? `${sizeGB}GB` : `${sizeMB}MB`;
     
     if (params.file.size > MAX_FILE_SIZE) {
       addToast({
         type: 'error',
         title: 'File Too Large',
-        description: `${params.file.name} (${sizeMB}MB) exceeds the ${limitMB}MB limit. Please compress or use a smaller file.`,
+        description: `${params.file.name} (${displaySize}) exceeds the 10GB limit. Please compress or use a smaller file.`,
       });
       return;
     }

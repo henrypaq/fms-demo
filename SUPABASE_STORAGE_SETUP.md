@@ -1,7 +1,12 @@
-# Supabase Storage Configuration for 100MB File Uploads
+# Supabase Storage Configuration for Large File Uploads
+
+## Current Setup
+The platform now supports uploads up to **10GB** with smart n8n integration:
+- Files up to 100MB: Auto-tagged via n8n
+- Files 100MB-10GB: Uploaded without auto-tagging (shows notification)
 
 ## Problem
-Supabase Storage has default file size limits that need to be increased to allow 100MB uploads.
+Supabase Storage has default file size limits that need to be increased.
 
 ## Solution: Update Storage Bucket Settings
 
@@ -18,6 +23,12 @@ Supabase Storage has default file size limits that need to be increased to allow
 ### Step 3: Configure File Size Limit
 In the bucket settings, update:
 
+**For 10GB Support (Recommended):**
+- **File size limit**: Set to **10 GB** (or `10737418240` bytes)
+- **Allowed MIME types**: Leave as `*/*` (allows all file types)
+- **Public bucket**: Should be **enabled** ✅
+
+**For 100MB Support (Basic):**
 - **File size limit**: Set to **100 MB** (or `104857600` bytes)
 - **Allowed MIME types**: Leave as `*/*` (allows all file types)
 - **Public bucket**: Should be **enabled** ✅
@@ -30,6 +41,29 @@ Click **Save**
 
 If you prefer SQL, run this in the Supabase SQL Editor:
 
+**For 10GB Support (Recommended):**
+```sql
+-- Update the storage bucket size limit to 10GB
+UPDATE storage.buckets
+SET file_size_limit = 10737418240  -- 10GB in bytes
+WHERE id = 'files';
+
+-- Verify the change
+SELECT id, name, file_size_limit, 
+       file_size_limit / 1024 / 1024 / 1024 as size_limit_gb,
+       public
+FROM storage.buckets
+WHERE id = 'files';
+```
+
+Expected result:
+```
+id    | name  | file_size_limit | size_limit_gb | public
+------|-------|-----------------|---------------|--------
+files | files | 10737418240     | 10.0          | true
+```
+
+**For 100MB Support (Basic):**
 ```sql
 -- Update the storage bucket size limit to 100MB
 UPDATE storage.buckets
