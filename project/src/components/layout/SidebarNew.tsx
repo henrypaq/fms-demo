@@ -1,7 +1,9 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { 
   User,
-  Star
+  Star,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { 
   RiHome3Line, 
@@ -59,6 +61,29 @@ const SidebarNew: React.FC<SidebarNewProps> = ({
 }) => {
   const { currentWorkspace } = useWorkspace();
   const { uploads } = useUploads();
+  
+  // Theme state
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    return saved !== 'light'; // Default to dark mode
+  });
+  
+  // Apply theme on mount and when it changes
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove('light');
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
+  
+  const toggleTheme = () => {
+    setIsDarkMode(prev => !prev);
+  };
   
   // Count active uploads
   const activeUploads = uploads.filter(upload => upload.status === 'uploading' || upload.status === 'paused');
@@ -232,6 +257,41 @@ const SidebarNew: React.FC<SidebarNewProps> = ({
       </SidebarContent>
 
         <SidebarFooter className="border-t border-border">
+          {/* Theme Toggle Button */}
+          <div className="px-2 py-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={toggleTheme}
+                    className={`
+                      w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+                      text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[hsl(240,30%,8%)]/50
+                      transition-all duration-150
+                      ${isCollapsed ? 'justify-center' : ''}
+                    `}
+                  >
+                    {isDarkMode ? (
+                      <Moon className={`${isCollapsed ? 'w-5 h-5' : 'w-4 h-4'} flex-shrink-0`} />
+                    ) : (
+                      <Sun className={`${isCollapsed ? 'w-5 h-5' : 'w-4 h-4'} flex-shrink-0`} />
+                    )}
+                    {!isCollapsed && (
+                      <span className="text-sm font-medium">
+                        {isDarkMode ? 'Dark Mode' : 'Light Mode'}
+                      </span>
+                    )}
+                  </button>
+                </TooltipTrigger>
+                {isCollapsed && (
+                  <TooltipContent side="right" className="bg-[#1A1C3A] border border-[#2A2C45] text-[#CFCFF6] text-xs px-2 py-1">
+                    {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          
           <AccountSwitcher 
             currentRole={userRole} 
             onAdminDashboard={onViewChange ? () => onViewChange('admin') : undefined}
