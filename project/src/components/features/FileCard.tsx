@@ -457,8 +457,8 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
             />
           ) : null}
           
-          {/* Fallback gradient + icon when no thumbnail */}
-          <div className={`flex items-center justify-center w-full h-full bg-gradient-to-br from-[#2A2C45] to-[#080A15] ${getThumbnailUrl() ? 'hidden' : 'flex'}`}>
+          {/* Fallback solid background + icon when no thumbnail */}
+          <div className={`flex items-center justify-center w-full h-full bg-[#080A15] ${getThumbnailUrl() ? 'hidden' : 'flex'}`}>
             <div className="w-8 h-8 text-[#6049E3] opacity-80">
               {getFileIcon(file.type)}
             </div>
@@ -660,7 +660,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
               {displayTags.length > 4 && (
                 <>
                   {/* Fade overlay */}
-                  <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#1A1C3A] to-transparent pointer-events-none" />
+                  <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#080A15] to-transparent pointer-events-none" />
                   {/* More indicator */}
                   <span className="text-xs text-[#8A8C8E] hover:text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[#080A15]/80 backdrop-blur-sm border border-[#2A2C45] transition-colors flex items-center gap-1 relative z-10">
                     ···
