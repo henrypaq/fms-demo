@@ -64,7 +64,7 @@ const CreateProjectModal: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4">
-      <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md">
+      <div className="bg-[#111111]/90 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-md">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-[#CFCFF6]">Create Project</h3>
@@ -81,7 +81,7 @@ const CreateProjectModal: React.FC<{
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter project name..."
-                className="w-full px-3 py-2 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50"
+                className="w-full px-3 py-2 bg-[#111111]/40 border border-[#2A2A2A]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#00C28C]/50 focus:border-[#00C28C]/50"
                 autoFocus
                 required
               />
@@ -94,7 +94,7 @@ const CreateProjectModal: React.FC<{
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Project description..."
                 rows={3}
-                className="w-full px-3 py-2 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50 resize-none"
+                className="w-full px-3 py-2 bg-[#111111]/40 border border-[#2A2A2A]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#00C28C]/50 focus:border-[#00C28C]/50 resize-none"
               />
             </div>
 
@@ -124,7 +124,7 @@ const CreateProjectModal: React.FC<{
               <button
                 type="submit"
                 disabled={!name.trim()}
-                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 border-2 border-[#00C28C] bg-[#00C28C]/20 text-[#CFCFF6] hover:bg-[#00C28C]/30 hover:text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4" />
                 <span>Create Project</span>
@@ -132,7 +132,7 @@ const CreateProjectModal: React.FC<{
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200"
+                className="px-4 py-2 bg-[#111111]/60 hover:bg-[#111111] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200"
               >
                 Cancel
               </button>
@@ -182,7 +182,7 @@ const EditProjectModal: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4">
-      <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md">
+      <div className="bg-[#111111]/90 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-md">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-[#CFCFF6]">Edit Project</h3>
@@ -198,7 +198,7 @@ const EditProjectModal: React.FC<{
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter project name..."
-                className="w-full px-3 py-2 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50"
+                className="w-full px-3 py-2 bg-[#111111]/40 border border-[#2A2A2A]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#00C28C]/50 focus:border-[#00C28C]/50"
                 autoFocus
                 required
               />
@@ -210,7 +210,7 @@ const EditProjectModal: React.FC<{
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Project description..."
                 rows={3}
-                className="w-full px-3 py-2 bg-[#1A1C3A]/40 border border-[#2A2C45]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50 resize-none"
+                className="w-full px-3 py-2 bg-[#111111]/40 border border-[#2A2A2A]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#00C28C]/50 focus:border-[#00C28C]/50 resize-none"
               />
             </div>
             <div>
@@ -462,7 +462,7 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
               }}
               className="group transition-all duration-200 ease-out cursor-pointer relative folder-card hover:scale-[1.02] hover:brightness-110"
               style={{
-                background: '#111235',
+                background: '#1C1C1C',
                 maskImage: 'url(/folder-shape.svg)',
                 maskSize: 'cover',
                 maskRepeat: 'no-repeat',
@@ -471,14 +471,14 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
                 WebkitMaskSize: 'cover',
                 WebkitMaskRepeat: 'no-repeat',
                 WebkitMaskPosition: 'center',
-                filter: 'drop-shadow(0 0 0 1px hsl(240, 25%, 15%)) drop-shadow(0 2px 8px rgba(0,0,0,0.35))',
+                filter: 'drop-shadow(0 0 0 1px #2A2A2A) drop-shadow(0 2px 8px rgba(0,0,0,0.35))',
                 transition: 'filter 0.2s ease-out, transform 0.2s ease-out'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.filter = 'drop-shadow(0 0 0 2px #6049E3) drop-shadow(0 6px 16px rgba(96, 73, 227, 0.5))';
+                e.currentTarget.style.filter = 'drop-shadow(0 0 0 2px #00C28C) drop-shadow(0 6px 16px rgba(0, 194, 140, 0.5))';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.filter = 'drop-shadow(0 0 0 1px hsl(240, 25%, 15%)) drop-shadow(0 2px 8px rgba(0,0,0,0.35))';
+                e.currentTarget.style.filter = 'drop-shadow(0 0 0 1px #2A2A2A) drop-shadow(0 2px 8px rgba(0,0,0,0.35))';
               }}
               onClick={(e) => {
                 e.preventDefault();
@@ -571,7 +571,7 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
             onClick={() => setShowCreateProject(true)}
             className="group transition-all duration-200 cursor-pointer flex flex-col items-center justify-center folder-card hover:scale-[1.02]"
             style={{
-              background: '#111235',
+              background: '#1C1C1C',
               maskImage: 'url(/folder-shape.svg)',
               maskSize: 'cover',
               maskRepeat: 'no-repeat',
@@ -580,13 +580,13 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
               WebkitMaskSize: 'cover',
               WebkitMaskRepeat: 'no-repeat',
               WebkitMaskPosition: 'center',
-              filter: 'drop-shadow(0 0 0 2px #6049E3) drop-shadow(0 2px 8px rgba(96, 73, 227, 0.3))'
+              filter: 'drop-shadow(0 0 0 2px #00C28C) drop-shadow(0 2px 8px rgba(0, 194, 140, 0.3))'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.filter = 'drop-shadow(0 0 0 2px #6049E3) drop-shadow(0 4px 12px rgba(96, 73, 227, 0.5))';
+              e.currentTarget.style.filter = 'drop-shadow(0 0 0 2px #00C28C) drop-shadow(0 4px 12px rgba(0, 194, 140, 0.5))';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.filter = 'drop-shadow(0 0 0 2px #6049E3) drop-shadow(0 2px 8px rgba(96, 73, 227, 0.3))';
+              e.currentTarget.style.filter = 'drop-shadow(0 0 0 2px #00C28C) drop-shadow(0 2px 8px rgba(0, 194, 140, 0.3))';
             }}
           >
             <div className="relative w-full h-full flex flex-col">

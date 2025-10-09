@@ -47,7 +47,7 @@ const CustomSheetContent = React.forwardRef<
           duration: 0.3
         }}
         className={cn(
-          "fixed top-0 bottom-0 right-0 z-50 h-full w-[420px] bg-[#1A1C3A] backdrop-blur-md text-[#CFCFF6] border-l border-[#2A2C45]/60 shadow-xl rounded-lg",
+          "fixed top-0 bottom-0 right-0 z-50 h-full w-[420px] bg-[#111111] backdrop-blur-md text-[#CFCFF6] border-l border-[#2A2A2A]/60 shadow-xl rounded-lg",
           className
         )}
         style={{
@@ -266,11 +266,11 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
           >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <SheetHeader className="p-6 pb-4 border-b border-[#1A1C3A] space-y-1">
+          <SheetHeader className="p-6 pb-4 border-b border-[#111111] space-y-1">
             <SheetTitle className="text-white text-xl font-bold flex items-center justify-between">
               <span>Upload Files</span>
               {contextUploads.filter(u => u.status === 'uploading').length > 0 && (
-                <span className="text-xs font-normal text-[#6049E3] bg-[#6049E3]/10 px-2 py-1 rounded-md border border-[#6049E3]/30 flex items-center space-x-1">
+                <span className="text-xs font-normal text-[#00C28C] bg-[#00C28C]/10 px-2 py-1 rounded-md border border-[#00C28C]/30 flex items-center space-x-1">
                   <Loader className="w-3 h-3 animate-spin" />
                   <span>{contextUploads.filter(u => u.status === 'uploading').length} active</span>
                 </span>
@@ -284,7 +284,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
           {/* Content */}
           <div className="flex-1 p-6 space-y-4 overflow-y-auto">
             {/* Auto-tagging Toggle */}
-            <div className="bg-[#1A1C3A]/50 border border-[#1A1C3A] rounded-lg p-4">
+            <div className="bg-[#111111]/50 border border-[#111111] rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-white font-medium text-sm">Auto-tagging</h3>
@@ -298,7 +298,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                     disabled={isUploading}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-[#1A1C3A] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#6049E3]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#6049E3]"></div>
+                  <div className="w-11 h-6 bg-[#111111] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#00C28C]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00C28C]"></div>
                 </label>
               </div>
             </div>
@@ -310,12 +310,12 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
               onDragLeave={handleDragLeave}
               className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${
                 dragActive 
-                  ? 'border-[#6049E3] bg-[#6049E3]/10' 
-                  : 'border-[#1A1C3A] hover:border-[#6049E3]/50'
+                  ? 'border-[#00C28C] bg-[#00C28C]/10' 
+                  : 'border-[#111111] hover:border-[#00C28C]/50'
               }`}
             >
               <Upload className={`w-12 h-12 mx-auto mb-4 ${
-                dragActive ? 'text-[#6049E3]' : 'text-[#CFCFF6]/40'
+                dragActive ? 'text-[#00C28C]' : 'text-[#CFCFF6]/40'
               }`} />
               <p className="text-white font-medium mb-2">
                 {dragActive ? 'Drop files here' : 'Drop files here or click to browse'}
@@ -325,7 +325,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
                 variant="outline"
-                className="border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white hover:border-[#6049E3] transition-all"
+                className="border-2 border-[#00C28C] bg-[#00C28C]/20 text-[#CFCFF6] hover:bg-[#00C28C]/30 hover:text-white hover:border-[#00C28C] transition-all"
               >
                 Choose Files
               </Button>
@@ -352,7 +352,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                 </div>
                 <div className="space-y-2 max-h-40 overflow-y-auto">
                   {selectedFiles.map((file, index) => (
-                    <div key={`${file.name}-${index}`} className="flex items-center justify-between p-3 bg-[#1A1C3A]/50 rounded-lg">
+                    <div key={`${file.name}-${index}`} className="flex items-center justify-between p-3 bg-[#111111]/50 rounded-lg">
                       <div className="flex items-center space-x-3 flex-1 min-w-0">
                         <File className="w-4 h-4 text-[#CFCFF6]/60 flex-shrink-0" />
                         <div className="min-w-0 flex-1">
@@ -365,7 +365,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                         disabled={isUploading}
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 flex-shrink-0 hover:bg-[#1A1C3A]"
+                        className="h-8 w-8 flex-shrink-0 hover:bg-[#111111]"
                       >
                         <X className="w-4 h-4" />
                       </Button>
@@ -389,7 +389,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                 <div className="space-y-3">
                   {/* Show uploads from UploadContext with detailed info */}
                   {contextUploads.map((upload) => (
-                    <div key={upload.id} className="p-3 bg-[#1A1C3A]/50 border border-[#2A2C45]/30 rounded-lg">
+                    <div key={upload.id} className="p-3 bg-[#111111]/50 border border-[#2A2A2A]/30 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2 flex-1 min-w-0">
                           {upload.status === 'completed' ? (
@@ -399,7 +399,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                           ) : upload.status === 'paused' ? (
                             <Clock className="w-4 h-4 text-[#CFCFF6]/60 flex-shrink-0" />
                           ) : (
-                            <Loader className="w-4 h-4 text-[#6049E3] animate-spin flex-shrink-0" />
+                            <Loader className="w-4 h-4 text-[#00C28C] animate-spin flex-shrink-0" />
                           )}
                           <span className="text-white text-sm font-medium truncate">
                             {upload.name}
@@ -409,13 +409,13 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                       </div>
                       
                       {/* Progress bar with smooth animation */}
-                      <div className="w-full bg-[#1A1C3A] rounded-full h-2 mb-2 overflow-hidden">
+                      <div className="w-full bg-[#111111] rounded-full h-2 mb-2 overflow-hidden">
                         <div
                           className={`h-2 rounded-full transition-all duration-500 ease-out ${
                             upload.status === 'failed' ? 'bg-red-500' : 
                             upload.status === 'completed' ? 'bg-green-500' : 
                             upload.status === 'paused' ? 'bg-[#CFCFF6]/40' : 
-                            'bg-gradient-to-r from-[#6049E3] to-[#8b5cf6]'
+                            'bg-gradient-to-r from-[#00C28C] to-[#8b5cf6]'
                           }`}
                           style={{ 
                             width: `${upload.progress}%`,
@@ -465,7 +465,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                   
                   {/* Fallback to old uploads if contextUploads is empty */}
                   {contextUploads.length === 0 && uploads.map((upload) => (
-                    <div key={upload.fileId} className="p-3 bg-[#1A1C3A]/50 border border-[#2A2C45]/30 rounded-lg">
+                    <div key={upload.fileId} className="p-3 bg-[#111111]/50 border border-[#2A2A2A]/30 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2 flex-1 min-w-0">
                           {upload.status === 'complete' ? (
@@ -473,7 +473,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                           ) : upload.status === 'error' ? (
                             <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
                           ) : (
-                            <Loader className="w-4 h-4 text-[#6049E3] animate-spin flex-shrink-0" />
+                            <Loader className="w-4 h-4 text-[#00C28C] animate-spin flex-shrink-0" />
                           )}
                           <span className="text-white text-sm font-medium truncate">
                             {upload.fileName}
@@ -481,12 +481,12 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                         </div>
                         <span className="text-[#CFCFF6]/60 text-xs flex-shrink-0 font-mono">{upload.progress}%</span>
                       </div>
-                      <div className="w-full bg-[#1A1C3A] rounded-full h-2">
+                      <div className="w-full bg-[#111111] rounded-full h-2">
                         <div
                           className={`h-2 rounded-full transition-all duration-300 ${
                             upload.status === 'error' ? 'bg-red-500' : 
                             upload.status === 'complete' ? 'bg-green-500' : 
-                            'bg-gradient-to-r from-[#6049E3] to-[#8b5cf6]'
+                            'bg-gradient-to-r from-[#00C28C] to-[#8b5cf6]'
                           }`}
                           style={{ width: `${upload.progress}%` }}
                         />
@@ -512,9 +512,9 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                   <h3 className="text-white font-medium text-sm">Recent Uploads ({recentUploads.length})</h3>
                 </div>
 
-                <div className="space-y-2 max-h-64 overflow-y-auto border border-[#1A1C3A] rounded-lg p-3 bg-[#1A1C3A]/20">
+                <div className="space-y-2 max-h-64 overflow-y-auto border border-[#111111] rounded-lg p-3 bg-[#111111]/20">
                   {recentUploads.map((file) => (
-                    <div key={file.id} className="p-3 bg-[#1A1C3A]/50 rounded-lg">
+                    <div key={file.id} className="p-3 bg-[#111111]/50 rounded-lg">
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2 mb-2">
@@ -530,7 +530,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                               file.tags.map((tag) => (
                                 <span
                                   key={tag}
-                                  className="inline-flex items-center px-2 py-0.5 bg-[#1A1C3A] text-[#CFCFF6]/80 text-xs rounded-md"
+                                  className="inline-flex items-center px-2 py-0.5 bg-[#111111] text-[#CFCFF6]/80 text-xs rounded-md"
                                 >
                                   {tag}
                                 </span>
@@ -544,7 +544,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                           onClick={() => removeRecentUpload(file.id)}
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 flex-shrink-0 text-[#CFCFF6]/60 hover:text-red-400 hover:bg-[#1A1C3A]"
+                          className="h-8 w-8 flex-shrink-0 text-[#CFCFF6]/60 hover:text-red-400 hover:bg-[#111111]"
                         >
                           <X className="w-4 h-4" />
                         </Button>
@@ -557,11 +557,11 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
           </div>
 
           {/* Footer */}
-          <SheetFooter className="p-6 pt-4 border-t border-[#1A1C3A] flex-row justify-between items-center space-x-0">
+          <SheetFooter className="p-6 pt-4 border-t border-[#111111] flex-row justify-between items-center space-x-0">
             {errorMessage ? (
               <div className="text-red-400 text-sm flex-1">{errorMessage}</div>
             ) : contextUploads.filter(u => u.status === 'uploading').length > 0 ? (
-              <div className="text-[#6049E3] text-sm flex-1 flex items-center space-x-2">
+              <div className="text-[#00C28C] text-sm flex-1 flex items-center space-x-2">
                 <Loader className="w-3 h-3 animate-spin" />
                 <span>
                   {contextUploads.filter(u => u.status === 'uploading').length} file{contextUploads.filter(u => u.status === 'uploading').length !== 1 ? 's' : ''} uploading... 
@@ -573,7 +573,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
               <Button
                 onClick={() => onOpenChange(false)}
                 variant="ghost"
-                className="text-[#CFCFF6] hover:bg-[#1A1C3A]"
+                className="text-[#CFCFF6] hover:bg-[#111111]"
               >
                 {contextUploads.filter(u => u.status === 'uploading').length > 0 ? 'Close' : 'Cancel'}
               </Button>
@@ -582,7 +582,7 @@ const UploadSheet: React.FC<UploadSheetProps> = ({
                   onClick={handleUpload}
                   disabled={isUploading || !currentWorkspace}
                   variant="outline"
-                  className="border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white hover:border-[#6049E3] transition-all flex items-center space-x-2"
+                  className="border-2 border-[#00C28C] bg-[#00C28C]/20 text-[#CFCFF6] hover:bg-[#00C28C]/30 hover:text-white hover:border-[#00C28C] transition-all flex items-center space-x-2"
                 >
                   {isUploading && <Loader className="w-3 h-3 animate-spin" />}
                   <span>

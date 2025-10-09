@@ -27,57 +27,57 @@
   }
 
   :root {
-    /* New Cinematic Theme Color System */
-    --background: 240 30% 4%; /* #080A15 - Darker navy-black with violet hint */
+    /* True Black + Emerald Theme Color System */
+    --background: 0 0% 0%; /* #000000 - Pure black background */
     --foreground: 240 10% 82%; /* #CFCFF6 - Soft lavender for headers and key labels */
-    --card: 240 30% 8%; /* #0C0E1F - Darker navy for panels */
+    --card: 0 0% 7%; /* #111111 - Very dark grey for content boxes */
     --card-foreground: 240 10% 82%; /* #CFCFF6 - Card text */
-    --popover: 240 30% 8%; /* #0C0E1F - Popover background */
+    --popover: 0 0% 7%; /* #111111 - Popover background */
     --popover-foreground: 240 10% 82%; /* #CFCFF6 - Popover text */
-    --primary: 220 85% 45%; /* #1E40AF - Royal blue accent */
+    --primary: 166 100% 39%; /* #00C28C - Emerald green accent */
     --primary-foreground: 0 0% 100%; /* #FFFFFF - White for primary text */
-    --secondary: 240 30% 8%; /* #0C0E1F - Secondary background */
+    --secondary: 0 0% 7%; /* #111111 - Secondary background */
     --secondary-foreground: 240 10% 82%; /* #CFCFF6 - Secondary text */
-    --muted: 240 30% 8%; /* #0C0E1F - Muted background */
+    --muted: 0 0% 7%; /* #111111 - Muted background */
     --muted-foreground: 0 0% 54%; /* #8A8C8E - Soft gray for inactive text and icons */
-    --accent: 240 30% 8%; /* #0C0E1F - Accent background */
+    --accent: 0 0% 11%; /* #1C1C1C - Accent background (slightly lighter than card) */
     --accent-foreground: 240 10% 82%; /* #CFCFF6 - Accent text */
     --destructive: 0 84% 60%; /* #EF4444 - Error/destructive */
     --destructive-foreground: 0 0% 100%; /* #FFFFFF - Destructive text */
-    --border: 240 25% 15%; /* #1F2138 - Slight separation borders */
-    --input: 240 30% 8%; /* #0C0E1F - Input background */
-    --ring: 220 85% 45%; /* #1E40AF - Focus ring using royal blue */
+    --border: 0 0% 16%; /* #2A2A2A - Subtle separation borders */
+    --input: 0 0% 7%; /* #111111 - Input background */
+    --ring: 166 100% 39%; /* #00C28C - Focus ring using emerald */
     --radius: 0.5rem; /* Border radius for rounded corners */
     
     /* Additional tokens for highlights and secondary text */
     --highlight: 0 0% 100%; /* #FFFFFF - Crisp white for clarity and hierarchy */
     --active-foreground: 0 0% 100%; /* #FFFFFF - White for active/selected items */
-    --surface: 240 30% 8%; /* #0C0E1F - Content areas (top bar + main workspace panels) */
-    --card-light: 240 30% 10%; /* #12142A - Lighter navy for cards and interactive elements */
+    --surface: 0 0% 7%; /* #111111 - Content areas (top bar + main workspace panels) */
+    --card-light: 0 0% 11%; /* #1C1C1C - Lighter grey for cards and interactive elements */
     
-    /* Sidebar Navy Colors */
-    --sidebar-background: 240 30% 4%; /* #080A15 - Darker navy-black sidebar */
-    --sidebar-foreground: 240 10% 90%; /* #E4E5F1 - Soft off-white text */
-    --sidebar-primary: 220 85% 45%; /* #1E40AF - Royal blue primary */
+    /* Sidebar Black Colors */
+    --sidebar-background: 0 0% 0%; /* #000000 - Pure black sidebar */
+    --sidebar-foreground: 0 0% 90%; /* #E6E6E6 - Soft off-white text */
+    --sidebar-primary: 166 100% 39%; /* #00C28C - Emerald green primary */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - White text on primary */
-    --sidebar-accent: 240 30% 8%; /* #0C0E1F - Accent background */
-    --sidebar-accent-foreground: 240 10% 90%; /* #E4E5F1 - Accent text */
-    --sidebar-border: 240 25% 15%; /* #1F2138 - Border color */
-    --sidebar-ring: 220 85% 45%; /* #1E40AF - Focus ring */
+    --sidebar-accent: 0 0% 11%; /* #1C1C1C - Accent background */
+    --sidebar-accent-foreground: 0 0% 90%; /* #E6E6E6 - Accent text */
+    --sidebar-border: 0 0% 13%; /* #222222 - Border color */
+    --sidebar-ring: 166 100% 39%; /* #00C28C - Focus ring */
     
     /* Sidebar Width Variables */
     --sidebar-width: 16rem; /* 256px - Expanded width */
     --sidebar-width-icon: 5rem; /* 80px - Collapsed width */
   }
   .dark {
-    --sidebar-background: 240 30% 4%; /* #080A15 - Darker navy-black sidebar */
-    --sidebar-foreground: 240 10% 90%; /* #E4E5F1 - Soft off-white text */
-    --sidebar-primary: 220 85% 45%; /* #1E40AF - Royal blue primary */
+    --sidebar-background: 0 0% 0%; /* #000000 - Pure black sidebar */
+    --sidebar-foreground: 0 0% 90%; /* #E6E6E6 - Soft off-white text */
+    --sidebar-primary: 166 100% 39%; /* #00C28C - Emerald green primary */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - White text on primary */
-    --sidebar-accent: 240 30% 8%; /* #0C0E1F - Accent background */
-    --sidebar-accent-foreground: 240 10% 90%; /* #E4E5F1 - Accent text */
-    --sidebar-border: 240 25% 15%; /* #1F2138 - Border color */
-    --sidebar-ring: 220 85% 45%; /* #1E40AF - Focus ring */
+    --sidebar-accent: 0 0% 11%; /* #1C1C1C - Accent background */
+    --sidebar-accent-foreground: 0 0% 90%; /* #E6E6E6 - Accent text */
+    --sidebar-border: 0 0% 13%; /* #222222 - Border color */
+    --sidebar-ring: 166 100% 39%; /* #00C28C - Focus ring */
   }
 }
 
@@ -367,7 +367,7 @@
 
 /* Sidebar color change when upload sheet is open - matches upload sheet */
 .upload-sheet-open [data-sidebar="sidebar"] {
-  background-color: #1A1C3A !important;
+  background-color: #111111 !important;
 }
 
 /* Add dark gutter between sidebar and upload sheet when open */
