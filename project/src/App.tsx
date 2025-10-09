@@ -642,10 +642,10 @@ function AppContentWithWorkspace({
                       variant="outline"
                       size="sm"
                       type="button"
-                      className="gap-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-white hover:bg-[#6049E3]/30 hover:text-white hover:border-[#6049E3] transition-all"
+                      className="gap-2 border-2 border-[#6049E3] bg-[#6049E3]/20 !text-white hover:bg-[#6049E3]/30 hover:!text-white hover:border-[#6049E3] transition-all"
                     >
                       {ctaConfig.icon}
-                      <span className="hidden sm:inline">{ctaConfig.label}</span>
+                      <span className="hidden sm:inline !text-white">{ctaConfig.label}</span>
                     </Button>
                   );
                 })()}
