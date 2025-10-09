@@ -17,6 +17,8 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const [autoTaggingEnabled, setAutoTaggingEnabled] = useState(true);
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
   const { currentWorkspace } = useWorkspace();
   const { uploadFiles, isUploading } = useFileUpload();
 
@@ -54,21 +56,52 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
     if (!currentWorkspace || selectedFiles.length === 0) return;
 
     try {
-      // uploadFiles signature: (files, manualTags, autoTaggingEnabled, projectId, folderId)
-      // Always enable auto-tagging (3rd parameter = true)
-      console.log('📤 [UploadModal] Uploading to:', { projectId, folderId });
-      await uploadFiles(selectedFiles, [], true, projectId || undefined, folderId || undefined);
-      setSelectedFiles([]);
+      // Initialize progress for each file
+      const progressMap: Record<string, number> = {};
+      selectedFiles.forEach((file, index) => {
+        progressMap[`file-${index}`] = 0;
+      });
+      setUploadProgress(progressMap);
+
+      // Simulate progress animation (since we don't have real progress from uploadFiles)
+      selectedFiles.forEach((file, index) => {
+        const key = `file-${index}`;
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += Math.random() * 15;
+          if (progress >= 95) {
+            progress = 95;
+            clearInterval(interval);
+          }
+          setUploadProgress(prev => ({ ...prev, [key]: Math.min(progress, 95) }));
+        }, 300);
+      });
+
+      console.log('📤 [UploadModal] Uploading to:', { projectId, folderId, autoTaggingEnabled });
+      await uploadFiles(selectedFiles, [], autoTaggingEnabled, projectId || undefined, folderId || undefined);
       
-      // Call completion callback to refresh file list
-      if (onUploadComplete) {
-        console.log('📢 [UploadModal] Calling onUploadComplete callback');
-        onUploadComplete();
-      }
+      // Complete progress
+      const completeProgressMap: Record<string, number> = {};
+      selectedFiles.forEach((file, index) => {
+        completeProgressMap[`file-${index}`] = 100;
+      });
+      setUploadProgress(completeProgressMap);
       
-      onClose();
+      setTimeout(() => {
+        setSelectedFiles([]);
+        setUploadProgress({});
+        
+        // Call completion callback to refresh file list
+        if (onUploadComplete) {
+          console.log('📢 [UploadModal] Calling onUploadComplete callback');
+          onUploadComplete();
+        }
+        
+        onClose();
+      }, 500);
     } catch (error) {
       console.error('Upload failed:', error);
+      setUploadProgress({});
     }
   };
 
@@ -155,42 +188,96 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
             />
           </div>
 
+          {/* Auto-Tagging Toggle */}
+          <div className="mt-6 flex items-center justify-between p-3 bg-[#1A1C3A]/40 rounded-lg border border-[#2A2C45]/40">
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-[#CFCFF6]">Auto-Tagging</span>
+              <span className="text-xs text-[#CFCFF6]/60">Automatically tag files using AI</span>
+            </div>
+            <button
+              onClick={() => setAutoTaggingEnabled(!autoTaggingEnabled)}
+              disabled={isUploading}
+              className={`
+                relative w-11 h-6 rounded-full transition-colors duration-200
+                ${autoTaggingEnabled ? 'bg-[#6049E3]' : 'bg-[#2A2C45]'}
+                ${isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+              `}
+            >
+              <span
+                className={`
+                  absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform duration-200
+                  ${autoTaggingEnabled ? 'translate-x-5' : 'translate-x-0'}
+                `}
+              />
+            </button>
+          </div>
+
           {/* Selected Files List */}
           {selectedFiles.length > 0 && (
             <div className="mt-6">
               <h4 className="text-sm font-medium text-[#CFCFF6]/70 mb-3">
                 Selected Files ({selectedFiles.length})
               </h4>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {selectedFiles.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-[#1A1C3A]/40 rounded-lg border border-[#2A2C45]/40"
-                  >
-                    <div className="flex items-center space-x-3 flex-1 min-w-0">
-                      <File className="w-5 h-5 text-[#6049E3] flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#CFCFF6] truncate">
-                          {file.name}
-                        </p>
-                        <p className="text-xs text-[#CFCFF6]/60">
-                          {formatFileSize(file.size)}
-                        </p>
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {selectedFiles.map((file, index) => {
+                  const progress = uploadProgress[`file-${index}`] || 0;
+                  const isComplete = progress === 100;
+                  
+                  return (
+                    <div
+                      key={index}
+                      className="bg-[#1A1C3A]/40 rounded-lg border border-[#2A2C45]/40 overflow-hidden"
+                    >
+                      <div className="flex items-center justify-between p-3">
+                        <div className="flex items-center space-x-3 flex-1 min-w-0">
+                          <File className={`w-5 h-5 flex-shrink-0 ${
+                            isComplete ? 'text-green-400' : 'text-[#6049E3]'
+                          }`} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-[#CFCFF6] truncate">
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-[#CFCFF6]/60">
+                              {formatFileSize(file.size)}
+                            </p>
+                          </div>
+                        </div>
+                        {!isUploading && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeFile(index);
+                            }}
+                            className="ml-3 p-1 hover:bg-red-500/20 rounded text-red-400 hover:text-red-300 transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
+                      
+                      {/* Progress Bar */}
+                      {isUploading && (
+                        <div className="px-3 pb-3">
+                          <div className="w-full h-1.5 bg-[#1A1C3A] rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${progress}%` }}
+                              transition={{ duration: 0.3, ease: "easeOut" }}
+                              className={`h-full ${
+                                isComplete 
+                                  ? 'bg-green-500' 
+                                  : 'bg-gradient-to-r from-[#6049E3] to-[#8b5cf6]'
+                              }`}
+                            />
+                          </div>
+                          <p className="text-xs text-[#CFCFF6]/60 mt-1">
+                            {isComplete ? 'Complete' : `${Math.round(progress)}%`}
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    {!isUploading && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeFile(index);
-                        }}
-                        className="ml-3 p-1 hover:bg-red-500/20 rounded text-red-400 hover:text-red-300 transition-colors"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
