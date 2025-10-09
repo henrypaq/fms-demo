@@ -104,6 +104,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
   const [showTagsEdit, setShowTagsEdit] = useState(false);
   const [editedTags, setEditedTags] = useState<string[]>(file.tags || []);
   const [showExpandedTags, setShowExpandedTags] = useState(false);
+  const [videoScrubPosition, setVideoScrubPosition] = useState<number | null>(null);
   
   // Ref to store click timeout for double-click detection
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -297,6 +298,19 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
   const displayTags = file.tags && file.tags.length > 0 ? file.tags : [];
   const currentSelected = isSelected || internalSelected;
 
+  // Video scrubbing handlers - optimized for performance
+  const handleVideoMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (file.type !== 'video') return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = (x / rect.width) * 100;
+    setVideoScrubPosition(Math.max(0, Math.min(100, percentage)));
+  }, [file.type]);
+
+  const handleVideoMouseLeave = useCallback(() => {
+    setVideoScrubPosition(null);
+  }, []);
+
   return (
     <>
       {/* Full-screen dimmed overlay when tags are expanded - covers EVERYTHING */}
@@ -339,7 +353,11 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
         {/* Image container with overlay title - takes most space */}
         <div className="flex-1 relative">
           {/* Thumbnail/Image Area */}
-          <div className="absolute inset-0 w-full h-full overflow-hidden">
+          <div 
+            className="absolute inset-0 w-full h-full overflow-hidden"
+            onMouseMove={handleVideoMouseMove}
+            onMouseLeave={handleVideoMouseLeave}
+          >
           {getThumbnailUrl() ? (
             <img
               src={getThumbnailUrl()!}
@@ -371,6 +389,22 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
               <div className="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-sm">
                 <Icon Icon={RiVideoLine} size={IconSizes.medium} color="#ffffff" className="w-6 h-6" />
               </div>
+            </div>
+          )}
+
+          {/* Video scrubbing bar - cranberry colored */}
+          {file.type === 'video' && videoScrubPosition !== null && (
+            <div 
+              className="absolute top-0 bottom-0 w-0.5 bg-[#DC143C] pointer-events-none z-10"
+              style={{ 
+                left: `${videoScrubPosition}%`,
+                transform: 'translateX(-50%)',
+                boxShadow: '0 0 8px rgba(220, 20, 60, 0.6), 0 0 4px rgba(220, 20, 60, 0.8)',
+                willChange: 'left'
+              }}
+            >
+              {/* Glow effect */}
+              <div className="absolute inset-0 w-full bg-[#DC143C] blur-sm opacity-50" />
             </div>
           )}
 
