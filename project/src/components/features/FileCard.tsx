@@ -308,7 +308,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
         />
       )}
       
-      <div className={`relative flex flex-col ${className} ${showExpandedTags ? 'z-[210]' : 'z-0'}`}>
+      <div className={`relative flex flex-col ${className} ${showExpandedTags ? 'z-[210]' : currentSelected ? 'z-[5]' : 'z-0'}`}>
       
       <Card 
         className={`
@@ -327,7 +327,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           transition-all duration-150 ease-out
           cursor-pointer group
           flex flex-col
-          relative ${showExpandedTags ? 'z-[210]' : 'z-0'}
+          relative ${showExpandedTags ? 'z-[210]' : currentSelected ? 'z-[5]' : 'z-0'}
           ${currentSelected && !showExpandedTags
             ? 'shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(96,73,227,0.4)]' 
             : !showExpandedTags ? 'hover:scale-[1.02] hover:shadow-[0_0_0_2px_#6049E3,0_8px_24px_rgba(0,0,0,0.5)]' : ''
