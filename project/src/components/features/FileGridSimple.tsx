@@ -117,10 +117,10 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
       >
         {/* List View */}
         {viewMode === 'list' ? (
-          <div className="bg-[#000000] border border-[#2A2A2A] rounded-xl overflow-hidden">
+          <div className="bg-[#080A15] border border-[#2A2C45] rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-[#1C1C1C]">
+                <thead className="bg-[#111235]">
                   <tr>
                     <th className="px-4 py-3 text-left w-12">
                       <span className="text-xs font-medium text-[#CFCFF6]/70 uppercase tracking-wider">Select</span>
@@ -145,12 +145,12 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2A2A2A]">
+                <tbody className="divide-y divide-[#2A2C45]">
                   {files.map((file) => (
                     <tr
                       key={file.id}
-                      className={`hover:bg-[#1C1C1C] transition-colors duration-200 ${
-                        selectedFiles.has(file.id) ? 'bg-[#4338CA]/10' : 'cursor-pointer'
+                      className={`hover:bg-[#111235] transition-colors duration-200 ${
+                        selectedFiles.has(file.id) ? 'bg-[#6049E3]/10' : 'cursor-pointer'
                       }`}
                       onClick={() => onFileClick?.(file)}
                       onDoubleClick={() => onFileDoubleClick?.(file)}
@@ -174,7 +174,7 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
                               setInternalSelectedFiles(newSelection);
                             }
                           }}
-                          className="w-4 h-4 rounded border-2 border-[#4338CA]/50 bg-[hsl(240,30%,5%)] checked:bg-[#4338CA] checked:border-[#4338CA] cursor-pointer"
+                          className="w-4 h-4 rounded border-2 border-[#6049E3]/50 bg-[hsl(240,30%,5%)] checked:bg-[#6049E3] checked:border-[#6049E3] cursor-pointer"
                         />
                       </td>
 
@@ -192,7 +192,7 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
                       {/* Thumbnail + Name */}
                       <td className="px-4 py-3 whitespace-nowrap min-w-[200px]">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 rounded bg-[#1C1C1C] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          <div className="w-10 h-10 rounded bg-[#111235] flex items-center justify-center flex-shrink-0 overflow-hidden">
                             {file.thumbnail ? (
                               <img
                                 src={file.thumbnail}
@@ -222,7 +222,7 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
                             file.tags.map((tag, index) => (
                               <span
                                 key={index}
-                                className="inline-flex items-center px-2 py-0.5 text-xs rounded-md bg-[#4338CA]/20 text-[#CFCFF6] border border-[#4338CA]/30"
+                                className="inline-flex items-center px-2 py-0.5 text-xs rounded-md bg-[#6049E3]/20 text-[#CFCFF6] border border-[#6049E3]/30"
                               >
                                 {tag}
                               </span>
@@ -251,7 +251,7 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
                               e.stopPropagation();
                               onFileDoubleClick?.(file);
                             }}
-                            className="p-1.5 rounded text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[#1C1C1C] transition-colors duration-200"
+                            className="p-1.5 rounded text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[#111235] transition-colors duration-200"
                             title="Preview"
                           >
                             <Eye className="w-4 h-4" />
@@ -280,7 +280,7 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
             {files.length === 0 && (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center space-y-4">
-                  <div className="w-16 h-16 bg-[#1C1C1C] rounded-full flex items-center justify-center mx-auto">
+                  <div className="w-16 h-16 bg-[#111235] rounded-full flex items-center justify-center mx-auto">
                     <span className="text-[#8A8C8E] text-2xl">📁</span>
                   </div>
                   <h3 className="text-lg font-semibold text-[#CFCFF6]">No files found</h3>

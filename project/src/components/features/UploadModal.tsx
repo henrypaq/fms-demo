@@ -102,9 +102,9 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: 10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="bg-[#000000]/90 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+            className="bg-[#080A15]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
           >
-        <div className="p-6 border-b border-[#2A2A2A]/40">
+        <div className="p-6 border-b border-[#2A2C45]/40">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold text-[#CFCFF6]">Upload Files</h3>
             <Button 
@@ -129,7 +129,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
             className={`
               border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200
               ${dragActive 
-                ? 'border-[#4338CA] bg-[#4338CA]/10' 
+                ? 'border-[#6049E3] bg-[#6049E3]/10' 
                 : 'border-slate-600 hover:border-slate-500 bg-slate-700/30'
               }
               ${isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
@@ -137,7 +137,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
             onClick={() => !isUploading && fileInputRef.current?.click()}
           >
             <Upload className={`w-12 h-12 mx-auto mb-4 ${
-              dragActive ? 'text-[#4338CA]' : 'text-[#CFCFF6]/60'
+              dragActive ? 'text-[#6049E3]' : 'text-[#CFCFF6]/60'
             }`} />
             <p className="text-[#CFCFF6] font-medium mb-2">
               {dragActive ? 'Drop files here' : 'Drop files here or click to browse'}
@@ -165,10 +165,10 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
                 {selectedFiles.map((file, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 bg-[#000000]/40 rounded-lg border border-[#2A2A2A]/40"
+                    className="flex items-center justify-between p-3 bg-[#080A15]/40 rounded-lg border border-[#2A2C45]/40"
                   >
                     <div className="flex items-center space-x-3 flex-1 min-w-0">
-                      <File className="w-5 h-5 text-[#4338CA] flex-shrink-0" />
+                      <File className="w-5 h-5 text-[#6049E3] flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-[#CFCFF6] truncate">
                           {file.name}
@@ -197,7 +197,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-[#2A2A2A]/40 flex justify-between items-center">
+        <div className="p-6 border-t border-[#2A2C45]/40 flex justify-between items-center">
           <p className="text-sm text-[#CFCFF6]/60">
             {selectedFiles.length > 0 
               ? `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} selected`
@@ -209,7 +209,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
               type="button"
               onClick={handleClose}
               disabled={isUploading}
-              className="px-4 py-2 bg-[#000000]/60 hover:bg-[#000000] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-[#080A15]/60 hover:bg-[#080A15] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
@@ -218,7 +218,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUploadComp
                 onClick={handleUpload}
                 disabled={isUploading || !currentWorkspace}
                 variant="outline"
-                className="border-2 border-[#4338CA] bg-[#4338CA]/20 text-[#CFCFF6] hover:bg-[#4338CA]/30 hover:text-white hover:border-[#4338CA] transition-all flex items-center space-x-2"
+                className="border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white hover:border-[#6049E3] transition-all flex items-center space-x-2"
               >
                 {isUploading && <Loader className="w-4 h-4 animate-spin" />}
                 <span>

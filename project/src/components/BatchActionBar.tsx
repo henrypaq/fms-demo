@@ -232,12 +232,12 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
     <>
       {/* Floating Action Bar */}
       <div className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 ${className}`}>
-        <div className="bg-[#000000]/90 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl p-4 min-w-96">
+        <div className="bg-[#080A15]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl p-4 min-w-96">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-[#4338CA]/20 border border-[#4338CA]/40 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-[#4338CA]" />
+              <div className="w-8 h-8 bg-[#6049E3]/20 border border-[#6049E3]/40 rounded-lg flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-[#6049E3]" />
               </div>
               <div>
                 <h3 className="text-[#CFCFF6] font-medium">
@@ -257,10 +257,10 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
 
           {/* Processing Status */}
           {isProcessing && (
-            <div className="mb-4 p-3 bg-[#4338CA]/10 border border-[#4338CA]/30 rounded-lg">
+            <div className="mb-4 p-3 bg-[#6049E3]/10 border border-[#6049E3]/30 rounded-lg">
               <div className="flex items-center space-x-3">
-                <Loader className="w-5 h-5 text-[#4338CA] animate-spin" />
-                <span className="text-[#4338CA] font-medium">{processingAction}</span>
+                <Loader className="w-5 h-5 text-[#6049E3] animate-spin" />
+                <span className="text-[#6049E3] font-medium">{processingAction}</span>
               </div>
             </div>
           )}
@@ -299,7 +299,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
             <button
               onClick={() => setShowMoveModal(true)}
               disabled={isProcessing}
-              className="flex items-center space-x-2 px-4 py-2 bg-[#000000]/60 hover:bg-[#000000] disabled:opacity-50 text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
+              className="flex items-center space-x-2 px-4 py-2 bg-[#080A15]/60 hover:bg-[#080A15] disabled:opacity-50 text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
             >
               <Move className="w-4 h-4" />
               <span>Move</span>
@@ -309,7 +309,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
             <button
               onClick={handleBatchDownload}
               disabled={isProcessing}
-              className="flex items-center space-x-2 px-4 py-2 border-2 border-[#4338CA] bg-[#4338CA]/20 disabled:opacity-50 text-[#CFCFF6] hover:bg-[#4338CA]/30 hover:text-white rounded-lg font-medium transition-all duration-200"
+              className="flex items-center space-x-2 px-4 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 disabled:opacity-50 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-lg font-medium transition-all duration-200"
             >
               <Download className="w-4 h-4" />
               <span>Download</span>
@@ -333,8 +333,8 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
       {/* Move Modal */}
       {showMoveModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4">
-          <div className="bg-[#000000]/90 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-md max-h-96 overflow-hidden">
-            <div className="p-4 border-b border-[#2A2A2A]/40">
+          <div className="bg-[#080A15]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md max-h-96 overflow-hidden">
+            <div className="p-4 border-b border-[#2A2C45]/40">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium text-[#CFCFF6]">Move Files</h3>
                 <button
@@ -350,7 +350,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
             <div className="p-4 max-h-80 overflow-y-auto">
               {loadingProjects ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="w-6 h-6 border-2 border-[#4338CA] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-6 h-6 border-2 border-[#6049E3] border-t-transparent rounded-full animate-spin"></div>
                   <span className="ml-2 text-[#CFCFF6]/60">Loading projects...</span>
                 </div>
               ) : (
@@ -416,7 +416,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4">
-          <div className="bg-[#000000]/90 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-md">
+          <div className="bg-[#080A15]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md">
             <div className="p-6">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-12 h-12 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center">
@@ -450,7 +450,7 @@ const BatchActionBar: React.FC<BatchActionBarProps> = ({
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={isProcessing}
-                  className="px-4 py-2 bg-[#000000]/60 hover:bg-[#000000] disabled:opacity-50 text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
+                  className="px-4 py-2 bg-[#080A15]/60 hover:bg-[#080A15] disabled:opacity-50 text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
                 >
                   Cancel
                 </button>

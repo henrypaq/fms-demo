@@ -97,7 +97,7 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
         {onClearSearch && (
           <button
             onClick={onClearSearch}
-            className="flex items-center space-x-2 px-4 py-2 bg-[#000000]/60 hover:bg-[#000000] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
+            className="flex items-center space-x-2 px-4 py-2 bg-[#080A15]/60 hover:bg-[#080A15] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
           >
             <X className="w-4 h-4" />
             <span>Clear Search</span>
@@ -110,7 +110,7 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
       {loading && (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
-            <Loader className="w-8 h-8 text-[#4338CA] animate-spin mx-auto mb-4" />
+            <Loader className="w-8 h-8 text-[#6049E3] animate-spin mx-auto mb-4" />
             <p className="text-[#CFCFF6]/60">Searching...</p>
           </div>
         </div>
@@ -155,7 +155,7 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
             </>
           ) : (
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-[#000000]/60 border border-[#2A2A2A] rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-[#080A15]/60 border border-[#2A2C45] rounded-full flex items-center justify-center mx-auto mb-4">
                 <FileText className="w-8 h-8 text-[#8A8C8E]" />
               </div>
               <h3 className="text-lg font-medium text-[#CFCFF6] mb-2">No files found</h3>
@@ -171,10 +171,10 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
 
           {/* Show if results are limited */}
           {files.length === 150 && totalResults > 150 && (
-            <div className="mt-6 p-4 bg-[#4338CA]/10 border border-[#4338CA]/30 rounded-lg">
+            <div className="mt-6 p-4 bg-[#6049E3]/10 border border-[#6049E3]/30 rounded-lg">
               <div className="flex items-center space-x-2">
-                <Search className="w-5 h-5 text-[#4338CA]" />
-                <p className="text-[#4338CA] text-sm">
+                <Search className="w-5 h-5 text-[#6049E3]" />
+                <p className="text-[#6049E3] text-sm">
                   Showing top 150 results of {totalResults}. Results are ranked by relevance.
                 </p>
               </div>

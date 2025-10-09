@@ -13,7 +13,7 @@ const WorkspaceLogo = () => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
-        backgroundColor: isHovered ? '#1C1C1C' : 'white'
+        backgroundColor: isHovered ? '#111235' : 'white'
       }}
     >
       {/* Logo - fade out on hover */}
@@ -325,7 +325,7 @@ const SidebarTrigger = React.forwardRef<
         </TooltipTrigger>
         <TooltipContent 
           side="right" 
-          className="bg-[#000000] border border-[#2A2A2A] text-[#CFCFF6] text-xs px-2 py-1"
+          className="bg-[#080A15] border border-[#2A2C45] text-[#CFCFF6] text-xs px-2 py-1"
         >
           Toggle sidebar
         </TooltipContent>
@@ -562,13 +562,13 @@ const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md px-3 py-2 text-left text-sm outline-none ring-sidebar-ring transition-all duration-150 ease-out hover:bg-[#000000]/50 focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-[#000000] data-[active=true]:text-white group-data-[collapsible=icon]:!size-12 group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md px-3 py-2 text-left text-sm outline-none ring-sidebar-ring transition-all duration-150 ease-out hover:bg-[#080A15]/50 focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-[#080A15] data-[active=true]:text-white group-data-[collapsible=icon]:!size-12 group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "hover:bg-[#000000]/50 hover:text-[#CFCFF6]",
+        default: "hover:bg-[#080A15]/50 hover:text-[#CFCFF6]",
         outline:
-          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-[#000000]/50 hover:text-[#CFCFF6] hover:shadow-[0_0_0_1px_#2A2A2A]",
+          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-[#080A15]/50 hover:text-[#CFCFF6] hover:shadow-[0_0_0_1px_#2A2C45]",
       },
       size: {
         default: "h-10 text-sm",

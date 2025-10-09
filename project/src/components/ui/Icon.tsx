@@ -17,7 +17,7 @@ export function Icon({
   size = 20, 
   color = "#CCCCCC", 
   className = "",
-  hoverColor = "#4338CA",
+  hoverColor = "#6049E3",
   selectedColor = "#FFFFFF",
   isSelected = false,
   isHovered = false
@@ -60,7 +60,7 @@ export const IconSizes = {
 // Predefined colors for consistency
 export const IconColors = {
   muted: "#CCCCCC",
-  accent: "#4338CA",
+  accent: "#6049E3",
   white: "#FFFFFF",
   primary: "#1E40AF"
 } as const;

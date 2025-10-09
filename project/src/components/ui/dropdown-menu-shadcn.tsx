@@ -50,7 +50,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "z-[250] min-w-[8rem] overflow-hidden rounded-lg border border-[#2A2A2A]/60 bg-[#000000]/95 backdrop-blur-md p-1.5 text-[#CFCFF6] shadow-[0_8px_24px_rgba(0,0,0,0.5)]",
+      "z-[250] min-w-[8rem] overflow-hidden rounded-lg border border-[#2A2C45]/60 bg-[#080A15]/95 backdrop-blur-md p-1.5 text-[#CFCFF6] shadow-[0_8px_24px_rgba(0,0,0,0.5)]",
       "data-[state=open]:animate-in data-[state=closed]:animate-out",
       "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -72,7 +72,7 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "z-[250] max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-lg border border-[#2A2A2A]/60 bg-[#000000]/95 backdrop-blur-md p-1.5 text-[#CFCFF6] shadow-[0_8px_24px_rgba(0,0,0,0.5)]",
+        "z-[250] max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-lg border border-[#2A2C45]/60 bg-[#080A15]/95 backdrop-blur-md p-1.5 text-[#CFCFF6] shadow-[0_8px_24px_rgba(0,0,0,0.5)]",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -186,7 +186,7 @@ const DropdownMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-[#2A2A2A]", className)}
+    className={cn("-mx-1 my-1 h-px bg-[#2A2C45]", className)}
     {...props}
   />
 ))
