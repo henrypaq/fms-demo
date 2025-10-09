@@ -92,8 +92,9 @@ export const TagBadge: React.FC<TagBadgeProps> = ({
     <span
       className={`${baseClasses} ${variantClasses[variant]} ${onClick ? 'cursor-pointer' : ''} ${className}`}
       onClick={handleClick}
+      title={tag} // Show full tag name on hover
     >
-      <span className="truncate">{tag}</span>
+      <span className="truncate block overflow-hidden text-ellipsis whitespace-nowrap">{tag}</span>
       {onRemove && (
         <button
           onClick={handleRemove}
