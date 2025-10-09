@@ -659,10 +659,8 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
               ))}
               {displayTags.length > 4 && (
                 <>
-                  {/* Fade overlay */}
-                  <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#080A15] to-transparent pointer-events-none" />
-                  {/* More indicator */}
-                  <span className="text-xs text-[#8A8C8E] hover:text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[#080A15]/80 backdrop-blur-sm border border-[#2A2C45] transition-colors flex items-center gap-1 relative z-10">
+                  {/* More indicator - no fade overlay */}
+                  <span className="text-xs text-[#8A8C8E] hover:text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[#080A15] border border-[#2A2C45] transition-colors flex items-center gap-1 relative z-10">
                     ···
                   </span>
                 </>
