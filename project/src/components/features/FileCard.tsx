@@ -525,29 +525,34 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           }}
         >
           {showExpandedTags ? (
-            // Show up to 8 tags when expanded (approx 2 rows) + indicator
-            <>
-              {displayTags.slice(0, 8).map((tag, index) => (
-                <TagBadge key={index} tag={tag} variant="default" />
-              ))}
-              {displayTags.length > 8 && (
-                <span className="text-xs text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[#6049E3]/30 border border-[#6049E3] transition-colors flex items-center gap-1">
-                  +{displayTags.length - 8} more
-                </span>
-              )}
-            </>
-          ) : (
-            // Show only first 6 tags normally
+            // Show up to 6 tags when expanded (2 rows max) + indicator
             <>
               {displayTags.slice(0, 6).map((tag, index) => (
                 <TagBadge key={index} tag={tag} variant="default" />
               ))}
               {displayTags.length > 6 && (
-                <span className="text-xs text-[#8A8C8E] hover:text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[hsl(240,30%,10%)] border border-[hsl(240,25%,15%)] transition-colors flex items-center gap-1">
+                <span className="text-xs text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[#6049E3]/30 border border-[#6049E3] transition-colors flex items-center gap-1">
                   +{displayTags.length - 6} more
                 </span>
               )}
             </>
+          ) : (
+            // Show only first 4 tags normally (ensures 2 rows max) with fade indicator
+            <div className="relative flex flex-wrap gap-1.5 w-full">
+              {displayTags.slice(0, 4).map((tag, index) => (
+                <TagBadge key={index} tag={tag} variant="default" />
+              ))}
+              {displayTags.length > 4 && (
+                <>
+                  {/* Fade overlay */}
+                  <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[hsl(240,30%,7%)] to-transparent pointer-events-none" />
+                  {/* More indicator */}
+                  <span className="text-xs text-[#8A8C8E] hover:text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[hsl(240,30%,10%)]/80 backdrop-blur-sm border border-[hsl(240,25%,15%)] transition-colors flex items-center gap-1 relative z-10">
+                    ···
+                  </span>
+                </>
+              )}
+            </div>
           )}
         </div>
       )}
