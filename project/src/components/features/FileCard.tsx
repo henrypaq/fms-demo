@@ -298,14 +298,31 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
   const displayTags = file.tags && file.tags.length > 0 ? file.tags : [];
   const currentSelected = isSelected || internalSelected;
 
+  // Check if file is a video (support both type field and fileType MIME)
+  const isVideo = file.type === 'video' || file.fileType?.startsWith('video/');
+  
+  // Debug logging for videos
+  useEffect(() => {
+    if (isVideo) {
+      console.log('🎬 Video file detected:', {
+        name: file.name,
+        type: file.type,
+        fileType: file.fileType,
+        thumbnail: file.thumbnail,
+        hasFilePath: !!file.filePath
+      });
+    }
+  }, [isVideo, file.name, file.type, file.fileType, file.thumbnail, file.filePath]);
+
   // Video scrubbing handlers - optimized for performance
   const handleVideoMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (file.type !== 'video') return;
+    if (!isVideo) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percentage = (x / rect.width) * 100;
     setVideoScrubPosition(Math.max(0, Math.min(100, percentage)));
-  }, [file.type]);
+    console.log('🎥 Video scrub position:', percentage.toFixed(2) + '%');
+  }, [isVideo]);
 
   const handleVideoMouseLeave = useCallback(() => {
     setVideoScrubPosition(null);
@@ -384,7 +401,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           </div>
           
           {/* Video play overlay */}
-          {file.type === 'video' && file.filePath && (
+          {isVideo && file.filePath && (
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150">
               <div className="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-sm">
                 <Icon Icon={RiVideoLine} size={IconSizes.medium} color="#ffffff" className="w-6 h-6" />
@@ -393,7 +410,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           )}
 
           {/* Video scrubbing bar - cranberry colored */}
-          {file.type === 'video' && videoScrubPosition !== null && (
+          {isVideo && videoScrubPosition !== null && (
             <div 
               className="absolute top-0 bottom-0 w-0.5 bg-[#DC143C] pointer-events-none z-10"
               style={{ 
