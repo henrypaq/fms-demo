@@ -105,15 +105,21 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
   const [editedTags, setEditedTags] = useState<string[]>(file.tags || []);
   const [showExpandedTags, setShowExpandedTags] = useState(false);
   const [videoScrubPosition, setVideoScrubPosition] = useState<number | null>(null);
+  const [videoPreviewLoaded, setVideoPreviewLoaded] = useState(false);
   
-  // Ref to store click timeout for double-click detection
+  // Refs
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Cleanup timeout on unmount
+  // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
       if (clickTimeoutRef.current) {
         clearTimeout(clickTimeoutRef.current);
+      }
+      if (seekTimeoutRef.current) {
+        clearTimeout(seekTimeoutRef.current);
       }
     };
   }, []);
@@ -314,18 +320,58 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
     }
   }, [isVideo, file.name, file.type, file.fileType, file.thumbnail, file.filePath]);
 
-  // Video scrubbing handlers - optimized for performance
+  // Video scrubbing handlers - with actual preview seeking
   const handleVideoMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isVideo) return;
+    if (!isVideo || !videoRef.current) return;
+    
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percentage = (x / rect.width) * 100;
-    setVideoScrubPosition(Math.max(0, Math.min(100, percentage)));
-    console.log('🎥 Video scrub position:', percentage.toFixed(2) + '%');
+    const clampedPercentage = Math.max(0, Math.min(100, percentage));
+    
+    setVideoScrubPosition(clampedPercentage);
+    
+    // Seek video to the cursor position (debounced for performance)
+    if (videoRef.current && videoRef.current.duration) {
+      const targetTime = (clampedPercentage / 100) * videoRef.current.duration;
+      
+      // Clear any pending seek
+      if (seekTimeoutRef.current) {
+        clearTimeout(seekTimeoutRef.current);
+      }
+      
+      // Debounce seeking for smooth performance (16ms = ~60fps)
+      seekTimeoutRef.current = setTimeout(() => {
+        if (videoRef.current && !videoRef.current.seeking) {
+          videoRef.current.currentTime = targetTime;
+        }
+      }, 16);
+    }
   }, [isVideo]);
+
+  const handleVideoMouseEnter = useCallback(() => {
+    if (!isVideo || !file.filePath) return;
+    
+    // Load video for preview
+    if (videoRef.current && !videoPreviewLoaded) {
+      videoRef.current.load();
+    }
+  }, [isVideo, file.filePath, videoPreviewLoaded]);
 
   const handleVideoMouseLeave = useCallback(() => {
     setVideoScrubPosition(null);
+    setVideoPreviewLoaded(false);
+    
+    // Clear any pending seek
+    if (seekTimeoutRef.current) {
+      clearTimeout(seekTimeoutRef.current);
+    }
+    
+    // Reset video
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.pause();
+    }
   }, []);
 
   return (
@@ -373,9 +419,27 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           <div 
             className="absolute inset-0 w-full h-full overflow-hidden"
             onMouseMove={handleVideoMouseMove}
+            onMouseEnter={handleVideoMouseEnter}
             onMouseLeave={handleVideoMouseLeave}
           >
-          {getThumbnailUrl() ? (
+          {/* Video preview element - always render for video files but conditionally show */}
+          {isVideo && file.filePath && (
+            <video
+              ref={videoRef}
+              src={file.fileUrl || file.filePath}
+              className="w-full h-full object-cover"
+              preload="metadata"
+              muted
+              playsInline
+              onLoadedMetadata={() => setVideoPreviewLoaded(true)}
+              style={{ 
+                display: videoScrubPosition !== null && videoPreviewLoaded ? 'block' : 'none',
+                imageRendering: '-webkit-optimize-contrast'
+              }}
+            />
+          )}
+          {/* Thumbnail image - hide when video is showing */}
+          {(!isVideo || !videoPreviewLoaded || videoScrubPosition === null) && getThumbnailUrl() ? (
             <img
               src={getThumbnailUrl()!}
               alt={file.name}
