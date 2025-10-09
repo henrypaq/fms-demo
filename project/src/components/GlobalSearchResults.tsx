@@ -97,7 +97,7 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
         {onClearSearch && (
           <button
             onClick={onClearSearch}
-            className="flex items-center space-x-2 px-4 py-2 bg-[#080A15]/60 hover:bg-[#080A15] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
+            className="flex items-center space-x-2 px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
           >
             <X className="w-4 h-4" />
             <span>Clear Search</span>
@@ -155,7 +155,7 @@ const GlobalSearchResults: React.FC<GlobalSearchResultsProps> = ({
             </>
           ) : (
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-[#080A15]/60 border border-[#2A2C45] rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-[#1A1C3A]/60 border border-[#2A2C45] rounded-full flex items-center justify-center mx-auto mb-4">
                 <FileText className="w-8 h-8 text-[#8A8C8E]" />
               </div>
               <h3 className="text-lg font-medium text-[#CFCFF6] mb-2">No files found</h3>

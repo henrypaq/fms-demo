@@ -60,7 +60,7 @@ export const AssetBar: React.FC<AssetBarProps> = ({
         {/* Collapse/Expand Dropdown Button */}
         <button
           onClick={onToggleCollapse}
-          className="p-1 rounded border border-[#080A15] bg-[#080A15] hover:bg-[#111235] transition-all"
+          className="p-1 rounded border border-[#1A1C3A] bg-[hsl(240,30%,8%)] hover:bg-[hsl(240,30%,12%)] transition-all"
           title={isCollapsed ? 'Expand' : 'Collapse'}
         >
           <svg
@@ -96,7 +96,7 @@ export const AssetBar: React.FC<AssetBarProps> = ({
               ${
                 tagsVisible
                   ? 'bg-[#6049E3]/20 text-[#CFCFF6] border-[#6049E3]'
-                  : 'text-[#8A8C8E] hover:text-[#CFCFF6] border-[#080A15] bg-transparent'
+                  : 'text-[#8A8C8E] hover:text-[#CFCFF6] border-[#1A1C3A] bg-transparent'
               }
             `}
             title={tagsVisible ? 'Hide tags' : 'Show tags'}

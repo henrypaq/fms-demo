@@ -723,7 +723,7 @@ const TagView: React.FC<TagViewProps> = ({
 
       {/* Add Tag Modal */}
       <Dialog open={showAddTagModal} onOpenChange={setShowAddTagModal}>
-        <DialogContent className="bg-[#080A15]/90 backdrop-blur-md border-[#2A2C45]/60">
+        <DialogContent className="bg-[#1A1C3A]/90 backdrop-blur-md border-[#2A2C45]/60">
           <DialogHeader>
             <DialogTitle className="text-[#CFCFF6]">Add New Tag</DialogTitle>
             <DialogDescription className="text-[#CFCFF6]/60">
@@ -740,7 +740,7 @@ const TagView: React.FC<TagViewProps> = ({
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
                 placeholder="Enter tag name..."
-                className="bg-[#080A15]/40 border-[#2A2C45]/40 text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50"
+                className="bg-[#1A1C3A]/40 border-[#2A2C45]/40 text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:ring-[#6049E3]/50 focus:border-[#6049E3]/50"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && newTagName.trim()) {
@@ -759,7 +759,7 @@ const TagView: React.FC<TagViewProps> = ({
                 setNewTagName('');
               }}
               disabled={isProcessing}
-              className="bg-[#080A15]/60 hover:bg-[#080A15] text-[#CFCFF6] hover:text-white"
+              className="bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white"
             >
               Cancel
             </Button>
@@ -787,7 +787,7 @@ const TagView: React.FC<TagViewProps> = ({
 
       {/* Delete Tag Confirmation Modal */}
       <Dialog open={!!showDeleteConfirm} onOpenChange={(open) => !open && setShowDeleteConfirm(null)}>
-        <DialogContent className="bg-[#080A15]/90 backdrop-blur-md border-[#2A2C45]/60">
+        <DialogContent className="bg-[#1A1C3A]/90 backdrop-blur-md border-[#2A2C45]/60">
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
               <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center">
@@ -815,7 +815,7 @@ const TagView: React.FC<TagViewProps> = ({
               variant="ghost"
               onClick={() => setShowDeleteConfirm(null)}
               disabled={isProcessing}
-              className="bg-[#080A15]/60 hover:bg-[#080A15] text-[#CFCFF6] hover:text-white"
+              className="bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white"
             >
               Cancel
             </Button>

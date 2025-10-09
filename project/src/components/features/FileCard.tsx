@@ -392,12 +392,12 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           w-full h-[260px]
           p-0
           rounded-xl
-          bg-[#111235]
+          bg-[hsl(240,30%,12%)]
           ${showExpandedTags 
             ? 'border-2 border-[#6049E3] shadow-[0_8px_32px_rgba(96,73,227,0.5)]' 
             : currentSelected 
               ? 'border-2 border-[#6049E3]'
-              : 'border border-[#111235]'
+              : 'border border-[hsl(240,30%,12%)]'
           }
           shadow-[0_4px_10px_rgba(0,0,0,0.3)]
           overflow-hidden
@@ -457,8 +457,8 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
             />
           ) : null}
           
-          {/* Fallback solid background + icon when no thumbnail */}
-          <div className={`flex items-center justify-center w-full h-full bg-[#080A15] ${getThumbnailUrl() ? 'hidden' : 'flex'}`}>
+          {/* Fallback gradient + icon when no thumbnail */}
+          <div className={`flex items-center justify-center w-full h-full bg-gradient-to-br from-[hsl(240,25%,15%)] to-[hsl(240,30%,10%)] ${getThumbnailUrl() ? 'hidden' : 'flex'}`}>
             <div className="w-8 h-8 text-[#6049E3] opacity-80">
               {getFileIcon(file.type)}
             </div>
@@ -492,7 +492,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           {/* Favorite star indicator */}
           {file.isFavorite && (
             <div className="absolute top-2 left-2">
-              <div className="w-6 h-6 bg-[#111235]/70 backdrop-blur-sm rounded-md flex items-center justify-center">
+              <div className="w-6 h-6 bg-[hsl(240,30%,12%)]/70 backdrop-blur-sm rounded-md flex items-center justify-center">
                 <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
               </div>
             </div>
@@ -507,7 +507,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
 
             {/* Optimistic upload loading overlay */}
             {file.isOptimistic && (
-              <div className="absolute inset-0 bg-[#080A15]/90 backdrop-blur-sm flex flex-col items-center justify-center">
+              <div className="absolute inset-0 bg-[hsl(240,30%,10%)]/90 backdrop-blur-sm flex flex-col items-center justify-center">
                 {/* Loading spinner */}
                 <div className="relative w-16 h-16 mb-3">
                   <div className="absolute inset-0 border-4 border-[#6049E3]/20 rounded-full"></div>
@@ -526,7 +526,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                 </p>
                 
                 {/* Progress bar */}
-                <div className="w-32 h-1.5 bg-[#080A15] rounded-full overflow-hidden">
+                <div className="w-32 h-1.5 bg-[#1A1C3A] rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-[#6049E3] to-[#8b5cf6] transition-all duration-300 ease-out"
                     style={{ width: `${file.uploadProgress || 0}%` }}
@@ -538,7 +538,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
         </div>
         
         {/* Bottom metadata bar - Fixed height */}
-        <div className="h-8 flex items-center justify-between px-2 bg-[#111235] border-t border-[#2A2C45]/30">
+        <div className="h-8 flex items-center justify-between px-2 bg-[hsl(240,30%,12%)] border-t border-[hsl(240,25%,15%)]/30">
           <span className="text-xs text-[#8A8C8E]">
             {(file.fileSize / (1024 * 1024)).toFixed(2)} MB
           </span>
@@ -554,7 +554,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                     w-5 h-5
                     p-0
                     bg-transparent
-                    hover:bg-[#080A15]
+                    hover:bg-[hsl(240,30%,8%)]
                     text-[#8A8C8E] hover:text-[#CFCFF6]
                     rounded-md
                     transition-all duration-150
@@ -659,8 +659,10 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
               ))}
               {displayTags.length > 4 && (
                 <>
-                  {/* More indicator - no fade overlay */}
-                  <span className="text-xs text-[#8A8C8E] hover:text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[#080A15] border border-[#2A2C45] transition-colors flex items-center gap-1 relative z-10">
+                  {/* Fade overlay */}
+                  <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[hsl(240,30%,7%)] to-transparent pointer-events-none" />
+                  {/* More indicator */}
+                  <span className="text-xs text-[#8A8C8E] hover:text-[#CFCFF6] font-medium px-2 py-1 rounded-md bg-[hsl(240,30%,10%)]/80 backdrop-blur-sm border border-[hsl(240,25%,15%)] transition-colors flex items-center gap-1 relative z-10">
                     ···
                   </span>
                 </>
@@ -682,7 +684,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && createPortal(
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" onClick={() => setShowDeleteConfirm(false)}>
-          <div className="bg-[#080A15]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-12 h-12 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center">
@@ -715,7 +717,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={isDeleting}
-                  className="px-4 py-2 bg-[#080A15]/60 hover:bg-[#080A15] disabled:opacity-50 text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
+                  className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] disabled:opacity-50 text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
                 >
                   Cancel
                 </button>
@@ -729,14 +731,14 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
       {/* Rename Modal */}
       {showRename && createPortal(
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" onClick={() => setShowRename(false)}>
-          <div className="bg-[#080A15]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <h3 className="text-lg font-bold text-[#CFCFF6] mb-4">Rename File</h3>
               <input
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="w-full px-3 py-2 border border-[#2A2C45] rounded-md bg-[#080A15] text-[#CFCFF6] focus:outline-none focus:ring-2 focus:ring-[#6049E3]"
+                className="w-full px-3 py-2 border border-[#2A2C45] rounded-md bg-[hsl(240,30%,8%)] text-[#CFCFF6] focus:outline-none focus:ring-2 focus:ring-[#6049E3]"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleRename();
@@ -753,7 +755,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                 </button>
                 <button
                   onClick={() => setShowRename(false)}
-                  className="px-4 py-2 bg-[#080A15]/60 hover:bg-[#080A15] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
+                  className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
                 >
                   Cancel
                 </button>
@@ -767,7 +769,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
       {/* Tags Edit Modal */}
       {showTagsEdit && createPortal(
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" onClick={() => setShowTagsEdit(false)}>
-          <div className="bg-[#080A15]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-[#1A1C3A]/90 backdrop-blur-md border border-[#2A2C45]/60 rounded-xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <h3 className="text-lg font-bold text-[#CFCFF6] mb-4">Edit Tags</h3>
               <div className="space-y-2">
@@ -781,11 +783,11 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                         newTags[index] = e.target.value;
                         setEditedTags(newTags);
                       }}
-                      className="flex-1 px-3 py-2 border border-[#2A2C45] rounded-md bg-[#080A15] text-[#CFCFF6] focus:outline-none focus:ring-2 focus:ring-[#6049E3]"
+                      className="flex-1 px-3 py-2 border border-[#2A2C45] rounded-md bg-[hsl(240,30%,8%)] text-[#CFCFF6] focus:outline-none focus:ring-2 focus:ring-[#6049E3]"
                     />
                     <button
                       onClick={() => setEditedTags(editedTags.filter((_, i) => i !== index))}
-                      className="px-3 py-2 text-xs bg-[#080A15]/60 hover:bg-[#080A15] text-[#CFCFF6] hover:text-white rounded-md transition-all duration-200"
+                      className="px-3 py-2 text-xs bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-md transition-all duration-200"
                     >
                       Remove
                     </button>
@@ -793,7 +795,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                 ))}
                 <button
                   onClick={() => setEditedTags([...editedTags, ''])}
-                  className="w-full px-4 py-2 border border-[#2A2C45] bg-[#080A15]/40 hover:bg-[#080A15]/60 text-[#CFCFF6] hover:text-white rounded-md transition-all duration-200"
+                  className="w-full px-4 py-2 border border-[#2A2C45] bg-[#1A1C3A]/40 hover:bg-[#1A1C3A]/60 text-[#CFCFF6] hover:text-white rounded-md transition-all duration-200"
                 >
                   Add Tag
                 </button>
@@ -807,7 +809,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
                 </button>
                 <button
                   onClick={() => setShowTagsEdit(false)}
-                  className="px-4 py-2 bg-[#080A15]/60 hover:bg-[#080A15] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
+                  className="px-4 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200"
                 >
                   Cancel
                 </button>

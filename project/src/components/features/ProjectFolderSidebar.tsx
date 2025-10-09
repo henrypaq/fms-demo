@@ -128,7 +128,7 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
         console.log('🔍 Sidebar root context menu (should be prevented by child)');
       }}
     >
-      <div className="p-4 border-b border-[#080A15]">
+      <div className="p-4 border-b border-[#1A1C3A]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-[#CFCFF6]">Folders</h3>
           <button
@@ -196,7 +196,7 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
 
       {/* Drag Instructions */}
       {draggedItem && (
-        <div className="p-3 border-t border-[#080A15] bg-[#6049E3]/10">
+        <div className="p-3 border-t border-[#1A1C3A] bg-[#6049E3]/10">
           <p className="text-xs text-[#CFCFF6] text-center">
             Drop on a folder or Project Root to move {draggedItem.type}
           </p>

@@ -69,25 +69,29 @@ const SidebarNew: React.FC<SidebarNewProps> = ({
       id: 'dashboard', 
       icon: RiHome3Line, 
       label: 'All Files',
-      adminOnly: false
+      adminOnly: false,
+      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' // Purple-Blue
     },
     { 
       id: 'project-v3', 
       icon: RiFolder3Line, 
       label: 'Projects',
-      adminOnly: false
+      adminOnly: false,
+      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' // Pink-Red
     },
     { 
       id: 'tags', 
       icon: RiPriceTag3Line, 
       label: 'Tags',
-      adminOnly: false
+      adminOnly: false,
+      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' // Blue-Cyan
     },
     { 
       id: 'uploads', 
       icon: RiUploadLine, 
       label: 'Uploads',
-      adminOnly: false
+      adminOnly: false,
+      gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' // Green-Teal
     }
   ];
 
@@ -148,15 +152,41 @@ const SidebarNew: React.FC<SidebarNewProps> = ({
                       data-active={isActive}
                       className={`group/menu-item ${isCollapsed ? 'pl-[0.4rem]' : ''}`}
                     >
-                      <item.icon 
-                        className={`flex-shrink-0 transition-colors duration-150 ${
+                      <div 
+                        className={`flex-shrink-0 relative ${
                           isCollapsed ? 'w-[24px] h-[24px]' : 'w-[18px] h-[18px]'
-                        } ${
-                          isActive 
-                            ? 'text-white' 
-                            : 'text-[#8A8C8E] group-hover/menu-item:text-[#CFCFF6]'
                         }`}
-                      />
+                      >
+                        {isActive ? (
+                          <>
+                            {/* Gradient background layer */}
+                            <div 
+                              className="absolute inset-0 rounded-md"
+                              style={{
+                                background: item.gradient,
+                                maskImage: 'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iY3VycmVudENvbG9yIj48cmVjdCB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIGZpbGw9ImJsYWNrIi8+PC9zdmc+)',
+                                WebkitMaskImage: 'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iY3VycmVudENvbG9yIj48cmVjdCB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIGZpbGw9ImJsYWNrIi8+PC9zdmc+)',
+                              }}
+                            />
+                            {/* Icon with gradient via custom rendering */}
+                            <div 
+                              className="absolute inset-0 flex items-center justify-center"
+                              style={{
+                                background: item.gradient,
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text',
+                              }}
+                            >
+                              <item.icon className="w-full h-full" />
+                            </div>
+                          </>
+                        ) : (
+                          <item.icon 
+                            className={`w-full h-full text-[#8A8C8E] group-hover/menu-item:text-[#CFCFF6] transition-colors duration-150`}
+                          />
+                        )}
+                      </div>
                       {!isCollapsed && (
                         <>
                           <span 

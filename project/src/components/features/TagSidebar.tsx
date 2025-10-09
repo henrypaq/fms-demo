@@ -54,7 +54,7 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
 
   return (
     <div className="w-[280px] bg-card/95 rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.3)] flex flex-col flex-shrink-0 overflow-hidden h-full">
-      <div className="p-4 border-b border-[#080A15]">
+      <div className="p-4 border-b border-[#1A1C3A]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-[#CFCFF6] flex items-center gap-2">
             <RiPriceTag3Line className="w-4 h-4 text-[#6049E3]" />
@@ -79,7 +79,7 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
             value={tagSearch}
             onChange={e => onTagSearchChange(e.target.value)}
             placeholder="Search tags..."
-            className="pl-10 bg-[#0B0C20] border-[#080A15] text-[#CFCFF6] placeholder-[#8A8C8E] h-9"
+            className="pl-10 bg-[#0B0C20] border-[#1A1C3A] text-[#CFCFF6] placeholder-[#8A8C8E] h-9"
           />
         </div>
       </div>
@@ -109,7 +109,7 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
                         }
                       }}
                       autoFocus
-                      className="flex-1 h-8 text-sm bg-[#111235] border-[#080A15] text-[#CFCFF6]"
+                      className="flex-1 h-8 text-sm bg-[#111235] border-[#1A1C3A] text-[#CFCFF6]"
                     />
                     <Button
                       onClick={() => onRenameTagSubmit(stat.tag, renameTagValue)}
@@ -132,8 +132,8 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
                   <div
                     className={`group flex items-center justify-between px-3 py-2 rounded-md cursor-pointer transition-all duration-200 ${
                       isSelected
-                        ? 'bg-[#080A15]/60 text-white'
-                        : 'text-[#CFCFF6] hover:bg-[#080A15]/40 hover:text-white'
+                        ? 'bg-[#1A1C3A]/60 text-white'
+                        : 'text-[#CFCFF6] hover:bg-[#1A1C3A]/40 hover:text-white'
                     }`}
                     onClick={() => onTagSelect(stat.tag)}
                   >

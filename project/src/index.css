@@ -27,7 +27,7 @@
   }
 
   :root {
-    /* Original Cinematic Theme Color System */
+    /* New Cinematic Theme Color System */
     --background: 240 30% 4%; /* #080A15 - Darker navy-black with violet hint */
     --foreground: 240 10% 82%; /* #CFCFF6 - Soft lavender for headers and key labels */
     --card: 240 30% 8%; /* #0C0E1F - Darker navy for panels */
