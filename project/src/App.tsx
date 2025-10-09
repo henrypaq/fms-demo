@@ -616,10 +616,10 @@ function AppContentWithWorkspace({
                     placeholder="Search files, folders, or tags..."
                     value={searchFilters.query}
                     onChange={(e) => handleSearchChange(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-card-light border border-border/60 rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-border focus:bg-card-light hover:border-border hover:bg-card-light hover:brightness-125 focus:brightness-125"
+                    className="w-full px-4 py-2.5 bg-[#1A1C3A]/60 border-2 border-[#2A2C45]/80 rounded-lg text-foreground placeholder-[#8A8C8E] focus:outline-none focus:border-[#6049E3] focus:bg-[#1A1C3A] hover:border-[#6049E3]/60 hover:bg-[#1A1C3A] transition-all duration-200"
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg className="w-4 h-4 text-muted-foreground transition-colors duration-200 ease-out group-hover:text-foreground/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-[#8A8C8E] transition-colors duration-200 ease-out group-hover:text-[#6049E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
@@ -642,7 +642,7 @@ function AppContentWithWorkspace({
                       variant="outline"
                       size="sm"
                       type="button"
-                      className="gap-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white hover:border-[#6049E3] transition-all"
+                      className="gap-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-white hover:bg-[#6049E3]/30 hover:text-white hover:border-[#6049E3] transition-all"
                     >
                       {ctaConfig.icon}
                       <span className="hidden sm:inline">{ctaConfig.label}</span>
