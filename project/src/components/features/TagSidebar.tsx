@@ -54,16 +54,16 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
 
   return (
     <div className="w-[280px] bg-card/95 rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.3)] flex flex-col flex-shrink-0 overflow-hidden h-full">
-      <div className="p-4 border-b border-[#111111]">
+      <div className="p-4 border-b border-[#000000]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-[#CFCFF6] flex items-center gap-2">
-            <RiPriceTag3Line className="w-4 h-4 text-[#00C28C]" />
+            <RiPriceTag3Line className="w-4 h-4 text-[#4338CA]" />
             Tags ({tagStats.length})
           </h3>
           {canEditTags && (
             <button
               onClick={onAddTag}
-              className="p-1.5 rounded-md text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[#00C28C]/20 transition-colors duration-200"
+              className="p-1.5 rounded-md text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[#4338CA]/20 transition-colors duration-200"
               title="Add Tag"
             >
               <RiAddLine className="w-4 h-4" />
@@ -79,7 +79,7 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
             value={tagSearch}
             onChange={e => onTagSearchChange(e.target.value)}
             placeholder="Search tags..."
-            className="pl-10 bg-[#0B0C20] border-[#111111] text-[#CFCFF6] placeholder-[#8A8C8E] h-9"
+            className="pl-10 bg-[#0B0C20] border-[#000000] text-[#CFCFF6] placeholder-[#8A8C8E] h-9"
           />
         </div>
       </div>
@@ -109,13 +109,13 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
                         }
                       }}
                       autoFocus
-                      className="flex-1 h-8 text-sm bg-[#1C1C1C] border-[#111111] text-[#CFCFF6]"
+                      className="flex-1 h-8 text-sm bg-[#1C1C1C] border-[#000000] text-[#CFCFF6]"
                     />
                     <Button
                       onClick={() => onRenameTagSubmit(stat.tag, renameTagValue)}
                       size="sm"
                       variant="outline"
-                      className="h-8 px-2 border-2 border-[#00C28C] bg-[#00C28C]/20 text-[#CFCFF6] hover:bg-[#00C28C]/30 hover:text-white hover:border-[#00C28C] transition-all"
+                      className="h-8 px-2 border-2 border-[#4338CA] bg-[#4338CA]/20 text-[#CFCFF6] hover:bg-[#4338CA]/30 hover:text-white hover:border-[#4338CA] transition-all"
                     >
                       Save
                     </Button>
@@ -132,8 +132,8 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
                   <div
                     className={`group flex items-center justify-between px-3 py-2 rounded-md cursor-pointer transition-all duration-200 ${
                       isSelected
-                        ? 'bg-[#111111]/60 text-white'
-                        : 'text-[#CFCFF6] hover:bg-[#111111]/40 hover:text-white'
+                        ? 'bg-[#000000]/60 text-white'
+                        : 'text-[#CFCFF6] hover:bg-[#000000]/40 hover:text-white'
                     }`}
                     onClick={() => onTagSelect(stat.tag)}
                   >
@@ -195,7 +195,7 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
             {canEditTags && !tagSearch && (
               <button
                 onClick={onAddTag}
-                className="border-2 border-[#00C28C] bg-[#00C28C]/20 text-[#CFCFF6] hover:bg-[#00C28C]/30 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                className="border-2 border-[#4338CA] bg-[#4338CA]/20 text-[#CFCFF6] hover:bg-[#4338CA]/30 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               >
                 Create your first tag
               </button>

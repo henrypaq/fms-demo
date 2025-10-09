@@ -143,14 +143,14 @@ const CreateFolderModal: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300] p-4">
-      <div className="bg-[#111111]/90 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-md">
+      <div className="bg-[#000000]/90 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-md">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-[#CFCFF6]">Create Folder</h3>
             <button 
               onClick={onClose} 
               disabled={isSubmitting}
-              className="p-2 rounded-lg text-[#CFCFF6]/60 hover:text-white hover:bg-[#111111]/60 transition-colors duration-200 disabled:opacity-50"
+              className="p-2 rounded-lg text-[#CFCFF6]/60 hover:text-white hover:bg-[#000000]/60 transition-colors duration-200 disabled:opacity-50"
             >
               <X className="w-5 h-5" />
             </button>
@@ -170,7 +170,7 @@ const CreateFolderModal: React.FC<{
                   setError(null); // Clear error when user types
                 }}
                 placeholder="Enter folder name..."
-                className="w-full px-3 py-2 bg-[#111111]/40 border border-[#2A2A2A]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#00C28C]/50 focus:border-[#00C28C]/50"
+                className="w-full px-3 py-2 bg-[#000000]/40 border border-[#2A2A2A]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#4338CA]/50 focus:border-[#4338CA]/50"
                 autoFocus
                 disabled={isSubmitting}
                 maxLength={50}
@@ -193,7 +193,7 @@ const CreateFolderModal: React.FC<{
               <button
                 type="submit"
                 disabled={!name.trim() || isSubmitting}
-                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 border-2 border-[#00C28C] bg-[#00C28C]/20 text-[#CFCFF6] hover:bg-[#00C28C]/30 hover:text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 border-2 border-[#4338CA] bg-[#4338CA]/20 text-[#CFCFF6] hover:bg-[#4338CA]/30 hover:text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
@@ -211,7 +211,7 @@ const CreateFolderModal: React.FC<{
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-[#111111]/60 hover:bg-[#111111] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                className="px-4 py-2 bg-[#000000]/60 hover:bg-[#000000] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -1065,7 +1065,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                     <tr
                       key={folder.id}
                       className={`hover:bg-slate-700 transition-colors duration-200 cursor-pointer ${
-                        dragOverFolder === folder.id ? 'bg-[#00C28C]/20 ring-2 ring-[#00C28C]' : ''
+                        dragOverFolder === folder.id ? 'bg-[#4338CA]/20 ring-2 ring-[#4338CA]' : ''
                       } ${
                         draggedItem?.type === 'folder' && draggedItem?.id === folder.id ? 'opacity-50' : ''
                       }`}
@@ -1091,7 +1091,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                       <td className="px-4 py-3 whitespace-nowrap text-white font-medium" colSpan={6}>
                         {folder.name}
                         {dragOverFolder === folder.id && draggedItem && (
-                          <span className="ml-2 text-[#00C28C] text-xs">
+                          <span className="ml-2 text-[#4338CA] text-xs">
                             Drop to move here
                           </span>
                         )}
@@ -1344,8 +1344,8 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                 <div
                   className={`group flex items-center justify-between w-full rounded-lg px-4 py-3 h-[52px] cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.2)] active:scale-[0.99] ${
                     dragOverFolder === folder.id
-                      ? 'bg-[#00C28C]/20 border-[#00C28C] ring-2 ring-[#00C28C]/50'
-                      : 'bg-[#111111] border-transparent hover:bg-[#22243E] hover:border-[#2A2A2A]'
+                      ? 'bg-[#4338CA]/20 border-[#4338CA] ring-2 ring-[#4338CA]/50'
+                      : 'bg-[#000000] border-transparent hover:bg-[#22243E] hover:border-[#2A2A2A]'
                   } ${
                     draggedItem?.type === 'folder' && draggedItem?.id === folder.id
                       ? 'opacity-50 cursor-grabbing'
@@ -1386,14 +1386,14 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                 <div className="flex items-center flex-1 min-w-0 mr-2">
                   <Folder className={`w-5 h-5 mr-3 flex-shrink-0 transition-colors duration-150 ${
                     dragOverFolder === folder.id 
-                      ? 'text-[#00C28C]' 
+                      ? 'text-[#4338CA]' 
                       : 'text-[#8A8C8E] group-hover:text-[#CFCFF6]'
                   }`} />
                   <span className="flex-1 text-sm font-medium text-[#CFCFF6] truncate">
                     {folder.name}
                   </span>
                   {dragOverFolder === folder.id && draggedItem && (
-                    <span className="text-[#00C28C] text-xs ml-2 font-medium whitespace-nowrap">
+                    <span className="text-[#4338CA] text-xs ml-2 font-medium whitespace-nowrap">
                       Drop here
                     </span>
                   )}
@@ -1572,13 +1572,13 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
     <div className={`flex-1 flex flex-col h-full ${renderSidebar ? 'gap-6 p-6' : ''}`}>
       {/* Folder Sidebar Panel - Only render if renderSidebar is true */}
       {renderSidebar && (
-        <div className="w-[280px] bg-[#1C1C1C] border border-[#111111] rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.3)] flex flex-col transition-all duration-300 ease-in-out overflow-hidden">
-        <div className="p-4 border-b border-[#111111]">
+        <div className="w-[280px] bg-[#1C1C1C] border border-[#000000] rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.3)] flex flex-col transition-all duration-300 ease-in-out overflow-hidden">
+        <div className="p-4 border-b border-[#000000]">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-[#CFCFF6]">Folders</h3>
             <button
               onClick={() => setShowCreateFolder(true)}
-              className="p-1.5 rounded-md text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[#00C28C]/20 transition-colors duration-200"
+              className="p-1.5 rounded-md text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[#4338CA]/20 transition-colors duration-200"
               title="Create Folder"
             >
               <FolderPlus className="w-4 h-4" />
@@ -1589,10 +1589,10 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
           <div
             className={`flex items-center space-x-2 px-3 py-2 rounded-md cursor-pointer transition-all duration-200 mb-1 ${
               !currentFolder 
-                ? 'bg-[#00C28C] text-white' 
+                ? 'bg-[#4338CA] text-white' 
                 : dragOverFolder === null
                 ? 'bg-green-600 text-white'
-                : 'text-[#CFCFF6] hover:bg-[#111111] hover:text-white'
+                : 'text-[#CFCFF6] hover:bg-[#000000] hover:text-white'
             }`}
             onClick={() => selectFolder(null)}
             onDragOver={(e) => handleDragOver(e, null)}
@@ -1619,7 +1619,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
               <p className="text-[#8A8C8E] text-sm mb-3">No folders yet</p>
               <button
                 onClick={() => setShowCreateFolder(true)}
-                className="border-2 border-[#00C28C] bg-[#00C28C]/20 text-[#CFCFF6] hover:bg-[#00C28C]/30 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                className="border-2 border-[#4338CA] bg-[#4338CA]/20 text-[#CFCFF6] hover:bg-[#4338CA]/30 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
               >
                 Create your first folder
               </button>
@@ -1629,7 +1629,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
 
         {/* Drag Instructions */}
         {draggedItem && (
-          <div className="p-3 border-t border-[#111111] bg-[#00C28C]/10">
+          <div className="p-3 border-t border-[#000000] bg-[#4338CA]/10">
             <p className="text-xs text-[#CFCFF6] text-center">
               Drop on a folder or Project Root to move {draggedItem.type}
             </p>
@@ -1639,13 +1639,13 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
       )}
 
       {/* Main Content Panel */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out overflow-hidden ${renderSidebar ? 'bg-[#1C1C1C] border border-[#111111] rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.3)]' : ''}`}>
+      <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out overflow-hidden ${renderSidebar ? 'bg-[#1C1C1C] border border-[#000000] rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.3)]' : ''}`}>
         {/* File Display - Only show files */}
         <div className="flex-1 overflow-auto p-6">
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <Loader className="w-8 h-8 text-[#00C28C] animate-spin mx-auto mb-4" />
+                <Loader className="w-8 h-8 text-[#4338CA] animate-spin mx-auto mb-4" />
                 <p className="text-[#8A8C8E]">Loading files...</p>
               </div>
             </div>
@@ -1659,7 +1659,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                 <p className="text-[#8A8C8E] mb-4">{error}</p>
                 <button 
                   onClick={loadFiles}
-                  className="px-6 py-2 border-2 border-[#00C28C] bg-[#00C28C]/20 text-[#CFCFF6] hover:bg-[#00C28C]/30 hover:text-white hover:border-[#00C28C] rounded-lg font-medium transition-all duration-200"
+                  className="px-6 py-2 border-2 border-[#4338CA] bg-[#4338CA]/20 text-[#CFCFF6] hover:bg-[#4338CA]/30 hover:text-white hover:border-[#4338CA] rounded-lg font-medium transition-all duration-200"
                 >
                   Try Again
                 </button>
@@ -1677,7 +1677,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
               </p>
               <button
                 onClick={() => setShowUploadSheet(true)}
-                className="px-6 py-2 border-2 border-[#00C28C] bg-[#00C28C]/20 text-[#CFCFF6] hover:bg-[#00C28C]/30 hover:text-white rounded-lg font-medium transition-all duration-200"
+                className="px-6 py-2 border-2 border-[#4338CA] bg-[#4338CA]/20 text-[#CFCFF6] hover:bg-[#4338CA]/30 hover:text-white rounded-lg font-medium transition-all duration-200"
               >
                 Upload Files
               </button>
@@ -1736,7 +1736,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
       })() && (
         <div
           ref={folderMenuRef}
-          className="fixed z-[100] bg-[#111111] border border-[#2A2A2A] rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.5)] py-1.5 px-1 min-w-[160px]"
+          className="fixed z-[100] bg-[#000000] border border-[#2A2A2A] rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.5)] py-1.5 px-1 min-w-[160px]"
           style={{ left: folderMenu.x, top: folderMenu.y }}
         >
           <button
@@ -1796,14 +1796,14 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 10 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="bg-[#111111]/85 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-md p-6"
+              className="bg-[#000000]/85 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-md p-6"
             >
               <h3 className="text-xl font-bold text-[#CFCFF6] mb-4">Rename Folder</h3>
               <input
                 type="text"
                 value={renameFolderName}
                 onChange={e => setRenameFolderName(e.target.value)}
-                className="w-full px-3 py-2 bg-[#111111]/40 border border-[#2A2A2A]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#00C28C]/50 focus:border-[#00C28C]/50 mb-4"
+                className="w-full px-3 py-2 bg-[#000000]/40 border border-[#2A2A2A]/40 rounded-lg text-[#CFCFF6] placeholder-[#CFCFF6]/40 focus:outline-none focus:ring-2 focus:ring-[#4338CA]/50 focus:border-[#4338CA]/50 mb-4"
                 autoFocus
                 maxLength={50}
                 disabled={isRenaming}
@@ -1812,12 +1812,12 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
               <div className="flex space-x-3">
                 <button
                   onClick={() => renameFolder(showRenameFolder.folder.id, renameFolderName)}
-                  className="flex-1 px-4 py-2 border-2 border-[#00C28C] bg-[#00C28C]/20 text-[#CFCFF6] hover:bg-[#00C28C]/30 hover:text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2 border-2 border-[#4338CA] bg-[#4338CA]/20 text-[#CFCFF6] hover:bg-[#4338CA]/30 hover:text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isRenaming || !renameFolderName.trim()}
                 >{isRenaming ? 'Renaming...' : 'Rename'}</button>
                 <button
                   onClick={() => setShowRenameFolder(null)}
-                  className="px-4 py-2 bg-[#111111]/60 hover:bg-[#111111] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                  className="px-4 py-2 bg-[#000000]/60 hover:bg-[#000000] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
                   disabled={isRenaming}
                 >Cancel</button>
               </div>
@@ -1840,7 +1840,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 10 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="bg-[#111111]/85 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-md p-6"
+              className="bg-[#000000]/85 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-md p-6"
             >
               <h3 className="text-xl font-bold text-[#CFCFF6] mb-4">Delete Folder</h3>
               <p className="text-[#CFCFF6]/70 mb-6">
@@ -1854,7 +1854,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                 >{isDeleting ? 'Deleting...' : 'Delete'}</button>
                 <button
                   onClick={() => setShowDeleteFolder(null)}
-                  className="px-4 py-2 bg-[#111111]/60 hover:bg-[#111111] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                  className="px-4 py-2 bg-[#000000]/60 hover:bg-[#000000] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
                   disabled={isDeleting}
                 >Cancel</button>
               </div>
@@ -1923,7 +1923,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.98, y: 10 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="bg-[#111111]/85 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-md"
+                className="bg-[#000000]/85 backdrop-blur-md border border-[#2A2A2A]/60 rounded-xl shadow-2xl w-full max-w-md"
               >
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
@@ -1931,7 +1931,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                   <button
                     onClick={() => setShowMoveFolder(null)}
                     disabled={isMoving}
-                    className="p-2 rounded-lg text-[#CFCFF6]/60 hover:text-white hover:bg-[#111111]/60 transition-colors duration-200 disabled:opacity-50"
+                    className="p-2 rounded-lg text-[#CFCFF6]/60 hover:text-white hover:bg-[#000000]/60 transition-colors duration-200 disabled:opacity-50"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -1944,7 +1944,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                   <p className="text-sm text-[#CFCFF6]/70 mb-4">Select destination folder:</p>
                 </div>
 
-                <div className="max-h-[400px] overflow-y-auto border border-[#2A2A2A]/40 rounded-lg bg-[#111111]/40 p-2">
+                <div className="max-h-[400px] overflow-y-auto border border-[#2A2A2A]/40 rounded-lg bg-[#000000]/40 p-2">
                   {/* Root / Project Root option */}
                   <button
                     type="button"
@@ -1972,7 +1972,7 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
                   <button
                     onClick={() => setShowMoveFolder(null)}
                     disabled={isMoving}
-                    className="flex-1 px-4 py-2 bg-[#111111]/60 hover:bg-[#111111] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                    className="flex-1 px-4 py-2 bg-[#000000]/60 hover:bg-[#000000] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
                   >
                     Cancel
                   </button>

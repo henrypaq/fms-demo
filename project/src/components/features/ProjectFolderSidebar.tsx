@@ -71,13 +71,13 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
             paddingLeft: `${level * 16 + 12}px`,
             backgroundColor: isSelected ? 'rgba(26, 28, 58, 0.5)' : isDragOver ? '#059669' : 'transparent',
             color: '#CFCFF6',
-            border: isSelected ? '1px solid rgba(0, 194, 140, 0.4)' : '1px solid transparent',
+            border: isSelected ? '1px solid rgba(67, 56, 202, 0.4)' : '1px solid transparent',
             transition: 'all 0.2s ease-out',
           }}
           onMouseEnter={(e) => {
             if (!isSelected && !isDragOver) {
               e.currentTarget.style.backgroundColor = 'rgba(26, 28, 58, 0.3)';
-              e.currentTarget.style.borderColor = 'rgba(0, 194, 140, 0.25)';
+              e.currentTarget.style.borderColor = 'rgba(67, 56, 202, 0.25)';
             }
           }}
           onMouseLeave={(e) => {
@@ -128,12 +128,12 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
         console.log('🔍 Sidebar root context menu (should be prevented by child)');
       }}
     >
-      <div className="p-4 border-b border-[#111111]">
+      <div className="p-4 border-b border-[#000000]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-[#CFCFF6]">Folders</h3>
           <button
             onClick={onCreateFolder}
-            className="p-1.5 rounded-md text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[#00C28C]/20 transition-colors duration-200"
+            className="p-1.5 rounded-md text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[#4338CA]/20 transition-colors duration-200"
             title="Create Folder"
           >
             <FolderPlus className="w-4 h-4" />
@@ -143,15 +143,15 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
         {/* Project Root */}
         <div
           style={{
-            backgroundColor: !currentFolder ? 'rgba(0, 194, 140, 0.2)' : (dragOverFolder === null && draggedItem) ? '#059669' : 'transparent',
-            border: !currentFolder ? '2px solid #00C28C' : (dragOverFolder === null && draggedItem) ? '2px solid #059669' : '2px solid transparent',
+            backgroundColor: !currentFolder ? 'rgba(67, 56, 202, 0.2)' : (dragOverFolder === null && draggedItem) ? '#059669' : 'transparent',
+            border: !currentFolder ? '2px solid #4338CA' : (dragOverFolder === null && draggedItem) ? '2px solid #059669' : '2px solid transparent',
             color: '#CFCFF6',
             fontWeight: !currentFolder ? '500' : '400',
           }}
           onMouseEnter={(e) => {
             if (currentFolder && (!draggedItem || dragOverFolder !== null)) {
-              e.currentTarget.style.backgroundColor = 'rgba(0, 194, 140, 0.1)';
-              e.currentTarget.style.borderColor = 'rgba(0, 194, 140, 0.3)';
+              e.currentTarget.style.backgroundColor = 'rgba(67, 56, 202, 0.1)';
+              e.currentTarget.style.borderColor = 'rgba(67, 56, 202, 0.3)';
             }
           }}
           onMouseLeave={(e) => {
@@ -186,7 +186,7 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
             <p className="text-[#8A8C8E] text-sm">No folders yet</p>
             <button
               onClick={onCreateFolder}
-              className="text-[#00C28C] hover:text-[#00C28C]/80 text-sm mt-1 font-medium"
+              className="text-[#4338CA] hover:text-[#4338CA]/80 text-sm mt-1 font-medium"
             >
               Create your first folder
             </button>
@@ -196,7 +196,7 @@ export const ProjectFolderSidebar: React.FC<ProjectFolderSidebarProps> = ({
 
       {/* Drag Instructions */}
       {draggedItem && (
-        <div className="p-3 border-t border-[#111111] bg-[#00C28C]/10">
+        <div className="p-3 border-t border-[#000000] bg-[#4338CA]/10">
           <p className="text-xs text-[#CFCFF6] text-center">
             Drop on a folder or Project Root to move {draggedItem.type}
           </p>

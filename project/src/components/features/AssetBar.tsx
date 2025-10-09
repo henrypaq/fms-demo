@@ -46,7 +46,7 @@ export const AssetBar: React.FC<AssetBarProps> = ({
               }
             }}
             onChange={onSelectAll}
-            className="w-4 h-4 rounded border-2 border-[#00C28C]/50 bg-[hsl(240,30%,5%)] checked:bg-[#00C28C] checked:border-[#00C28C] hover:border-[#00C28C] focus:ring-2 focus:ring-[#00C28C]/30 focus:ring-offset-0 cursor-pointer transition-all appearance-none flex items-center justify-center"
+            className="w-4 h-4 rounded border-2 border-[#4338CA]/50 bg-[hsl(240,30%,5%)] checked:bg-[#4338CA] checked:border-[#4338CA] hover:border-[#4338CA] focus:ring-2 focus:ring-[#4338CA]/30 focus:ring-offset-0 cursor-pointer transition-all appearance-none flex items-center justify-center"
             style={{
               backgroundImage: allSelected ? 'url("data:image/svg+xml,%3csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z\'/%3e%3c/svg%3e")' : someSelected ? 'url("data:image/svg+xml,%3csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M4 8h8\'/%3e%3c/svg%3e")' : 'none',
               backgroundSize: '100% 100%',
@@ -60,7 +60,7 @@ export const AssetBar: React.FC<AssetBarProps> = ({
         {/* Collapse/Expand Dropdown Button */}
         <button
           onClick={onToggleCollapse}
-          className="p-1 rounded border border-[#111111] bg-[#111111] hover:bg-[#1C1C1C] transition-all"
+          className="p-1 rounded border border-[#000000] bg-[#000000] hover:bg-[#1C1C1C] transition-all"
           title={isCollapsed ? 'Expand' : 'Collapse'}
         >
           <svg
@@ -95,8 +95,8 @@ export const AssetBar: React.FC<AssetBarProps> = ({
               text-xs font-medium px-2 py-0.5 ml-3 rounded-md border transition-all
               ${
                 tagsVisible
-                  ? 'bg-[#00C28C]/20 text-[#CFCFF6] border-[#00C28C]'
-                  : 'text-[#8A8C8E] hover:text-[#CFCFF6] border-[#111111] bg-transparent'
+                  ? 'bg-[#4338CA]/20 text-[#CFCFF6] border-[#4338CA]'
+                  : 'text-[#8A8C8E] hover:text-[#CFCFF6] border-[#000000] bg-transparent'
               }
             `}
             title={tagsVisible ? 'Hide tags' : 'Show tags'}

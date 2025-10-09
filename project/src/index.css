@@ -27,57 +27,57 @@
   }
 
   :root {
-    /* True Black + Emerald Theme Color System */
-    --background: 0 0% 0%; /* #000000 - Pure black background */
+    /* Inverted Grey + Deep Indigo Theme Color System */
+    --background: 0 0% 7%; /* #111111 - Dark grey background */
     --foreground: 240 10% 82%; /* #CFCFF6 - Soft lavender for headers and key labels */
-    --card: 0 0% 7%; /* #111111 - Very dark grey for content boxes */
+    --card: 0 0% 0%; /* #000000 - Pure black for content boxes */
     --card-foreground: 240 10% 82%; /* #CFCFF6 - Card text */
-    --popover: 0 0% 7%; /* #111111 - Popover background */
+    --popover: 0 0% 0%; /* #000000 - Popover background */
     --popover-foreground: 240 10% 82%; /* #CFCFF6 - Popover text */
-    --primary: 166 100% 39%; /* #00C28C - Emerald green accent */
+    --primary: 243 58% 51%; /* #4338CA - Deep indigo blue accent */
     --primary-foreground: 0 0% 100%; /* #FFFFFF - White for primary text */
-    --secondary: 0 0% 7%; /* #111111 - Secondary background */
+    --secondary: 0 0% 0%; /* #000000 - Secondary background */
     --secondary-foreground: 240 10% 82%; /* #CFCFF6 - Secondary text */
-    --muted: 0 0% 7%; /* #111111 - Muted background */
+    --muted: 0 0% 0%; /* #000000 - Muted background */
     --muted-foreground: 0 0% 54%; /* #8A8C8E - Soft gray for inactive text and icons */
     --accent: 0 0% 11%; /* #1C1C1C - Accent background (slightly lighter than card) */
     --accent-foreground: 240 10% 82%; /* #CFCFF6 - Accent text */
     --destructive: 0 84% 60%; /* #EF4444 - Error/destructive */
     --destructive-foreground: 0 0% 100%; /* #FFFFFF - Destructive text */
     --border: 0 0% 16%; /* #2A2A2A - Subtle separation borders */
-    --input: 0 0% 7%; /* #111111 - Input background */
-    --ring: 166 100% 39%; /* #00C28C - Focus ring using emerald */
+    --input: 0 0% 0%; /* #000000 - Input background */
+    --ring: 243 58% 51%; /* #4338CA - Focus ring using deep indigo */
     --radius: 0.5rem; /* Border radius for rounded corners */
     
     /* Additional tokens for highlights and secondary text */
     --highlight: 0 0% 100%; /* #FFFFFF - Crisp white for clarity and hierarchy */
     --active-foreground: 0 0% 100%; /* #FFFFFF - White for active/selected items */
-    --surface: 0 0% 7%; /* #111111 - Content areas (top bar + main workspace panels) */
+    --surface: 0 0% 0%; /* #000000 - Content areas (top bar + main workspace panels) */
     --card-light: 0 0% 11%; /* #1C1C1C - Lighter grey for cards and interactive elements */
     
-    /* Sidebar Black Colors */
-    --sidebar-background: 0 0% 0%; /* #000000 - Pure black sidebar */
+    /* Sidebar Grey Colors */
+    --sidebar-background: 0 0% 7%; /* #111111 - Dark grey sidebar */
     --sidebar-foreground: 0 0% 90%; /* #E6E6E6 - Soft off-white text */
-    --sidebar-primary: 166 100% 39%; /* #00C28C - Emerald green primary */
+    --sidebar-primary: 243 58% 51%; /* #4338CA - Deep indigo blue primary */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - White text on primary */
     --sidebar-accent: 0 0% 11%; /* #1C1C1C - Accent background */
     --sidebar-accent-foreground: 0 0% 90%; /* #E6E6E6 - Accent text */
     --sidebar-border: 0 0% 13%; /* #222222 - Border color */
-    --sidebar-ring: 166 100% 39%; /* #00C28C - Focus ring */
+    --sidebar-ring: 243 58% 51%; /* #4338CA - Focus ring */
     
     /* Sidebar Width Variables */
     --sidebar-width: 16rem; /* 256px - Expanded width */
     --sidebar-width-icon: 5rem; /* 80px - Collapsed width */
   }
   .dark {
-    --sidebar-background: 0 0% 0%; /* #000000 - Pure black sidebar */
+    --sidebar-background: 0 0% 7%; /* #111111 - Dark grey sidebar */
     --sidebar-foreground: 0 0% 90%; /* #E6E6E6 - Soft off-white text */
-    --sidebar-primary: 166 100% 39%; /* #00C28C - Emerald green primary */
+    --sidebar-primary: 243 58% 51%; /* #4338CA - Deep indigo blue primary */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - White text on primary */
     --sidebar-accent: 0 0% 11%; /* #1C1C1C - Accent background */
     --sidebar-accent-foreground: 0 0% 90%; /* #E6E6E6 - Accent text */
     --sidebar-border: 0 0% 13%; /* #222222 - Border color */
-    --sidebar-ring: 166 100% 39%; /* #00C28C - Focus ring */
+    --sidebar-ring: 243 58% 51%; /* #4338CA - Focus ring */
   }
 }
 
@@ -367,7 +367,7 @@
 
 /* Sidebar color change when upload sheet is open - matches upload sheet */
 .upload-sheet-open [data-sidebar="sidebar"] {
-  background-color: #111111 !important;
+  background-color: #000000 !important;
 }
 
 /* Add dark gutter between sidebar and upload sheet when open */

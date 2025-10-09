@@ -109,7 +109,7 @@ const AutoTaggingButton: React.FC<AutoTaggingButtonProps> = ({
       return 'border-2 border-red-500 bg-red-500/20 text-[#CFCFF6] hover:bg-red-500/30 hover:text-white';
     }
     
-    return 'border-2 border-[#00C28C] bg-[#00C28C]/20 text-[#CFCFF6] hover:bg-[#00C28C]/30 hover:text-white';
+    return 'border-2 border-[#4338CA] bg-[#4338CA]/20 text-[#CFCFF6] hover:bg-[#4338CA]/30 hover:text-white';
   };
 
   return (

@@ -123,7 +123,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({
                   : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80'
               }`}>
                 {currentUser.role === 'admin' && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#4B38B3] via-[#5A47CC] to-[#00C28C]" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#4B38B3] via-[#5A47CC] to-[#4338CA]" />
                 )}
                 <User className="w-5 h-5 relative z-10" />
               </div>
@@ -136,7 +136,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({
                   : 'bg-muted text-muted-foreground group-hover:text-foreground'
               }`}>
                 {currentUser.role === 'admin' && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#4B38B3] via-[#5A47CC] to-[#00C28C]" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#4B38B3] via-[#5A47CC] to-[#4338CA]" />
                 )}
                 <User className="w-4 h-4 relative z-10" />
               </div>
@@ -147,7 +147,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({
                 <div className="text-xs text-muted-foreground truncate flex items-center gap-1">
                   <span className="capitalize">{currentUser.role}</span>
                   {currentUser.role === 'admin' && (
-                    <Shield className="w-3 h-3 text-[#00C28C]" />
+                    <Shield className="w-3 h-3 text-[#4338CA]" />
                   )}
                 </div>
               </div>
