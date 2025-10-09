@@ -26,8 +26,9 @@ const DropdownMenuSubTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       "flex cursor-pointer select-none items-center rounded-md py-2 px-3 text-sm font-medium tracking-[-0.01em] outline-none",
-      "text-[#CFCFF6] hover:bg-[#22243E]/80 hover:text-white transition-all duration-150 ease-out",
+      "text-[#CFCFF6] hover:bg-[#22243E]/80 hover:text-white hover:scale-[1.01] transition-all duration-150 ease-out",
       "focus:bg-[#22243E]/80 focus:text-white",
+      "active:scale-[0.99]",
       "data-[state=open]:bg-[#22243E]/80",
       "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       inset && "pl-8",
@@ -94,8 +95,9 @@ const DropdownMenuItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-pointer select-none items-center gap-2 rounded-md py-2 px-3 text-sm font-medium tracking-[-0.01em] outline-none",
-      "text-[#CFCFF6] hover:bg-[#22243E]/80 hover:text-white transition-all duration-150 ease-out",
+      "text-[#CFCFF6] hover:bg-[#22243E]/80 hover:text-white hover:scale-[1.01] transition-all duration-150 ease-out",
       "focus:bg-[#22243E]/80 focus:text-white",
+      "active:scale-[0.99]",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       inset && "pl-8",
@@ -114,8 +116,9 @@ const DropdownMenuCheckboxItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-3 text-sm font-medium tracking-[-0.01em] outline-none",
-      "text-[#CFCFF6] hover:bg-[#22243E]/80 hover:text-white transition-all duration-150 ease-out",
+      "text-[#CFCFF6] hover:bg-[#22243E]/80 hover:text-white hover:scale-[1.01] transition-all duration-150 ease-out",
       "focus:bg-[#22243E]/80 focus:text-white",
+      "active:scale-[0.99]",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
@@ -141,8 +144,9 @@ const DropdownMenuRadioItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-3 text-sm font-medium tracking-[-0.01em] outline-none",
-      "text-[#CFCFF6] hover:bg-[#22243E]/80 hover:text-white transition-all duration-150 ease-out",
+      "text-[#CFCFF6] hover:bg-[#22243E]/80 hover:text-white hover:scale-[1.01] transition-all duration-150 ease-out",
       "focus:bg-[#22243E]/80 focus:text-white",
+      "active:scale-[0.99]",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
