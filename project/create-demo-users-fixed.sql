@@ -182,3 +182,5 @@ SELECT id, email, name, role, workspace_id FROM users WHERE email IN ('admin@dem
 
 
 
+
+
