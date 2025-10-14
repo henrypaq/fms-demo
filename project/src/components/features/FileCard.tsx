@@ -203,11 +203,11 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
       clickTimeoutRef.current = null;
     }
 
-    // Immediately open preview with Comments tab (default preview behavior)
+    // Immediately open preview with Comments tab (same as three-dots menu)
     setPreviewInitialTab('comments');
     setShowPreview(true);
-    onDoubleClick?.(file);
-  }, [onDoubleClick, file]);
+    // Don't call onDoubleClick to avoid interference with modal opening
+  }, []);
 
 
   const handleDeleteConfirm = async () => {
