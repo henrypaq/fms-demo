@@ -298,6 +298,7 @@ function AppContentWithWorkspace({
   });
   const [fileGridCollapsed, setFileGridCollapsed] = useState(false);
   const [tagsVisible, setTagsVisible] = useState(true);
+  const [sizeVisible, setSizeVisible] = useState(true);
   const [selectedFileIds, setSelectedFileIds] = useState<Set<string>>(new Set());
 
   // Auto-show uploads panel when uploads start
@@ -812,6 +813,9 @@ function AppContentWithWorkspace({
                 showTagsToggle={true}
                 tagsVisible={tagsVisible}
                 onToggleTags={() => setTagsVisible(!tagsVisible)}
+                showSizeToggle={true}
+                sizeVisible={sizeVisible}
+                onToggleSize={() => setSizeVisible(!sizeVisible)}
                 showSelectCheckbox={showFilesView && !showTagsView && !showUploadsView}
                 allSelected={allSelected}
                 someSelected={someSelected}
@@ -870,6 +874,8 @@ function AppContentWithWorkspace({
                     filterType={activeView as any}
                     loading={loading}
                     totalCount={totalCount}
+                    tagsVisible={tagsVisible}
+                    sizeVisible={sizeVisible}
                     hasNextPage={hasNextPage}
                     hasPrevPage={hasPrevPage}
                     currentPage={currentPage}

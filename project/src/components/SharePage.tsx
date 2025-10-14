@@ -232,18 +232,18 @@ const SharePage: React.FC<SharePageProps> = ({ fileId }) => {
           <div className="flex items-center space-x-4">
             <div>
               <h1 className="text-xl font-bold text-white">Shared File</h1>
-              <p className="text-slate-400 text-sm">Public file sharing via Njordgear FMS</p>
+              <p className="text-slate-400 text-sm">Public file sharing via FMS - File Management System</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center overflow-hidden">
               <img 
                 src={logoImage} 
-                alt="Njordgear" 
+                alt="FMS" 
                 className="w-full h-full object-contain"
               />
             </div>
-            <span className="text-xl font-bold text-white">Njordgear FMS</span>
+            <span className="text-xl font-bold text-white">FMS - File Management System</span>
           </div>
         </div>
       </div>
@@ -419,12 +419,12 @@ const SharePage: React.FC<SharePageProps> = ({ fileId }) => {
                     <div className="w-12 h-12 bg-blue-600/10 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                       <img 
                         src={logoImage} 
-                        alt="Njordgear" 
+                        alt="FMS" 
                         className="w-8 h-8 object-contain"
                       />
                     </div>
                     <p className="text-xs text-slate-500">
-                      This file was shared with you via Njordgear FMS
+                      This file was shared with you via the FMS - File Management System
                     </p>
                     <p className="text-xs text-slate-600 mt-1">
                       Secure file management system
