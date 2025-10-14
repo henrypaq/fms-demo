@@ -41,6 +41,7 @@ interface FileGridSimpleProps {
   className?: string;
   isCollapsed?: boolean;
   tagsVisible?: boolean;
+  sizeVisible?: boolean;
   loading?: boolean;
   selectedFileIds?: Set<string>;
   onSelectionChange?: (selectedIds: Set<string>) => void;
@@ -79,6 +80,7 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
   className = '',
   isCollapsed = false,
   tagsVisible = true,
+  sizeVisible = true,
   loading = false,
   selectedFileIds,
   onSelectionChange
@@ -332,6 +334,7 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
                     userRole={userRole}
                     userProjectAccess={userProjectAccess}
                     tagsVisible={tagsVisible}
+                    sizeVisible={sizeVisible}
                   />
                 </motion.div>
               );
@@ -376,6 +379,7 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
                     userRole={userRole}
                     userProjectAccess={userProjectAccess}
                     tagsVisible={tagsVisible}
+                    sizeVisible={sizeVisible}
                 />
               </motion.div>
             );

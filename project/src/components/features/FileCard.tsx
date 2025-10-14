@@ -22,6 +22,7 @@ import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '../ui/dropdown-menu-shadcn';
 import FilePreviewModal from '../FilePreviewModal';
 import { TagBadge } from '../ui/TagBadge';
+import { formatFileSize } from '../../lib/utils';
 
 export interface FileItem {
   id: string;
@@ -61,6 +62,7 @@ interface FileCardProps {
   userProjectAccess?: string[];
   className?: string;
   tagsVisible?: boolean;
+  sizeVisible?: boolean;
   selectionMode?: boolean;
 }
 
@@ -91,6 +93,7 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
   userProjectAccess = [],
   className = '',
   tagsVisible = true,
+  sizeVisible = true,
   selectionMode = false
 }) => {
   const [showPreview, setShowPreview] = useState(false);
@@ -203,11 +206,11 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
       clickTimeoutRef.current = null;
     }
 
-    // Immediately open preview with Comments tab (default preview behavior)
+    // Immediately open preview with Comments tab (same as three-dots menu)
     setPreviewInitialTab('comments');
     setShowPreview(true);
-    onDoubleClick?.(file);
-  }, [onDoubleClick, file]);
+    // Don't call onDoubleClick to avoid interference with modal opening
+  }, []);
 
 
   const handleDeleteConfirm = async () => {
@@ -537,11 +540,13 @@ const FileCard: React.FC<FileCardProps> = React.memo(({
           </div>
         </div>
         
-        {/* Bottom metadata bar - Fixed height */}
-        <div className="h-8 flex items-center justify-between px-2 bg-[hsl(240,30%,12%)] border-t border-[hsl(240,25%,15%)]/30">
-          <span className="text-xs text-[#8A8C8E]">
-            {(file.fileSize / (1024 * 1024)).toFixed(2)} MB
-          </span>
+         {/* Bottom metadata bar - Fixed height */}
+         <div className="h-8 flex items-center justify-between px-2 bg-[hsl(240,30%,12%)] border-t border-[hsl(240,25%,15%)]/30">
+           {sizeVisible && (
+             <span className="text-xs text-[#8A8C8E]">
+               {formatFileSize(file.fileSize)}
+             </span>
+           )}
           
           {/* Three-dot menu button */}
           <DropdownMenu>

@@ -38,12 +38,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto overflow-hidden bg-card border border-border shadow-sm">
             <img 
               src={logoImage} 
-              alt="Njordgear" 
+              alt="FMS" 
               className="w-full h-full object-contain"
             />
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-foreground">Njordgear FMS</h1>
+            <h1 className="text-3xl font-bold text-foreground">FMS - File Management System</h1>
             <p className="text-sm text-muted-foreground">
               File Management System
             </p>

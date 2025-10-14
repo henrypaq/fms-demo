@@ -300,9 +300,11 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
     }
   };
 
-  const loadFiles = async () => {
+  const loadFiles = async (skipLoadingState = false) => {
     try {
-      setLoading(true);
+      if (!skipLoadingState) {
+        setLoading(true);
+      }
       if (!currentWorkspace) throw new Error('No workspace selected');
       
       console.log('📂 Loading files with query parameters:', {
@@ -368,7 +370,8 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
   // When navigating folders, load files for the selected folder
   useEffect(() => {
     if (project && currentWorkspace && currentFolder !== undefined) {
-      loadFiles();
+      // Skip setting loading state since selectFolder already set it
+      loadFiles(true);
     }
   }, [currentFolder]);
 
@@ -601,6 +604,16 @@ const ProjectWorkspaceView: React.FC<ProjectWorkspaceViewProps> = ({
   };
 
   const selectFolder = (folder: any) => {
+    // Don't reload if clicking on the same folder
+    if (currentFolder?.id === folder?.id) {
+      return;
+    }
+    
+    // Immediately clear files and set loading to prevent showing old content
+    setFiles([]);
+    setLoading(true);
+    setError(null);
+    // Then set the new folder (this will trigger loadFiles via useEffect)
     setCurrentFolder(folder);
   };
 

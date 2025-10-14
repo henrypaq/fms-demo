@@ -1,5 +1,5 @@
 import React, { useState, memo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+// Removed framer-motion for better performance
 import { 
   X, 
   Download, 
@@ -97,13 +97,25 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [showNativeEmojiPicker, setShowNativeEmojiPicker] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
 
   // Set initial tab when modal opens
   useEffect(() => {
     if (isOpen) {
       setActiveTab(initialTab);
+      setImageLoading(true);
+      setImageError(false);
     }
   }, [isOpen, initialTab]);
+
+  // Reset image loading state when file changes
+  useEffect(() => {
+    if (file && file.type === 'image') {
+      setImageLoading(true);
+      setImageError(false);
+    }
+  }, [file]);
 
   // Check permissions
   const canEdit = userRole === 'admin';
@@ -391,6 +403,17 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
     return `${supabaseUrl}/storage/v1/object/public/files/${file.filePath}`;
   };
 
+  const getOptimizedImageUrl = () => {
+    const baseUrl = getFileUrl();
+    // For images, add transform parameters to optimize quality without being too heavy
+    if (file.type === 'image') {
+      // Add Supabase transform parameters for optimized quality
+      // width=1920&height=1080&quality=85&format=auto
+      return `${baseUrl}?width=1920&height=1080&quality=85&format=auto`;
+    }
+    return baseUrl;
+  };
+
   const handleDownload = async () => {
     try {
       const { data, error } = await supabase.storage
@@ -503,21 +526,18 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
   const handleVideoPause = () => setIsPlaying(false);
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && file && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
+        <div 
           className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4"
-          onClick={onClose}
+          onClick={(e) => {
+            // Only close if clicking directly on the overlay, not on child elements
+            if (e.target === e.currentTarget) {
+              onClose();
+            }
+          }}
         >
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.98, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 10 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+          <div 
             className="bg-[#080A15]/95 backdrop-blur-md rounded-xl border border-[#2A2C45]/40 w-full max-w-[calc(100vw-4rem)] max-h-[calc(100vh-4rem)] overflow-hidden shadow-2xl relative"
             draggable={false}
             onDragStart={handleDragStart}
@@ -547,8 +567,11 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
           {/* Right: Share Button and Close */}
           <div className="flex items-center space-x-3">
               <button
-              onClick={handleShare}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+              onClick={(e) => {
+                e.stopPropagation();
+                handleShare();
+              }}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-100 ${
                 copySuccess 
                   ? 'border-2 border-green-500 bg-green-500/20 text-[#CFCFF6]' 
                   : 'border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white'
@@ -558,8 +581,11 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
               <span>{copySuccess ? 'Copied!' : 'Share'}</span>
               </button>
             <button
-              onClick={onClose}
-              className="p-2 rounded-lg text-[#CFCFF6]/60 hover:text-white hover:bg-[#22243E] transition-colors duration-200"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="p-2 rounded-lg text-[#CFCFF6]/60 hover:text-white hover:bg-[#22243E] transition-colors duration-100"
             >
               <X className="w-5 h-5" />
             </button>
@@ -571,17 +597,36 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
           <div className="flex-1 flex items-center justify-center bg-[#0C0E1F]/30 p-6 pb-8">
             <div className="w-full h-full flex items-center justify-center">
               {file.type === 'image' ? (
-                <img
-                  src={file.thumbnail || getFileUrl()}
-                  alt={file.name}
-                  className="w-full h-full object-contain rounded-xl shadow-2xl"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (target.src !== getFileUrl()) {
-                      target.src = getFileUrl();
-                    }
-                  }}
-                />
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {imageLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#0C0E1F]/50 rounded-xl">
+                      <div className="flex flex-col items-center space-y-3">
+                        <Loader className="w-8 h-8 text-[#CFCFF6] animate-spin" />
+                        <p className="text-[#CFCFF6] text-sm">Loading image...</p>
+                      </div>
+                    </div>
+                  )}
+                  <img
+                    src={getOptimizedImageUrl()}
+                    alt={file.name}
+                    className="w-full h-full object-contain rounded-xl shadow-2xl"
+                    loading="eager"
+                    onLoad={() => {
+                      setImageLoading(false);
+                      setImageError(false);
+                    }}
+                    onError={(e) => {
+                      setImageLoading(false);
+                      setImageError(true);
+                      const target = e.target as HTMLImageElement;
+                      // Fallback to thumbnail if optimized image fails to load
+                      if (file.thumbnail && target.src !== file.thumbnail) {
+                        target.src = file.thumbnail;
+                        setImageError(false);
+                      }
+                    }}
+                  />
+                </div>
               ) : file.type === 'video' ? (
                 <div className="relative w-full h-full flex items-center justify-center">
                   <VideoPlayer
@@ -614,7 +659,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
             <div className="flex border-b border-[#2A2C45]/40 p-2">
               <button
                 onClick={() => setActiveTab('comments')}
-                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-100 flex items-center justify-center space-x-2 ${
                   activeTab === 'comments'
                     ? 'bg-[#22243E] text-[#CFCFF6] border border-[#6049E3]/30'
                     : 'text-[#CFCFF6]/70 hover:bg-[#22243E]/60 border border-transparent'
@@ -625,7 +670,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
               </button>
               <button
                 onClick={() => setActiveTab('fields')}
-                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-100 flex items-center justify-center space-x-2 ${
                   activeTab === 'fields'
                     ? 'bg-[#22243E] text-[#CFCFF6] border border-[#6049E3]/30'
                     : 'text-[#CFCFF6]/70 hover:bg-[#22243E]/60 border border-transparent'
@@ -790,7 +835,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                                 placeholder="Write a reply..."
                                 value={replyText}
                                 onChange={(e) => setReplyText(e.target.value)}
-                                className="flex-1 min-w-0 bg-[#1A1C3A]/60 border-2 border-[#2A2C45]/60 rounded-lg px-3 py-2 text-[#CFCFF6] placeholder-[#CFCFF6]/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#6049E3] focus:border-[#6049E3] hover:bg-[#1A1C3A]/80 hover:border-[#2A2C45]/80 transition-all duration-200"
+                                className="flex-1 min-w-0 bg-[#1A1C3A]/60 border-2 border-[#2A2C45]/60 rounded-lg px-3 py-2 text-[#CFCFF6] placeholder-[#CFCFF6]/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#6049E3] focus:border-[#6049E3] hover:bg-[#1A1C3A]/80 hover:border-[#2A2C45]/80 transition-all duration-100"
                                 onKeyDown={(e) => {
                                   if (e.key === 'Enter' && replyText.trim() && !savingComment) {
                                     e.preventDefault();
@@ -806,7 +851,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                               <button
                                 onClick={() => saveReply(comment.id)}
                                 disabled={!replyText.trim() || savingComment}
-                                className="px-3 py-2 bg-[#6049E3] hover:bg-[#6049E3]/90 text-white rounded-lg font-medium transition-all duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                                className="px-3 py-2 bg-[#6049E3] hover:bg-[#6049E3]/90 text-white rounded-lg font-medium transition-all duration-100 text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                               >
                                 {savingComment ? (
                                   <Loader className="w-4 h-4 animate-spin" />
@@ -819,7 +864,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                                   setReplyingTo(null);
                                   setReplyText('');
                                 }}
-                                className="px-3 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200 text-sm"
+                                className="px-3 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-100 text-sm"
                               >
                                 Cancel
                               </button>
@@ -976,7 +1021,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                         placeholder="Leave your comment..."
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
-                        className="flex-1 min-w-0 bg-[#1A1C3A]/60 border-2 border-[#2A2C45]/60 rounded-lg px-3 py-2 text-[#CFCFF6] placeholder-[#CFCFF6]/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#6049E3] focus:border-[#6049E3] hover:bg-[#1A1C3A]/80 hover:border-[#2A2C45]/80 transition-all duration-200"
+                        className="flex-1 min-w-0 bg-[#1A1C3A]/60 border-2 border-[#2A2C45]/60 rounded-lg px-3 py-2 text-[#CFCFF6] placeholder-[#CFCFF6]/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#6049E3] focus:border-[#6049E3] hover:bg-[#1A1C3A]/80 hover:border-[#2A2C45]/80 transition-all duration-100"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && commentText.trim() && !savingComment) {
                             e.preventDefault();
@@ -1003,7 +1048,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                       <button
                         onClick={saveComment}
                         disabled={!commentText.trim() || savingComment}
-                        className="border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed p-2 rounded-lg transition-all duration-200"
+                        className="border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed p-2 rounded-lg transition-all duration-100"
                         title="Send comment"
                       >
                         {savingComment ? (
@@ -1032,7 +1077,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                     type="text"
                     value={editedName}
                     onChange={(e) => setEditedName(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#1A1C3A]/60 border-2 border-[#2A2C45]/60 rounded-lg text-[#CFCFF6] focus:outline-none focus:ring-2 focus:ring-[#6049E3] focus:border-[#6049E3] hover:bg-[#1A1C3A]/80 hover:border-[#2A2C45]/80 transition-all duration-200"
+                    className="w-full px-3 py-2 bg-[#1A1C3A]/60 border-2 border-[#2A2C45]/60 rounded-lg text-[#CFCFF6] focus:outline-none focus:ring-2 focus:ring-[#6049E3] focus:border-[#6049E3] hover:bg-[#1A1C3A]/80 hover:border-[#2A2C45]/80 transition-all duration-100"
                   />
                 ) : (
                   <p className="text-[#CFCFF6] font-medium">{file.name}</p>
@@ -1120,14 +1165,14 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                   <div className="flex space-x-2">
                     <button
                       onClick={handleSave}
-                          className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-lg font-medium transition-all duration-200 text-sm"
+                          className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-lg font-medium transition-all duration-100 text-sm"
                     >
                       <Save className="w-4 h-4" />
                           <span>Save</span>
                     </button>
                     <button
                       onClick={() => setIsEditing(false)}
-                          className="px-3 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200 text-sm"
+                          className="px-3 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-100 text-sm"
                     >
                       Cancel
                     </button>
@@ -1136,7 +1181,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                       <div className="space-y-2">
                   <button
                     onClick={handleDownload}
-                          className="w-full flex items-center justify-center space-x-2 px-3 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-lg font-medium transition-all duration-200 text-sm"
+                          className="w-full flex items-center justify-center space-x-2 px-3 py-2 border-2 border-[#6049E3] bg-[#6049E3]/20 text-[#CFCFF6] hover:bg-[#6049E3]/30 hover:text-white rounded-lg font-medium transition-all duration-100 text-sm"
                   >
                     <Download className="w-4 h-4" />
                           <span>Download</span>
@@ -1144,7 +1189,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
                         {canEdit && !isPreviewMode && (
                           <button
                             onClick={() => setIsEditing(!isEditing)}
-                            className="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-200 text-sm"
+                            className="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-[#1A1C3A]/60 hover:bg-[#1A1C3A] text-[#CFCFF6] hover:text-white rounded-lg font-medium transition-all duration-100 text-sm"
                           >
                             <Edit3 className="w-4 h-4" />
                             <span>Edit Details</span>
@@ -1171,10 +1216,10 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = memo(({
         </div>
         </div>
 
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 });
 

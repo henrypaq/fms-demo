@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatFileSize } from '../../lib/utils';
 
 interface AssetBarProps {
   assetCount: number;
@@ -9,6 +10,9 @@ interface AssetBarProps {
   showTagsToggle?: boolean;
   tagsVisible?: boolean;
   onToggleTags?: () => void;
+  showSizeToggle?: boolean;
+  sizeVisible?: boolean;
+  onToggleSize?: () => void;
   // Selection
   showSelectCheckbox?: boolean; // Show checkbox only on file pages
   allSelected: boolean;
@@ -25,12 +29,15 @@ export const AssetBar: React.FC<AssetBarProps> = ({
   showTagsToggle = true,
   tagsVisible = true,
   onToggleTags,
+  showSizeToggle = true,
+  sizeVisible = true,
+  onToggleSize,
   showSelectCheckbox = false,
   allSelected,
   someSelected,
   onSelectAll,
 }) => {
-  const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+  const formattedSize = formatFileSize(totalSize);
 
   return (
     <div className="px-6 py-2">
@@ -80,12 +87,12 @@ export const AssetBar: React.FC<AssetBarProps> = ({
           </svg>
         </button>
         
-        {/* Assets Count and Size */}
-        <div className="text-sm text-[#8A8C8E] font-medium">
-          <span>
-            {assetCount} {assetType} • {sizeMB} MB
-          </span>
-        </div>
+         {/* Assets Count and Size */}
+         <div className="text-sm text-[#8A8C8E] font-medium">
+           <span>
+             {assetCount} {assetType} • {formattedSize}
+           </span>
+         </div>
 
         {/* Tags Toggle Button */}
         {showTagsToggle && onToggleTags && (
@@ -102,6 +109,24 @@ export const AssetBar: React.FC<AssetBarProps> = ({
             title={tagsVisible ? 'Hide tags' : 'Show tags'}
           >
             Tags
+          </button>
+        )}
+
+        {/* Size Toggle Button */}
+        {showSizeToggle && onToggleSize && (
+          <button
+            onClick={onToggleSize}
+            className={`
+              text-xs font-medium px-2 py-0.5 ml-2 rounded-md border transition-all
+              ${
+                sizeVisible
+                  ? 'bg-[#6049E3]/20 text-[#CFCFF6] border-[#6049E3]'
+                  : 'text-[#8A8C8E] hover:text-[#CFCFF6] border-[#1A1C3A] bg-transparent'
+              }
+            `}
+            title={sizeVisible ? 'Hide file sizes' : 'Show file sizes'}
+          >
+            Size
           </button>
         )}
       </div>
