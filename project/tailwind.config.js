@@ -5,7 +5,7 @@ export default {
   theme: {
 		extend: {
 			fontFamily: {
-				sans: ['Space Grotesk', 'sans-serif'],
+				sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
 			},
 			animation: {
 				// Fast, snappy animations for modern SaaS feel
