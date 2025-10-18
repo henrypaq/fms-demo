@@ -9,8 +9,7 @@ import {
   ArrowRight,
   Edit3,
   Trash2,
-  Edit,
-  Settings
+  Edit
 } from 'lucide-react';
 import { RiFolder3Line, RiMoreFill } from '@remixicon/react';
 import { Icon, IconSizes, IconColors } from '../ui/Icon';
@@ -298,6 +297,40 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
     }
   }, [currentWorkspace]);
 
+  // Listen for file updates to refresh project sizes
+  useEffect(() => {
+    const handleFilesUpdated = () => {
+      if (currentWorkspace?.id) {
+        loadProjects();
+      }
+    };
+
+    window.addEventListener('filesUpdated', handleFilesUpdated);
+    return () => window.removeEventListener('filesUpdated', handleFilesUpdated);
+  }, [currentWorkspace]);
+
+  const calculateProjectSize = async (projectId: string): Promise<string> => {
+    try {
+      const { data: files, error } = await supabase
+        .from('files')
+        .select('file_size')
+        .eq('project_id', projectId)
+        .is('deleted_at', null);
+
+      if (error) throw error;
+
+      const totalSize = files?.reduce((sum, file) => sum + (file.file_size || 0), 0) || 0;
+      
+      if (totalSize === 0) return '0 MB';
+      if (totalSize < 1024 * 1024) return `${(totalSize / 1024).toFixed(1)} KB`;
+      if (totalSize < 1024 * 1024 * 1024) return `${(totalSize / (1024 * 1024)).toFixed(1)} MB`;
+      return `${(totalSize / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+    } catch (err) {
+      console.error('Error calculating project size:', err);
+      return '0 MB';
+    }
+  };
+
   const loadProjects = async () => {
     if (!currentWorkspace?.id) return;
     try {
@@ -312,7 +345,15 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
 
       if (projectsError) throw projectsError;
 
-      setProjects(projectsData || []);
+      // Calculate sizes for each project
+      const projectsWithSizes = await Promise.all(
+        (projectsData || []).map(async (project) => ({
+          ...project,
+          size: await calculateProjectSize(project.id)
+        }))
+      );
+
+      setProjects(projectsWithSizes);
     } catch (err) {
       console.error('Error loading projects:', err);
       setError(err instanceof Error ? err.message : 'Failed to load projects');
@@ -495,7 +536,7 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
                 <div className="relative flex-1 overflow-hidden">
                   {/* Project thumbnail/image placeholder */}
                   <div 
-                    className="w-full h-full flex items-center justify-center"
+                    className="w-full h-full flex items-center justify-center p-4"
                     style={{ backgroundColor: project.color + '20' }}
                   >
                     <Icon
@@ -511,10 +552,10 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
                 <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-gradient-to-t from-background/95 to-transparent backdrop-blur-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors duration-200 mb-1">
+                      <h3 className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors duration-200 mb-1 ml-2">
                         {project.name}
                       </h3>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-xs text-muted-foreground ml-2">
                         {project.size || '0 MB'}
                       </div>
                     </div>
@@ -531,16 +572,22 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); }}>
+                          <DropdownMenuItem 
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              setEditProjectData(project);
+                              setShowEditProject(true);
+                            }}
+                          >
                             <Edit className="w-4 h-4 mr-2" />
                             Edit Project
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); }}>
-                            <Settings className="w-4 h-4 mr-2" />
-                            Project Settings
-                          </DropdownMenuItem>
                           <DropdownMenuItem 
-                            onClick={(e) => { e.stopPropagation(); }}
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              setDeleteProjectData(project);
+                              setShowDeleteConfirm(true);
+                            }}
                             className="text-destructive focus:text-destructive"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
@@ -593,7 +640,7 @@ const ProjectSelectionView: React.FC<ProjectSelectionViewProps> = ({ onProjectSe
               {/* Main image/content area */}
               <div className="relative flex-1 overflow-hidden">
                 {/* Add project placeholder */}
-                <div className="w-full h-full flex items-center justify-center bg-muted/20">
+                <div className="w-full h-full flex items-center justify-center bg-muted/20 p-4">
                   <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors duration-200">
                     <Plus className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
                   </div>
