@@ -401,6 +401,118 @@ const FileGridSimple: React.FC<FileGridSimpleProps> = ({
         )}
       </div>
 
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-6 py-4 border-t border-[hsl(240,25%,15%)] bg-[hsl(240,30%,8%)]">
+          {/* Page Info */}
+          <div className="text-sm text-[#8A8C8E]">
+            Showing {((currentPage - 1) * 54) + 1}-{Math.min(currentPage * 54, totalCount)} of {totalCount} files
+          </div>
+          
+          {/* Pagination Controls */}
+          <div className="flex items-center gap-2">
+            {/* Previous Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onPrevPage}
+              disabled={!hasPrevPage}
+              className="h-8 px-3 text-xs text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[hsl(240,30%,12%)] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Previous
+            </Button>
+            
+            {/* Page Numbers */}
+            <div className="flex items-center gap-1">
+              {(() => {
+                const pages = [];
+                const maxVisiblePages = 5;
+                const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+                
+                // Show first page if not visible
+                if (startPage > 1) {
+                  pages.push(
+                    <Button
+                      key={1}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onGoToPage(1)}
+                      className="h-8 w-8 p-0 text-xs text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[hsl(240,30%,12%)]"
+                    >
+                      1
+                    </Button>
+                  );
+                  if (startPage > 2) {
+                    pages.push(
+                      <span key="ellipsis1" className="text-[#8A8C8E] text-xs px-1">
+                        ...
+                      </span>
+                    );
+                  }
+                }
+                
+                // Show visible pages
+                for (let i = startPage; i <= endPage; i++) {
+                  pages.push(
+                    <Button
+                      key={i}
+                      variant={i === currentPage ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => onGoToPage(i)}
+                      className={`h-8 w-8 p-0 text-xs ${
+                        i === currentPage
+                          ? 'bg-[#6049E3] text-white hover:bg-[#6049E3]/90'
+                          : 'text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[hsl(240,30%,12%)]'
+                      }`}
+                    >
+                      {i}
+                    </Button>
+                  );
+                }
+                
+                // Show last page if not visible
+                if (endPage < totalPages) {
+                  if (endPage < totalPages - 1) {
+                    pages.push(
+                      <span key="ellipsis2" className="text-[#8A8C8E] text-xs px-1">
+                        ...
+                      </span>
+                    );
+                  }
+                  pages.push(
+                    <Button
+                      key={totalPages}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onGoToPage(totalPages)}
+                      className="h-8 w-8 p-0 text-xs text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[hsl(240,30%,12%)]"
+                    >
+                      {totalPages}
+                    </Button>
+                  );
+                }
+                
+                return pages;
+              })()}
+            </div>
+            
+            {/* Next Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onNextPage}
+              disabled={!hasNextPage}
+              className="h-8 px-3 text-xs text-[#8A8C8E] hover:text-[#CFCFF6] hover:bg-[hsl(240,30%,12%)] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Batch Action Bar - appears when files are selected */}
       {selectedFiles.size > 0 && (
         <BatchActionBar

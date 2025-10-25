@@ -154,7 +154,6 @@ function AppWithFileData({ currentWorkspace, currentUser }: { currentWorkspace: 
     toggleFavorite, 
     updateFile, 
     deleteFile,
-    addFiles, 
     refreshFiles,
     changeView,
     nextPage,
@@ -207,7 +206,6 @@ function AppWithFileData({ currentWorkspace, currentUser }: { currentWorkspace: 
       toggleFavorite={toggleFavorite}
       updateFile={updateFile}
       deleteFile={deleteFile}
-      addFiles={addFiles}
       refreshFiles={refreshFiles}
       changeView={changeView}
       nextPage={nextPage}
@@ -325,14 +323,14 @@ function AppContentWithWorkspace({
   const shouldShowGlobalSearch = searchFilters.query.trim().length >= 2 || searchFilters.tags.length > 0;
 
   // Apply search filters using the hook - must be called at top level
-  const searchFilteredFiles = useFileSearch(files, searchFilters);
+  const searchFilteredFiles = useFileSearch(files as FileItem[], searchFilters);
 
   // Apply additional filters using the new hook - this handles favorites filtering
   const { filteredFiles } = useFileFilters({
     files: searchFilteredFiles,
     viewMode,
-    sortBy: serverSortBy,
-    sortDirection: serverSortDirection,
+    sortBy: serverSortBy as 'name' | 'date' | 'size' | 'type',
+    sortDirection: serverSortDirection as 'asc' | 'desc',
     filterType,
     searchQuery: searchFilters.query,
     selectedTags: searchFilters.tags,
@@ -585,9 +583,9 @@ function AppContentWithWorkspace({
           onViewChange={handleViewChange}
           onUploadClick={() => setShowUploadSheet(true)}
           uploadSheetOpen={showUploadSheet}
-          userRole={currentUser?.role || 'employee'}
-          userProjectAccess={currentUser?.projectAccess || []}
-          currentUser={currentUser}
+          userRole={(currentUser as any)?.role || 'employee'}
+          userProjectAccess={(currentUser as any)?.projectAccess || []}
+          currentUser={currentUser as any}
         />
         
         <SidebarInset className="flex flex-col h-screen">
@@ -680,7 +678,7 @@ function AppContentWithWorkspace({
             {/* Tags View - Render at flex level like ProjectFolderSidebar */}
             {showTagsView ? (
               <TagView 
-                userRole={currentUser?.role || 'employee'}
+                userRole={(currentUser as any)?.role || 'employee'}
                 triggerCreateTag={triggerCreateTag}
               />
             ) : (
@@ -695,6 +693,38 @@ function AppContentWithWorkspace({
 
                 {/* Right Side - Filters and Controls */}
                 <div className="flex items-center gap-3">
+                  {/* Tags Toggle Button */}
+                  <button
+                    onClick={() => setTagsVisible(!tagsVisible)}
+                    className={`
+                      text-xs font-medium px-2 py-1.5 h-7 rounded-md border transition-all
+                      ${
+                        tagsVisible
+                          ? 'bg-[#6049E3]/20 text-[#CFCFF6] border-[#6049E3]'
+                          : 'text-[#8A8C8E] hover:text-[#CFCFF6] border-[#1A1C3A] bg-transparent'
+                      }
+                    `}
+                    title={tagsVisible ? 'Hide tags' : 'Show tags'}
+                  >
+                    Tags
+                  </button>
+
+                  {/* Size Toggle Button */}
+                  <button
+                    onClick={() => setSizeVisible(!sizeVisible)}
+                    className={`
+                      text-xs font-medium px-2 py-1.5 h-7 rounded-md border transition-all
+                      ${
+                        sizeVisible
+                          ? 'bg-[#6049E3]/20 text-[#CFCFF6] border-[#6049E3]'
+                          : 'text-[#8A8C8E] hover:text-[#CFCFF6] border-[#1A1C3A] bg-transparent'
+                      }
+                    `}
+                    title={sizeVisible ? 'Hide file sizes' : 'Show file sizes'}
+                  >
+                    Size
+                  </button>
+
                   {/* View Toggles - Dropdown Style */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -810,16 +840,15 @@ function AppContentWithWorkspace({
                 assetType={showUploadsView ? 'Uploads' : 'Assets'}
                 isCollapsed={fileGridCollapsed}
                 onToggleCollapse={() => setFileGridCollapsed(!fileGridCollapsed)}
-                showTagsToggle={true}
-                tagsVisible={tagsVisible}
-                onToggleTags={() => setTagsVisible(!tagsVisible)}
-                showSizeToggle={true}
-                sizeVisible={sizeVisible}
-                onToggleSize={() => setSizeVisible(!sizeVisible)}
+                showTagsToggle={false}
+                showSizeToggle={false}
                 showSelectCheckbox={showFilesView && !showTagsView && !showUploadsView}
                 allSelected={allSelected}
                 someSelected={someSelected}
                 onSelectAll={handleSelectAll}
+                totalCount={totalCount}
+                currentPage={currentPage}
+                itemsPerPage={54}
               />
             )}
 
@@ -885,11 +914,10 @@ function AppContentWithWorkspace({
                     onGoToPage={goToPage}
                     viewMode={viewMode}
                     onViewModeChange={setViewMode}
-                    sortBy={serverSortBy}
-                    sortDirection={serverSortDirection}
-                    onSortChange={handleSortChange}
+                    sortBy={serverSortBy as 'name' | 'date' | 'size' | 'type'}
+                    sortDirection={serverSortDirection as 'asc' | 'desc'}
+                    onServerSortChange={handleSortChange}
                     isCollapsed={fileGridCollapsed}
-                    tagsVisible={tagsVisible}
                     selectedFileIds={selectedFileIds}
                     onSelectionChange={setSelectedFileIds}
                   />
