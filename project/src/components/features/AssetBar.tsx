@@ -18,6 +18,10 @@ interface AssetBarProps {
   allSelected: boolean;
   someSelected: boolean;
   onSelectAll: () => void;
+  // Pagination info
+  totalCount?: number;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 export const AssetBar: React.FC<AssetBarProps> = ({
@@ -36,6 +40,9 @@ export const AssetBar: React.FC<AssetBarProps> = ({
   allSelected,
   someSelected,
   onSelectAll,
+  totalCount,
+  currentPage,
+  itemsPerPage = 50,
 }) => {
   const formattedSize = formatFileSize(totalSize);
 
@@ -90,7 +97,15 @@ export const AssetBar: React.FC<AssetBarProps> = ({
          {/* Assets Count and Size */}
          <div className="text-sm text-[#8A8C8E] font-medium">
            <span>
-             {assetCount} {assetType} • {formattedSize}
+             {totalCount && currentPage ? (
+               <>
+                 {assetCount} out of {totalCount} {assetType.toLowerCase()} • {formattedSize}
+               </>
+             ) : (
+               <>
+                 {assetCount} {assetType} • {formattedSize}
+               </>
+             )}
            </span>
          </div>
 

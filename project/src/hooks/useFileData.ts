@@ -51,7 +51,7 @@ const convertFileRecord = (record: FileRecord): FileItem => ({
 });
 
 // Increased items per page for better dashboard experience
-const ITEMS_PER_PAGE = 50;
+const ITEMS_PER_PAGE = 54;
 
 export const useFileData = (projectContext: boolean = false, showTrash: boolean = false) => {
   const [files, setFiles] = useState<FileItem[]>([]);
